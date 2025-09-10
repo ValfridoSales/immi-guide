@@ -2,15 +2,15 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users, CheckCircle } from 'lucide-react';
-
 interface QuizIntroProps {
   onStart: () => void;
   completionsCount: number;
 }
-
-export function QuizIntro({ onStart, completionsCount }: QuizIntroProps) {
-  return (
-    <div className="max-w-4xl mx-auto animate-fade-in">
+export function QuizIntro({
+  onStart,
+  completionsCount
+}: QuizIntroProps) {
+  return <div className="max-w-4xl mx-auto animate-fade-in">
       <div className="text-center space-y-8">
         {/* Hero Section */}
         <div className="space-y-6">
@@ -80,19 +80,10 @@ export function QuizIntro({ onStart, completionsCount }: QuizIntroProps) {
             <div className="bg-gradient-subtle p-6 rounded-lg">
               <h3 className="text-lg font-semibold mb-4">O que você vai receber:</h3>
               <div className="grid md:grid-cols-2 gap-3">
-                {[
-                  'Ranking dos melhores programas para você',
-                  'Análise de compatibilidade personalizada',
-                  'Tempo estimado e custos por programa',
-                  'Seus pontos fortes e áreas a melhorar',
-                  'Próximos passos práticos e detalhados',
-                  'Análise completa gratuita por email'
-                ].map((item, index) => (
-                  <div key={index} className="flex items-start space-x-2">
+                {['Ranking dos melhores programas para você', 'Análise de compatibilidade personalizada', 'Tempo estimado e custos por programa', 'Seus pontos fortes e áreas a melhorar', 'Próximos passos práticos e detalhados', 'Análise completa gratuita por email'].map((item, index) => <div key={index} className="flex items-start space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                     <span className="text-sm">{item}</span>
-                  </div>
-                ))}
+                  </div>)}
               </div>
             </div>
 
@@ -100,29 +91,15 @@ export function QuizIntro({ onStart, completionsCount }: QuizIntroProps) {
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Programas avaliados:</h3>
               <div className="flex flex-wrap gap-2 justify-center">
-                {[
-                  'Express Entry',
-                  'Provincial Nominee Program',
-                  'Quebec Skilled Worker',
-                  'Family Sponsorship',
-                  'Study Permit → PR',
-                  'Startup Visa'
-                ].map((program) => (
-                  <Badge key={program} variant="secondary">
+                {['Express Entry', 'Provincial Nominee Program', 'Quebec Skilled Worker', 'Family Sponsorship', 'Study Permit → PR', 'Startup Visa'].map(program => <Badge key={program} variant="secondary">
                     {program}
-                  </Badge>
-                ))}
+                  </Badge>)}
               </div>
             </div>
 
             {/* CTA */}
             <div className="space-y-4">
-              <Button 
-                variant="canadian" 
-                size="lg" 
-                onClick={onStart}
-                className="text-lg px-8 py-3"
-              >
+              <Button variant="canadian" size="lg" onClick={onStart} className="text-lg px-8 py-3">
                 Começar Quiz Gratuito
               </Button>
               <p className="text-sm text-muted-foreground">
@@ -140,10 +117,9 @@ export function QuizIntro({ onStart, completionsCount }: QuizIntroProps) {
           <div className="flex justify-center gap-4 text-xs text-muted-foreground">
             <span>🔒 Seus dados estão seguros</span>
             <span>📊 Algoritmo baseado em casos reais</span>
-            <span>🇨🇦 Atualizado com as regras de 2024</span>
+            <span>🇨🇦 Atualizado com as regras de 2025</span>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
