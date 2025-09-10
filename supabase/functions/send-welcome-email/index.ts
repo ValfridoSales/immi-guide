@@ -20,9 +20,12 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log("=== Send Welcome Email Function Started ===");
     const { email, resultId }: WelcomeEmailRequest = await req.json();
+    console.log("Request data:", { email, resultId });
 
     if (!email || !resultId) {
+      console.error("Missing required fields:", { email: !!email, resultId: !!resultId });
       return new Response(
         JSON.stringify({ error: "email and resultId are required" }),
         {
@@ -31,8 +34,6 @@ const handler = async (req: Request): Promise<Response> => {
         }
       );
     }
-
-    console.log("Processing email request for:", email, "resultId:", resultId);
 
     // Check if Resend API key is configured
     const resendKey = Deno.env.get("RESEND_API_KEY");
@@ -46,16 +47,14 @@ const handler = async (req: Request): Promise<Response> => {
         }
       );
     }
-
-    console.log("Resend API key configured");
+    console.log("Resend API key configured:", resendKey ? "✓" : "✗");
 
     // Get the site origin to create the results link
     const siteOrigin = req.headers.get("origin") || req.headers.get("Origin") || Deno.env.get("PUBLIC_SITE_URL") || "";
     const resultsUrl = `${siteOrigin}/pdf/preview?resultId=${resultId}`;
-    
     console.log("Results URL:", resultsUrl);
 
-    // Send email with results link
+    // Send email from settings
     const fromEnv = Deno.env.get("MAIL_FROM") || "onboarding@resend.dev";
     const from = fromEnv.includes("<") ? fromEnv : `Canada Immigration Quiz <${fromEnv}>`;
     console.log("Using FROM:", from);
@@ -64,6 +63,8 @@ const handler = async (req: Request): Promise<Response> => {
     let pdfAttachment = null;
     try {
       const pdfApiKey = Deno.env.get("PDF_API_KEY");
+      console.log("PDF_API_KEY configured:", pdfApiKey ? "✓" : "✗");
+      
       if (pdfApiKey) {
         console.log("Generating PDF attachment...");
         
@@ -87,6 +88,8 @@ const handler = async (req: Request): Promise<Response> => {
           }),
         });
 
+        console.log("PDFShift response status:", pdfResponse.status);
+        
         if (pdfResponse.ok) {
           const pdfBuffer = await pdfResponse.arrayBuffer();
           const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
@@ -99,15 +102,19 @@ const handler = async (req: Request): Promise<Response> => {
             disposition: "attachment"
           };
           
-          console.log("PDF attachment generated successfully");
+          console.log("PDF attachment generated successfully, size:", pdfBuffer.byteLength);
         } else {
-          console.warn("PDF generation failed, sending email without attachment");
+          const errorText = await pdfResponse.text();
+          console.warn("PDF generation failed:", pdfResponse.status, errorText);
         }
+      } else {
+        console.log("PDF_API_KEY not configured, skipping PDF generation");
       }
     } catch (pdfError) {
-      console.warn("PDF generation error, sending email without attachment:", pdfError);
+      console.warn("PDF generation error:", pdfError);
     }
 
+    console.log("Sending email with Resend...");
     const { data: resendData, error: resendError } = await resend.emails.send({
       from,
       to: [email],
@@ -178,14 +185,14 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (resendError) {
-      console.error("Resend error:", resendError);
+      console.error("Resend error details:", JSON.stringify(resendError, null, 2));
       return new Response(JSON.stringify({ error: resendError.message || "Failed to send email" }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
-    console.log("Email queued:", resendData);
+    console.log("Email sent successfully:", resendData?.id);
 
     return new Response(JSON.stringify({ success: true, id: resendData?.id }), {
       status: 200,
@@ -197,8 +204,9 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error: any) {
     console.error("Error in send-welcome-email function:", error);
+    console.error("Error stack:", error.stack);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || "Internal server error" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
