@@ -1,73 +1,167 @@
-# Welcome to your Lovable project
+# Quiz de Imigração para o Canadá
 
-## Project info
+Um quiz interativo para ajudar pessoas a descobrir os melhores programas de imigração canadense baseado em seus perfis pessoais.
 
 **URL**: https://lovable.dev/projects/ec587b2f-b360-447b-afee-f65d37a2365e
 
-## How can I edit this code?
+## Funcionalidades
 
-There are several ways of editing your application.
+- Quiz personalizado com 11 perguntas sobre perfil de imigração
+- Sistema de pontuação baseado nas regras de 2025 do governo canadense
+- Análise de compatibilidade com diferentes programas (Express Entry, PNP, etc.)
+- Interface responsiva e acessível
+- Sistema de PDF para resultados
+- Integração com email para envio de relatórios
 
-**Use Lovable**
+## PDF de Resultados
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ec587b2f-b360-447b-afee-f65d37a2365e) and start prompting.
+### Fluxo
+1. **Preview**: Usuários podem visualizar resultados em `/pdf/preview?resultId=DEMO`
+2. **API PDF**: Endpoint `/functions/v1/generate-pdf` gera PDF usando Puppeteer
+3. **Envio Email**: Endpoint `/functions/v1/send-welcome-email` envia PDF por email via Resend
 
-Changes made via Lovable will be committed automatically to this repo.
+### Funcionalidades do PDF
+- Layout idêntico ao app web
+- Otimizado para impressão A4
+- Inclui disclaimer oficial do IRCC
+- Data de atualização das regras
+- Attachment automático por email
 
-**Use your preferred IDE**
+### Como testar localmente
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+#### Preview do PDF
+```bash
+# Acesse no navegador
+http://localhost:5173/pdf/preview?resultId=DEMO
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+#### Gerar PDF via API
+```bash
+# POST request para gerar PDF
+curl -X POST "http://localhost:54321/functions/v1/generate-pdf" \
+  -H "Content-Type: application/json" \
+  -d '{"resultId": "DEMO"}' \
+  --output resultado.pdf
+```
 
-Follow these steps:
+#### Enviar por email
+```bash
+# POST request para enviar email com PDF
+curl -X POST "http://localhost:54321/functions/v1/send-welcome-email" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@example.com", "resultId": "DEMO"}'
+```
 
+## Variáveis de Ambiente
+
+### Obrigatórias
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+
+### Para funcionalidade de PDF/Email
+```env
+# Resend (para envio de emails)
+RESEND_API_KEY=re_your_api_key
+MAIL_FROM="Canada Immigration Quiz <noreply@yourdomain.com>"
+```
+
+### Opcional
+```env
+# Para ambientes de produção
+NEXT_PUBLIC_BASE_URL=https://yourdomain.com
+```
+
+## Stack Tecnológico
+
+- **Frontend**: React 18, TypeScript, Vite
+- **UI**: Tailwind CSS, shadcn/ui
+- **Backend**: Supabase (Database, Auth, Edge Functions)
+- **PDF**: Puppeteer (via Supabase Edge Functions)
+- **Email**: Resend
+- **Deploy**: Lovable (auto-deploy)
+
+## Sistema de Pontuação
+
+O sistema segue as regras oficiais de imigração canadense de 2025:
+
+### Programas Suportados
+- **Express Entry**: FSW, CEC, FST
+- **Provincial Nominee Programs (PNP)**
+- **Quebec Immigration**
+- **Family Sponsorship**
+- **Study Permit → Work → PR**
+- **Start-Up Visa**
+- **Self-Employed Persons**
+
+### Fatores de Pontuação
+- Idade (máximo 25 pontos)
+- Educação (máximo 15 pontos)
+- Idiomas (CLB - máximo 30 pontos)
+- Experiência de trabalho (máximo 35 pontos)
+- Experiência canadense (máximo 30 pontos)
+- Vínculos provinciais (máximo 15 pontos)
+
+### Regras de Elegibilidade
+- **FSW**: CLB 7 mínimo, 1 ano contínuo TEER 0-3, ECA, fundos
+- **CEC**: 12 meses no Canadá, CLB conforme TEER
+- **FST**: Ocupação trade, CLB 5 L/S e 4 R/W
+- **Category-Based Selection**: Bônus para STEM, Healthcare, Trades, French
+
+## Como editar o código
+
+### Use o Lovable
+Simplesmente visite o [Projeto Lovable](https://lovable.dev/projects/ec587b2f-b360-447b-afee-f65d37a2365e) e comece a fazer prompts.
+
+### Use seu IDE preferido
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Passo 1: Clone o repositório
+git clone <SUA_URL_GIT>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Passo 2: Navegue para o diretório
+cd <NOME_DO_PROJETO>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Passo 3: Instale dependências
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Passo 4: Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Via GitHub diretamente
+- Navegue para o arquivo desejado
+- Clique no botão "Edit" (ícone de lápis)
+- Faça suas mudanças e commit
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### GitHub Codespaces
+- Vá para a página principal do repositório
+- Clique no botão "Code" (verde)
+- Selecione a aba "Codespaces"
+- Clique em "New codespace"
 
-**Use GitHub Codespaces**
+## Deploy
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Abra [Lovable](https://lovable.dev/projects/ec587b2f-b360-447b-afee-f65d37a2365e) e clique em Share → Publish.
 
-## What technologies are used for this project?
+### Domínio Customizado
+Para conectar um domínio, navegue para Project > Settings > Domains e clique Connect Domain.
 
-This project is built with:
+## Disclaimer Importante
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Esta ferramenta é **apenas informativa**. Regras, valores e prazos mudam com frequência no sistema de imigração canadense. 
 
-## How can I deploy this project?
+**Sempre consulte**:
+- Site oficial do IRCC: [canada.ca](https://canada.ca)
+- Profissional de imigração licenciado (RCIC)
 
-Simply open [Lovable](https://lovable.dev/projects/ec587b2f-b360-447b-afee-f65d37a2365e) and click on Share -> Publish.
+### Responsabilidades de Manutenção
+- Manter tabelas de fundos mínimos atualizadas
+- Acompanhar mudanças nos cortes de CLB
+- Atualizar regras de Category-Based Selection
+- Verificar novos programas provinciais
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+© 2025 Canada Immigration Quiz - Baseado em dados oficiais do governo canadense
