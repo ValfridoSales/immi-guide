@@ -1,12 +1,192 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import { QuizState, QuizResponse, QuizResult, Lead } from '@/types/quiz';
+import { quizQuestions } from '@/data/quiz-questions';
+import { calculateQuizResults } from '@/utils/quiz-scoring';
+import { QuizIntro } from '@/components/QuizIntro';
+import { QuizQuestion } from '@/components/QuizQuestion';
+import { QuizProgress } from '@/components/QuizProgress';
+import { QuizResults } from '@/components/QuizResults';
+import { LeadCaptureForm } from '@/components/LeadCaptureForm';
+import { ThankYouPage } from '@/components/ThankYouPage';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
+  const [quizState, setQuizState] = useState<QuizState>('intro');
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [responses, setResponses] = useState<QuizResponse[]>([]);
+  const [results, setResults] = useState<QuizResult[]>([]);
+  const { toast } = useToast();
+
+  const currentQuestion = quizQuestions[currentQuestionIndex];
+  const currentResponse = responses.find(r => r.questionId === currentQuestion?.id);
+
+  const handleStartQuiz = () => {
+    setQuizState('questions');
+    setCurrentQuestionIndex(0);
+    setResponses([]);
+  };
+
+  const handleAnswer = (value: string) => {
+    const newResponses = responses.filter(r => r.questionId !== currentQuestion.id);
+    newResponses.push({
+      questionId: currentQuestion.id,
+      selectedValues: [value],
+    });
+    setResponses(newResponses);
+  };
+
+  const handleNext = () => {
+    if (!currentResponse) {
+      toast({
+        title: "Resposta obrigatória",
+        description: "Por favor, selecione uma opção antes de continuar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (currentQuestionIndex < quizQuestions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      // Calculate results
+      const calculatedResults = calculateQuizResults(responses);
+      setResults(calculatedResults);
+      setQuizState('results');
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const handleStartLeadCapture = () => {
+    setQuizState('lead-capture');
+  };
+
+  const handleLeadSubmit = (lead: Lead) => {
+    console.log('Lead captured:', lead);
+    toast({
+      title: "Sucesso!",
+      description: "Sua análise foi enviada para seu email.",
+    });
+    setQuizState('thank-you');
+  };
+
+  const handleRestart = () => {
+    setQuizState('intro');
+    setCurrentQuestionIndex(0);
+    setResponses([]);
+    setResults([]);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gradient-subtle">
+      {/* Header */}
+      <header className="bg-background/80 backdrop-blur-sm border-b border-border">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">🍁</span>
+              <span className="text-xl font-bold text-primary">
+                Canada Immigration Quiz
+              </span>
+            </div>
+            {quizState === 'questions' && (
+              <div className="text-sm text-muted-foreground">
+                Pergunta {currentQuestionIndex + 1} de {quizQuestions.length}
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        {quizState === 'intro' && (
+          <QuizIntro onStart={handleStartQuiz} />
+        )}
+
+        {quizState === 'questions' && currentQuestion && (
+          <div className="max-w-2xl mx-auto space-y-8">
+            <QuizProgress 
+              currentStep={currentQuestionIndex + 1} 
+              totalSteps={quizQuestions.length} 
+            />
+            
+            <QuizQuestion
+              question={currentQuestion}
+              selectedValue={currentResponse?.selectedValues[0]}
+              onSelect={handleAnswer}
+            />
+
+            <div className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentQuestionIndex === 0}
+                className="flex items-center space-x-2"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>Anterior</span>
+              </Button>
+
+              <Button
+                variant="canadian"
+                onClick={handleNext}
+                className="flex items-center space-x-2"
+              >
+                <span>
+                  {currentQuestionIndex === quizQuestions.length - 1 ? 'Ver Resultados' : 'Próximo'}
+                </span>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {quizState === 'results' && (
+          <div className="max-w-4xl mx-auto">
+            <QuizResults 
+              results={results} 
+              onStartLeadCapture={handleStartLeadCapture} 
+            />
+          </div>
+        )}
+
+        {quizState === 'lead-capture' && (
+          <LeadCaptureForm 
+            onSubmit={handleLeadSubmit} 
+            results={results} 
+          />
+        )}
+
+        {quizState === 'thank-you' && (
+          <ThankYouPage onRestart={handleRestart} />
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-background border-t border-border mt-16">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center space-y-4">
+            <p className="text-sm text-muted-foreground">
+              <strong>Aviso importante:</strong> Esta ferramenta é apenas informativa. Para decisões oficiais sobre imigração, 
+              consulte sempre o site oficial{' '}
+              <a href="https://canada.ca" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                canada.ca
+              </a>{' '}
+              ou um consultor de imigração regulamentado (RCIC).
+            </p>
+            <p className="text-xs text-muted-foreground">
+              © 2024 Canada Immigration Quiz. Baseado em dados oficiais do governo canadense.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

@@ -1,0 +1,108 @@
+import { QuizQuestion } from '@/types/quiz';
+
+export const quizQuestions: QuizQuestion[] = [
+  {
+    id: 'age',
+    title: 'Qual é a sua idade?',
+    type: 'single',
+    required: true,
+    options: [
+      { id: '18-29', label: '18-29 anos', value: '18-29' },
+      { id: '30-35', label: '30-35 anos', value: '30-35' },
+      { id: '36-40', label: '36-40 anos', value: '36-40' },
+      { id: '41-45', label: '41-45 anos', value: '41-45' },
+      { id: '46+', label: '46+ anos', value: '46+' },
+    ],
+  },
+  {
+    id: 'education',
+    title: 'Qual é o seu nível de educação?',
+    type: 'single',
+    required: true,
+    options: [
+      { id: 'high_school', label: 'Ensino Médio', value: 'high_school' },
+      { id: 'diploma', label: 'Tecnólogo/Diploma (2-3 anos)', value: 'diploma' },
+      { id: 'bachelor', label: 'Bacharelado (4+ anos)', value: 'bachelor' },
+      { id: 'masters', label: 'Mestrado', value: 'masters' },
+      { id: 'phd', label: 'Doutorado', value: 'phd' },
+    ],
+  },
+  {
+    id: 'experience',
+    title: 'Quantos anos de experiência profissional você tem?',
+    type: 'single',
+    required: true,
+    options: [
+      { id: 'less-1', label: 'Menos de 1 ano', value: 'less-1' },
+      { id: '1-year', label: '1 ano', value: '1-year' },
+      { id: '2-3', label: '2-3 anos', value: '2-3' },
+      { id: '4-5', label: '4-5 anos', value: '4-5' },
+      { id: '6+', label: '6+ anos', value: '6+' },
+    ],
+  },
+  {
+    id: 'english',
+    title: 'Qual é o seu nível de inglês?',
+    type: 'single',
+    required: true,
+    options: [
+      { id: 'basic', label: 'Básico (CLB 4 ou menos)', value: 'basic' },
+      { id: 'intermediate', label: 'Intermediário (CLB 5-6)', value: 'intermediate' },
+      { id: 'upper_intermediate', label: 'Intermediário Superior (CLB 7-8)', value: 'upper_intermediate' },
+      { id: 'advanced', label: 'Avançado (CLB 9+)', value: 'advanced' },
+      { id: 'unknown', label: 'Não sei meu nível', value: 'unknown' },
+    ],
+  },
+  {
+    id: 'french',
+    title: 'Qual é o seu nível de francês?',
+    type: 'single',
+    required: true,
+    options: [
+      { id: 'none', label: 'Nenhum', value: 'none' },
+      { id: 'basic', label: 'Básico', value: 'basic' },
+      { id: 'intermediate', label: 'Intermediário', value: 'intermediate' },
+      { id: 'advanced', label: 'Avançado', value: 'advanced' },
+    ],
+  },
+  {
+    id: 'funds',
+    title: 'Qual é o seu orçamento disponível para imigração?',
+    type: 'single',
+    required: true,
+    options: [
+      { id: 'less-12k', label: 'Menos de CAD 12,000', value: 'less-12k' },
+      { id: '12k-20k', label: 'CAD 12,000 - 20,000', value: '12k-20k' },
+      { id: '20k-30k', label: 'CAD 20,000 - 30,000', value: '20k-30k' },
+      { id: '30k+', label: 'Mais de CAD 30,000', value: '30k+' },
+    ],
+  },
+  {
+    id: 'family',
+    title: 'Você tem família no Canadá?',
+    type: 'single',
+    required: true,
+    options: [
+      { id: 'spouse', label: 'Cônjuge/parceiro canadense ou residente permanente', value: 'spouse' },
+      { id: 'parents', label: 'Pais ou avós cidadãos canadenses', value: 'parents' },
+      { id: 'siblings', label: 'Irmãos cidadãos canadenses', value: 'siblings' },
+      { id: 'other', label: 'Outros parentes', value: 'other' },
+      { id: 'none', label: 'Nenhuma família', value: 'none' },
+    ],
+  },
+  {
+    id: 'province',
+    title: 'Qual província você prefere?',
+    type: 'single',
+    required: true,
+    options: [
+      { id: 'ontario', label: 'Ontario', value: 'ontario' },
+      { id: 'bc', label: 'British Columbia', value: 'bc' },
+      { id: 'alberta', label: 'Alberta', value: 'alberta' },
+      { id: 'quebec', label: 'Quebec', value: 'quebec' },
+      { id: 'maritimes', label: 'Províncias Marítimas (NS, NB, PEI)', value: 'maritimes' },
+      { id: 'prairies', label: 'Saskatchewan/Manitoba', value: 'prairies' },
+      { id: 'no-preference', label: 'Sem preferência', value: 'no-preference' },
+    ],
+  },
+];
