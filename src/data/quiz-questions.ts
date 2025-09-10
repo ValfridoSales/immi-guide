@@ -204,18 +204,4 @@ export const quizQuestions: QuizQuestion[] = [
       { id: 'no-preference', label: 'Sem preferência', value: 'no-preference' },
     ],
   },
-  {
-    id: 'immigration_goal',
-    title: 'Qual é o seu objetivo principal de imigração?',
-    type: 'single',
-    required: true,
-    options: [
-      { id: 'express_entry', label: 'Residência Permanente via Express Entry', value: 'express_entry' },
-      { id: 'pnp', label: 'Programa Provincial (PNP)', value: 'pnp' },
-      { id: 'study_pathway', label: 'Estudar → Trabalhar → Residência Permanente', value: 'study_pathway' },
-      { id: 'quebec', label: 'Quebec (programa específico)', value: 'quebec' },
-      { id: 'family_reunification', label: 'Reunificação Familiar', value: 'family_reunification' },
-      { id: 'startup', label: 'Start-Up Visa / Self-Employed', value: 'startup' },
-    ],
-  },
 ];

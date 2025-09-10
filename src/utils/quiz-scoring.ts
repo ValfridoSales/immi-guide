@@ -146,19 +146,23 @@ export function calculateQuizResults(responses: QuizResponse[]): QuizResult[] {
         score += fundScore;
       }
 
-      // Entrepreneur scoring for startup
+      // Entrepreneur scoring for startup - inferred from profile
       if (weights.empreendedor && programId === 'startup') {
-        const immigrationGoal = responseMap.immigration_goal as string;
-        if (immigrationGoal === 'startup') {
-          score += 80; // Simplified - in real implementation would check for support letter
+        // Infer entrepreneurial intent from occupation areas and education
+        const occupationAreas = responseMap.occupation_area as string[];
+        const education = responseMap.education as string;
+        if (occupationAreas?.includes('stem') || education === 'masters' || education === 'phd') {
+          score += 80; // Inferred entrepreneurial potential
         }
       }
 
-      // Cultural portfolio scoring for self-employed
+      // Cultural portfolio scoring for self-employed - inferred from profile
       if (weights.port_cultural && programId === 'selfemp') {
-        const immigrationGoal = responseMap.immigration_goal as string;
-        if (immigrationGoal === 'startup') { // Using startup as proxy for entrepreneurial intent
-          score += 40; // Simplified scoring
+        const occupationAreas = responseMap.occupation_area as string[];
+        const education = responseMap.education as string;
+        // Infer cultural/artistic background from education or stated experience
+        if (occupationAreas?.includes('education') || education === 'post_grad' || education === 'masters') {
+          score += 40; // Inferred cultural portfolio potential
         }
       }
 
