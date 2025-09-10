@@ -35,6 +35,45 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_results: {
+        Row: {
+          created_at: string
+          id: string
+          results: Json
+          session_id: string
+          updated_at: string
+          user_email: string | null
+          user_location: string | null
+          user_name: string | null
+          user_timeline: string | null
+          user_whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          results: Json
+          session_id: string
+          updated_at?: string
+          user_email?: string | null
+          user_location?: string | null
+          user_name?: string | null
+          user_timeline?: string | null
+          user_whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          results?: Json
+          session_id?: string
+          updated_at?: string
+          user_email?: string | null
+          user_location?: string | null
+          user_name?: string | null
+          user_timeline?: string | null
+          user_whatsapp?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
