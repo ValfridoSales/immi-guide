@@ -5,9 +5,10 @@ import { Clock, Users, CheckCircle } from 'lucide-react';
 
 interface QuizIntroProps {
   onStart: () => void;
+  completionsCount: number;
 }
 
-export function QuizIntro({ onStart }: QuizIntroProps) {
+export function QuizIntro({ onStart, completionsCount }: QuizIntroProps) {
   return (
     <div className="max-w-4xl mx-auto animate-fade-in">
       <div className="text-center space-y-8">
@@ -27,7 +28,7 @@ export function QuizIntro({ onStart }: QuizIntroProps) {
           <div className="flex items-center space-x-2">
             <Users className="w-5 h-5 text-primary" />
             <span className="text-sm text-muted-foreground">
-              <strong className="text-foreground">12,487</strong> pessoas fizeram este quiz
+              <strong className="text-foreground">{completionsCount.toLocaleString()}</strong> pessoas fizeram este quiz
             </span>
           </div>
           <div className="flex items-center space-x-2">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { QuizState, QuizResponse, QuizResult, Lead } from '@/types/quiz';
 import { quizQuestions } from '@/data/quiz-questions';
 import { calculateQuizResults } from '@/utils/quiz-scoring';
@@ -11,13 +11,45 @@ import { ThankYouPage } from '@/components/ThankYouPage';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [quizState, setQuizState] = useState<QuizState>('intro');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState<QuizResponse[]>([]);
   const [results, setResults] = useState<QuizResult[]>([]);
+  const [completionsCount, setCompletionsCount] = useState<number>(0);
+  const [sessionId] = useState(() => Math.random().toString(36).substring(2) + Date.now().toString(36));
   const { toast } = useToast();
+
+  useEffect(() => {
+    fetchCompletionsCount();
+  }, []);
+
+  const fetchCompletionsCount = async () => {
+    try {
+      const { data, error } = await supabase.rpc('get_quiz_completions_count');
+      if (error) throw error;
+      setCompletionsCount(data || 0);
+    } catch (error) {
+      console.error('Error fetching completions count:', error);
+    }
+  };
+
+  const trackQuizCompletion = async () => {
+    try {
+      const { error } = await supabase
+        .from('quiz_completions')
+        .insert([{ session_id: sessionId }]);
+      
+      if (error) throw error;
+      
+      // Update the count locally
+      setCompletionsCount(prev => prev + 1);
+    } catch (error) {
+      console.error('Error tracking quiz completion:', error);
+    }
+  };
 
   const currentQuestion = quizQuestions[currentQuestionIndex];
   const currentResponse = responses.find(r => r.questionId === currentQuestion?.id);
@@ -37,7 +69,7 @@ const Index = () => {
     setResponses(newResponses);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!currentResponse) {
       toast({
         title: "Resposta obrigatória",
@@ -54,6 +86,9 @@ const Index = () => {
       const calculatedResults = calculateQuizResults(responses);
       setResults(calculatedResults);
       setQuizState('results');
+      
+      // Track quiz completion
+      await trackQuizCompletion();
     }
   };
 
@@ -110,7 +145,7 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {quizState === 'intro' && (
-          <QuizIntro onStart={handleStartQuiz} />
+          <QuizIntro onStart={handleStartQuiz} completionsCount={completionsCount} />
         )}
 
         {quizState === 'questions' && currentQuestion && (
