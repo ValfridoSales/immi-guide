@@ -32,33 +32,15 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Generate PDF by calling the generate-pdf function
-    const baseUrl = Deno.env.get("SUPABASE_URL");
+    // Get the site origin to create the results link
     const siteOrigin = req.headers.get("origin") || req.headers.get("Origin") || Deno.env.get("PUBLIC_SITE_URL") || "";
-    const pdfResponse = await fetch(`${baseUrl}/functions/v1/generate-pdf`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": req.headers.get("Authorization") || "",
-        "apikey": Deno.env.get("SUPABASE_ANON_KEY") || "",
-      },
-      body: JSON.stringify({ resultId, siteOrigin }),
-    });
+    const resultsUrl = `${siteOrigin}/pdf/preview?resultId=${resultId}`;
 
-    if (!pdfResponse.ok) {
-      const errText = await pdfResponse.text().catch(() => "");
-      throw new Error(`Failed to generate PDF (${pdfResponse.status}): ${errText}`);
-    }
-
-    const pdfBuffer = await pdfResponse.arrayBuffer();
-    const currentDate = new Date().toISOString().split('T')[0].replace(/-/g, '');
-    const filename = `resultado-${resultId}-${currentDate}.pdf`;
-
-    // Send email with PDF attachment
+    // Send email with results link
     const emailResponse = await resend.emails.send({
       from: Deno.env.get("MAIL_FROM") || "Canada Immigration Quiz <noreply@lovable.app>",
       to: [email],
-      subject: "Seu PDF de Resultados — Imigração Canadá",
+      subject: "Seus Resultados de Imigração para o Canadá 🍁",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="text-align: center; padding: 20px;">
@@ -68,17 +50,31 @@ const handler = async (req: Request): Promise<Response> => {
           <div style="padding: 20px; background-color: #f9fafb; border-radius: 8px; margin: 20px 0;">
             <h2 style="color: #374151;">Olá!</h2>
             <p style="color: #6b7280; line-height: 1.6;">
-              Obrigado por usar nosso Quiz de Imigração para o Canadá! Em anexo, você encontrará 
-              uma análise personalizada dos melhores programas de imigração para o seu perfil.
+              Obrigado por usar nosso Quiz de Imigração para o Canadá! Sua análise personalizada 
+              dos melhores programas de imigração está pronta.
             </p>
             
-            <h3 style="color: #374151;">O que você vai encontrar no PDF:</h3>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resultsUrl}" 
+                 style="background-color: #dc2626; color: white; padding: 15px 30px; 
+                        text-decoration: none; border-radius: 8px; font-weight: bold; 
+                        display: inline-block;">
+                🔗 Ver Meus Resultados Completos
+              </a>
+            </div>
+            
+            <h3 style="color: #374151;">O que você encontrará na sua análise:</h3>
             <ul style="color: #6b7280; line-height: 1.6;">
               <li>Análise de compatibilidade com diferentes programas</li>
               <li>Estimativas de tempo e investimento</li>
               <li>Seus pontos fortes e áreas para melhoria</li>
               <li>Próximos passos recomendados</li>
             </ul>
+            
+            <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
+              💡 <strong>Dica:</strong> Você pode salvar esta página nos favoritos ou compartilhar 
+              o link para acessar seus resultados a qualquer momento.
+            </p>
           </div>
           
           <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
@@ -96,12 +92,6 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
         </div>
       `,
-      attachments: [
-        {
-          filename,
-          content: Array.from(new Uint8Array(pdfBuffer)),
-        },
-      ],
     });
 
     console.log("Email sent successfully:", emailResponse);
