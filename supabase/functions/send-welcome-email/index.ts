@@ -1,8 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -14,18 +12,21 @@ interface WelcomeEmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log("=== FUNCTION START ===");
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    console.log("OPTIONS request handled");
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log("=== Send Welcome Email Function Started ===");
+    console.log("Parsing request body...");
     const { email, resultId }: WelcomeEmailRequest = await req.json();
-    console.log("Request data:", { email, resultId });
+    console.log("Request data:", { email: email ? "✓" : "✗", resultId: resultId ? "✓" : "✗" });
 
     if (!email || !resultId) {
-      console.error("Missing required fields:", { email: !!email, resultId: !!resultId });
+      console.error("Missing required fields");
       return new Response(
         JSON.stringify({ error: "email and resultId are required" }),
         {
@@ -35,8 +36,10 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Check if Resend API key is configured
+    // Check RESEND_API_KEY
     const resendKey = Deno.env.get("RESEND_API_KEY");
+    console.log("RESEND_API_KEY present:", resendKey ? "✓" : "✗");
+    
     if (!resendKey) {
       console.error("RESEND_API_KEY not configured");
       return new Response(
@@ -47,76 +50,18 @@ const handler = async (req: Request): Promise<Response> => {
         }
       );
     }
-    console.log("Resend API key configured:", resendKey ? "✓" : "✗");
 
-    // Get the site origin to create the results link
-    const siteOrigin = req.headers.get("origin") || req.headers.get("Origin") || Deno.env.get("PUBLIC_SITE_URL") || "";
+    console.log("Initializing Resend...");
+    const resend = new Resend(resendKey);
+
+    // Get site origin
+    const siteOrigin = req.headers.get("origin") || req.headers.get("Origin") || "https://ec587b2f-b360-447b-afee-f65d37a2365e.sandbox.lovable.dev";
     const resultsUrl = `${siteOrigin}/pdf/preview?resultId=${resultId}`;
     console.log("Results URL:", resultsUrl);
 
-    // Send email from settings
-    const fromEnv = Deno.env.get("MAIL_FROM") || "onboarding@resend.dev";
-    const from = fromEnv.includes("<") ? fromEnv : `Canada Immigration Quiz <${fromEnv}>`;
-    console.log("Using FROM:", from);
-
-    // Generate PDF attachment
-    let pdfAttachment = null;
-    try {
-      const pdfApiKey = Deno.env.get("PDF_API_KEY");
-      console.log("PDF_API_KEY configured:", pdfApiKey ? "✓" : "✗");
-      
-      if (pdfApiKey) {
-        console.log("Generating PDF attachment...");
-        
-        const pdfResponse = await fetch("https://api.pdfshift.io/v3/convert/pdf", {
-          method: "POST",
-          headers: {
-            "Authorization": `Basic ${btoa(`api:${pdfApiKey}`)}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            source: resultsUrl,
-            format: "A4",
-            margin: {
-              top: "18mm",
-              right: "14mm", 
-              bottom: "18mm",
-              left: "14mm"
-            },
-            print_background: true,
-            wait_for: "networkidle0"
-          }),
-        });
-
-        console.log("PDFShift response status:", pdfResponse.status);
-        
-        if (pdfResponse.ok) {
-          const pdfBuffer = await pdfResponse.arrayBuffer();
-          const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
-          const currentDate = new Date().toISOString().split('T')[0].replace(/-/g, '');
-          
-          pdfAttachment = {
-            filename: `resultado-imigracao-canada-${resultId}-${currentDate}.pdf`,
-            content: pdfBase64,
-            type: "application/pdf",
-            disposition: "attachment"
-          };
-          
-          console.log("PDF attachment generated successfully, size:", pdfBuffer.byteLength);
-        } else {
-          const errorText = await pdfResponse.text();
-          console.warn("PDF generation failed:", pdfResponse.status, errorText);
-        }
-      } else {
-        console.log("PDF_API_KEY not configured, skipping PDF generation");
-      }
-    } catch (pdfError) {
-      console.warn("PDF generation error:", pdfError);
-    }
-
-    console.log("Sending email with Resend...");
+    console.log("Sending simple email (no PDF)...");
     const { data: resendData, error: resendError } = await resend.emails.send({
-      from,
+      from: "Canada Immigration Quiz <onboarding@resend.dev>",
       to: [email],
       subject: "Seus Resultados de Imigração para o Canadá 🍁",
       html: `
@@ -132,17 +77,6 @@ const handler = async (req: Request): Promise<Response> => {
               dos melhores programas de imigração está pronta.
             </p>
             
-            ${pdfAttachment ? `
-            <div style="background-color: #dbeafe; padding: 15px; border-radius: 8px; margin: 20px 0;">
-              <p style="margin: 0; color: #1e40af; font-weight: bold;">
-                📎 PDF Anexado
-              </p>
-              <p style="margin: 8px 0 0; color: #1e40af; font-size: 14px;">
-                Sua análise completa está anexada neste email em formato PDF para fácil download e compartilhamento.
-              </p>
-            </div>
-            ` : ''}
-            
             <div style="text-align: center; margin: 30px 0;">
               <a href="${resultsUrl}" 
                  style="background-color: #dc2626; color: white; padding: 15px 30px; 
@@ -151,29 +85,6 @@ const handler = async (req: Request): Promise<Response> => {
                 🔗 Ver Meus Resultados Online
               </a>
             </div>
-            
-            <h3 style="color: #374151;">O que você encontrará na sua análise:</h3>
-            <ul style="color: #6b7280; line-height: 1.6;">
-              <li>Análise de compatibilidade com diferentes programas</li>
-              <li>Estimativas de tempo e investimento</li>
-              <li>Seus pontos fortes e áreas para melhoria</li>
-              <li>Próximos passos recomendados</li>
-            </ul>
-            
-            <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
-              💡 <strong>Dica:</strong> Você pode salvar a página online nos favoritos ou compartilhar 
-              o link para acessar seus resultados a qualquer momento.
-            </p>
-          </div>
-          
-          <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0; color: #92400e; font-weight: bold;">
-              ⚠️ IMPORTANTE: Esta análise é informativa
-            </p>
-            <p style="margin: 8px 0 0; color: #92400e; font-size: 14px;">
-              Regras, valores e prazos mudam com frequência. Sempre confira no site oficial do IRCC 
-              (canada.ca) ou consulte um profissional de imigração licenciado (RCIC) para decisões oficiais.
-            </p>
           </div>
           
           <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
@@ -181,11 +92,10 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
         </div>
       `,
-      ...(pdfAttachment && { attachments: [pdfAttachment] })
     });
 
     if (resendError) {
-      console.error("Resend error details:", JSON.stringify(resendError, null, 2));
+      console.error("Resend error:", JSON.stringify(resendError, null, 2));
       return new Response(JSON.stringify({ error: resendError.message || "Failed to send email" }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -193,7 +103,6 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log("Email sent successfully:", resendData?.id);
-
     return new Response(JSON.stringify({ success: true, id: resendData?.id }), {
       status: 200,
       headers: {
@@ -203,7 +112,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
   } catch (error: any) {
-    console.error("Error in send-welcome-email function:", error);
+    console.error("Function error:", error.message);
     console.error("Error stack:", error.stack);
     return new Response(
       JSON.stringify({ error: error.message || "Internal server error" }),
