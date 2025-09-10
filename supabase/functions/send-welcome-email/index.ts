@@ -56,8 +56,12 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Results URL:", resultsUrl);
 
     // Send email with results link
-    const emailResponse = await resend.emails.send({
-      from: Deno.env.get("MAIL_FROM") || "Canada Immigration Quiz <noreply@lovable.app>",
+    const fromEnv = Deno.env.get("MAIL_FROM") || "onboarding@resend.dev";
+    const from = fromEnv.includes("<") ? fromEnv : `Canada Immigration Quiz <${fromEnv}>`;
+    console.log("Using FROM:", from);
+
+    const { data: resendData, error: resendError } = await resend.emails.send({
+      from,
       to: [email],
       subject: "Seus Resultados de Imigração para o Canadá 🍁",
       html: `
@@ -113,9 +117,17 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    if (resendError) {
+      console.error("Resend error:", resendError);
+      return new Response(JSON.stringify({ error: resendError.message || "Failed to send email" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
 
-    return new Response(JSON.stringify(emailResponse), {
+    console.log("Email queued:", resendData);
+
+    return new Response(JSON.stringify({ success: true, id: resendData?.id }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
