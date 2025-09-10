@@ -89,12 +89,15 @@ const Index = () => {
       <header className="bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+            <button 
+              onClick={handleRestart}
+              className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+            >
               <span className="text-2xl">🍁</span>
               <span className="text-xl font-bold text-primary">
                 Canada Immigration Quiz
               </span>
-            </div>
+            </button>
             {quizState === 'questions' && (
               <div className="text-sm text-muted-foreground">
                 Pergunta {currentQuestionIndex + 1} de {quizQuestions.length}
