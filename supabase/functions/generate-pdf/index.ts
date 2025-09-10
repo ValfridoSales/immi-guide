@@ -9,6 +9,7 @@ const corsHeaders = {
 
 interface PDFRequest {
   resultId: string;
+  siteOrigin?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -18,7 +19,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { resultId }: PDFRequest = await req.json();
+    const { resultId, siteOrigin }: PDFRequest = await req.json();
     
     if (!resultId) {
       return new Response(
@@ -30,8 +31,22 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Get the base URL from environment
-    const baseUrl = Deno.env.get("SUPABASE_URL") || "http://localhost:5173";
+    // Determine the site origin to render the preview page
+    const originFromHeader = req.headers.get("origin") || req.headers.get("Origin") || undefined;
+    const baseUrlRaw = siteOrigin || originFromHeader || Deno.env.get("PUBLIC_SITE_URL") || "";
+    const baseUrl = baseUrlRaw.replace(/\/$/, "");
+
+    if (!baseUrl) {
+      console.error("Missing site origin. Provide siteOrigin in body or set PUBLIC_SITE_URL env.");
+      return new Response(
+        JSON.stringify({ error: "Site origin not provided" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
     const previewUrl = `${baseUrl}/pdf/preview?resultId=${resultId}`;
 
     // Launch Puppeteer

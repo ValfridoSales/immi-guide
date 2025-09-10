@@ -34,17 +34,20 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Generate PDF by calling the generate-pdf function
     const baseUrl = Deno.env.get("SUPABASE_URL");
+    const siteOrigin = req.headers.get("origin") || req.headers.get("Origin") || Deno.env.get("PUBLIC_SITE_URL") || "";
     const pdfResponse = await fetch(`${baseUrl}/functions/v1/generate-pdf`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": req.headers.get("Authorization") || "",
+        "apikey": Deno.env.get("SUPABASE_ANON_KEY") || "",
       },
-      body: JSON.stringify({ resultId }),
+      body: JSON.stringify({ resultId, siteOrigin }),
     });
 
     if (!pdfResponse.ok) {
-      throw new Error("Failed to generate PDF");
+      const errText = await pdfResponse.text().catch(() => "");
+      throw new Error(`Failed to generate PDF (${pdfResponse.status}): ${errText}`);
     }
 
     const pdfBuffer = await pdfResponse.arrayBuffer();
