@@ -63,15 +63,7 @@ export function QuizResults({ results, onStartLeadCapture }: QuizResultsProps) {
               ))}
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button 
-              variant="outline" 
-              size="lg" 
-              onClick={() => window.open('/pdf/preview?resultId=DEMO', '_blank')}
-              className="text-lg px-8 py-3"
-            >
-              📄 Baixar PDF dos Resultados
-            </Button>
+          <div className="flex justify-center">
             <Button 
               variant="canadian" 
               size="lg" 
