@@ -13,6 +13,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { sendWelcomeEmail } from '@/utils/pdf';
+import { storeQuizResults, updateQuizResultsWithLead } from '@/utils/quiz-results';
 const Index = () => {
   const [quizState, setQuizState] = useState<QuizState>('intro');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -20,6 +21,7 @@ const Index = () => {
   const [results, setResults] = useState<QuizResult[]>([]);
   const [completionsCount, setCompletionsCount] = useState<number>(0);
   const [sessionId] = useState(() => Math.random().toString(36).substring(2) + Date.now().toString(36));
+  const [resultId, setResultId] = useState<string | null>(null);
   const {
     toast
   } = useToast();
@@ -80,13 +82,27 @@ const Index = () => {
     if (currentQuestionIndex < quizQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      // Calculate results
-      const calculatedResults = calculateQuizResults(responses);
-      setResults(calculatedResults);
-      setQuizState('results');
+      try {
+        // Calculate results
+        const calculatedResults = calculateQuizResults(responses);
+        setResults(calculatedResults);
 
-      // Track quiz completion
-      await trackQuizCompletion();
+        // Store quiz results and get the resultId
+        const storedResultId = await storeQuizResults(sessionId, calculatedResults);
+        setResultId(storedResultId);
+        
+        setQuizState('results');
+
+        // Track quiz completion
+        await trackQuizCompletion();
+      } catch (error) {
+        console.error('Error storing quiz results:', error);
+        toast({
+          title: "Erro",
+          description: "Houve um problema ao salvar os resultados. Tente novamente.",
+          variant: "destructive"
+        });
+      }
     }
   };
   const handlePrevious = () => {
@@ -101,8 +117,20 @@ const Index = () => {
     try {
       console.log('Lead captured:', lead);
       
-      // Send welcome email with PDF
-      await sendWelcomeEmail(lead.email, sessionId);
+      if (!resultId) {
+        toast({
+          title: "Erro!",
+          description: "Resultados não encontrados. Refaça o quiz.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Update quiz results with lead data
+      await updateQuizResultsWithLead(resultId, lead);
+      
+      // Send welcome email with PDF using resultId
+      await sendWelcomeEmail(lead.email, resultId);
       
       toast({
         title: "Sucesso!",
@@ -123,6 +151,7 @@ const Index = () => {
     setCurrentQuestionIndex(0);
     setResponses([]);
     setResults([]);
+    setResultId(null);
   };
   return <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}

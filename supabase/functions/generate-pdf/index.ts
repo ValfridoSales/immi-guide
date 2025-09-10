@@ -1,6 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -31,6 +29,18 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    const pdfApiKey = Deno.env.get("PDF_API_KEY");
+    if (!pdfApiKey) {
+      console.error("PDF_API_KEY not configured");
+      return new Response(
+        JSON.stringify({ error: "PDF service not configured" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
     // Determine the site origin to render the preview page
     const originFromHeader = req.headers.get("origin") || req.headers.get("Origin") || undefined;
     const baseUrlRaw = siteOrigin || originFromHeader || Deno.env.get("PUBLIC_SITE_URL") || "";
@@ -48,37 +58,43 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const previewUrl = `${baseUrl}/pdf/preview?resultId=${resultId}`;
+    console.log("Generating PDF for URL:", previewUrl);
 
-    // Launch Puppeteer
-    const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
-
-    const page = await browser.newPage();
-    
-    // Navigate to the preview page
-    await page.goto(previewUrl, { waitUntil: 'networkidle0' });
-    
-    // Generate PDF
-    const pdf = await page.pdf({
-      format: 'A4',
-      margin: {
-        top: '18mm',
-        right: '14mm',
-        bottom: '18mm',
-        left: '14mm'
+    // Call PDFShift API to generate PDF
+    const pdfResponse = await fetch("https://api.pdfshift.io/v3/convert/pdf", {
+      method: "POST",
+      headers: {
+        "Authorization": `Basic ${btoa(`api:${pdfApiKey}`)}`,
+        "Content-Type": "application/json",
       },
-      printBackground: true,
-      preferCSSPageSize: true
+      body: JSON.stringify({
+        source: previewUrl,
+        format: "A4",
+        margin: {
+          top: "18mm",
+          right: "14mm", 
+          bottom: "18mm",
+          left: "14mm"
+        },
+        print_background: true,
+        wait_for: "networkidle0"
+      }),
     });
 
-    await browser.close();
+    if (!pdfResponse.ok) {
+      const errorText = await pdfResponse.text();
+      console.error("PDFShift error:", errorText);
+      throw new Error(`PDF generation failed: ${pdfResponse.statusText}`);
+    }
+
+    const pdfBuffer = await pdfResponse.arrayBuffer();
+    console.log("PDF generated successfully, size:", pdfBuffer.byteLength);
 
     // Return PDF as response
     const currentDate = new Date().toISOString().split('T')[0].replace(/-/g, '');
     const filename = `resultado-${resultId}-${currentDate}.pdf`;
 
-    return new Response(pdf, {
+    return new Response(pdfBuffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",

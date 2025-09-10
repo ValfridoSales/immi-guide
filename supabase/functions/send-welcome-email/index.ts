@@ -60,6 +60,54 @@ const handler = async (req: Request): Promise<Response> => {
     const from = fromEnv.includes("<") ? fromEnv : `Canada Immigration Quiz <${fromEnv}>`;
     console.log("Using FROM:", from);
 
+    // Generate PDF attachment
+    let pdfAttachment = null;
+    try {
+      const pdfApiKey = Deno.env.get("PDF_API_KEY");
+      if (pdfApiKey) {
+        console.log("Generating PDF attachment...");
+        
+        const pdfResponse = await fetch("https://api.pdfshift.io/v3/convert/pdf", {
+          method: "POST",
+          headers: {
+            "Authorization": `Basic ${btoa(`api:${pdfApiKey}`)}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            source: resultsUrl,
+            format: "A4",
+            margin: {
+              top: "18mm",
+              right: "14mm", 
+              bottom: "18mm",
+              left: "14mm"
+            },
+            print_background: true,
+            wait_for: "networkidle0"
+          }),
+        });
+
+        if (pdfResponse.ok) {
+          const pdfBuffer = await pdfResponse.arrayBuffer();
+          const pdfBase64 = btoa(String.fromCharCode(...new Uint8Array(pdfBuffer)));
+          const currentDate = new Date().toISOString().split('T')[0].replace(/-/g, '');
+          
+          pdfAttachment = {
+            filename: `resultado-imigracao-canada-${resultId}-${currentDate}.pdf`,
+            content: pdfBase64,
+            type: "application/pdf",
+            disposition: "attachment"
+          };
+          
+          console.log("PDF attachment generated successfully");
+        } else {
+          console.warn("PDF generation failed, sending email without attachment");
+        }
+      }
+    } catch (pdfError) {
+      console.warn("PDF generation error, sending email without attachment:", pdfError);
+    }
+
     const { data: resendData, error: resendError } = await resend.emails.send({
       from,
       to: [email],
@@ -77,12 +125,23 @@ const handler = async (req: Request): Promise<Response> => {
               dos melhores programas de imigração está pronta.
             </p>
             
+            ${pdfAttachment ? `
+            <div style="background-color: #dbeafe; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin: 0; color: #1e40af; font-weight: bold;">
+                📎 PDF Anexado
+              </p>
+              <p style="margin: 8px 0 0; color: #1e40af; font-size: 14px;">
+                Sua análise completa está anexada neste email em formato PDF para fácil download e compartilhamento.
+              </p>
+            </div>
+            ` : ''}
+            
             <div style="text-align: center; margin: 30px 0;">
               <a href="${resultsUrl}" 
                  style="background-color: #dc2626; color: white; padding: 15px 30px; 
                         text-decoration: none; border-radius: 8px; font-weight: bold; 
                         display: inline-block;">
-                🔗 Ver Meus Resultados Completos
+                🔗 Ver Meus Resultados Online
               </a>
             </div>
             
@@ -95,7 +154,7 @@ const handler = async (req: Request): Promise<Response> => {
             </ul>
             
             <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
-              💡 <strong>Dica:</strong> Você pode salvar esta página nos favoritos ou compartilhar 
+              💡 <strong>Dica:</strong> Você pode salvar a página online nos favoritos ou compartilhar 
               o link para acessar seus resultados a qualquer momento.
             </p>
           </div>
@@ -115,6 +174,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
         </div>
       `,
+      ...(pdfAttachment && { attachments: [pdfAttachment] })
     });
 
     if (resendError) {

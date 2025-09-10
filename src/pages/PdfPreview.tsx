@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { QuizResult } from '@/types/quiz';
 import { ProgramCard } from '@/components/pdf/ProgramCard';
-import { supabase } from '@/integrations/supabase/client';
+import { getQuizResults } from '@/utils/quiz-results';
 
 export default function PdfPreview() {
   const [searchParams] = useSearchParams();
@@ -13,7 +13,8 @@ export default function PdfPreview() {
   useEffect(() => {
     const fetchResults = async () => {
       if (!resultId) {
-        // Mock data for demo
+        console.warn('No resultId provided, using mock data');
+        // Mock data for demo when no resultId
         setResults([
           {
             programId: 'fsw',
@@ -32,10 +33,32 @@ export default function PdfPreview() {
       }
 
       try {
-        // In a real implementation, fetch from Supabase
-        // const { data, error } = await supabase.from('quiz_results').select('*').eq('id', resultId);
+        console.log('Fetching quiz results for ID:', resultId);
+        const storedResult = await getQuizResults(resultId);
         
-        // For now, use mock data
+        if (storedResult && storedResult.results) {
+          setResults(storedResult.results);
+          console.log('Quiz results loaded:', storedResult.results.length, 'programs');
+        } else {
+          console.warn('No results found for ID:', resultId);
+          // Fallback to mock data if no results found
+          setResults([
+            {
+              programId: 'fsw',
+              programName: 'Express Entry - Federal Skilled Worker',
+              compatibility: 85,
+              estimatedTime: '6-12 meses',
+              investment: 'CAD $15,000+',
+              description: 'Programa ideal para profissionais qualificados com experiência internacional.',
+              strengths: ['CLB alto em inglês', 'Educação superior', 'Experiência qualificada'],
+              improvements: ['Melhorar francês', 'Obter ECA'],
+              nextSteps: ['Preparar documentos', 'Fazer teste de idioma', 'Submeter aplicação']
+            }
+          ]);
+        }
+      } catch (error) {
+        console.error('Error fetching results:', error);
+        // Fallback to mock data on error
         setResults([
           {
             programId: 'fsw',
@@ -49,8 +72,6 @@ export default function PdfPreview() {
             nextSteps: ['Preparar documentos', 'Fazer teste de idioma', 'Submeter aplicação']
           }
         ]);
-      } catch (error) {
-        console.error('Error fetching results:', error);
       } finally {
         setLoading(false);
       }
