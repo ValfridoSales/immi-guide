@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { sendWelcomeEmail } from '@/utils/pdf';
 const Index = () => {
   const [quizState, setQuizState] = useState<QuizState>('intro');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -96,13 +97,26 @@ const Index = () => {
   const handleStartLeadCapture = () => {
     setQuizState('lead-capture');
   };
-  const handleLeadSubmit = (lead: Lead) => {
-    console.log('Lead captured:', lead);
-    toast({
-      title: "Sucesso!",
-      description: "Sua análise foi enviada para seu email."
-    });
-    setQuizState('thank-you');
+  const handleLeadSubmit = async (lead: Lead) => {
+    try {
+      console.log('Lead captured:', lead);
+      
+      // Send welcome email with PDF
+      await sendWelcomeEmail(lead.email, sessionId);
+      
+      toast({
+        title: "Sucesso!",
+        description: "Sua análise foi enviada para seu email."
+      });
+      setQuizState('thank-you');
+    } catch (error) {
+      console.error('Error sending email:', error);
+      toast({
+        title: "Erro!",
+        description: "Houve um problema ao enviar o email. Tente novamente.",
+        variant: "destructive"
+      });
+    }
   };
   const handleRestart = () => {
     setQuizState('intro');
