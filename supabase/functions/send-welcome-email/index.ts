@@ -32,9 +32,28 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    console.log("Processing email request for:", email, "resultId:", resultId);
+
+    // Check if Resend API key is configured
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendKey) {
+      console.error("RESEND_API_KEY not configured");
+      return new Response(
+        JSON.stringify({ error: "Email service not configured" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    console.log("Resend API key configured");
+
     // Get the site origin to create the results link
     const siteOrigin = req.headers.get("origin") || req.headers.get("Origin") || Deno.env.get("PUBLIC_SITE_URL") || "";
     const resultsUrl = `${siteOrigin}/pdf/preview?resultId=${resultId}`;
+    
+    console.log("Results URL:", resultsUrl);
 
     // Send email with results link
     const emailResponse = await resend.emails.send({
