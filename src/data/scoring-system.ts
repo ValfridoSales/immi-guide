@@ -1,4 +1,4 @@
-// Scoring System V2 - Aligned with 2024-2025 changes
+// Scoring System V2 - Aligned with 2025 changes
 // Based on program suitability scoring (0-100 scale)
 
 export interface ProgramWeights {
