@@ -81,6 +81,33 @@ O ECA deve ser feito por uma organização reconhecida pelo IRCC, como WES, IQAS
       { id: '4-5', label: '4-5 anos', value: '4-5' },
       { id: '6+', label: '6+ anos', value: '6+' },
     ],
+    helpInfo: {
+      title: 'ℹ️ O que é TEER 0–3?',
+      content: `O sistema de imigração do Canadá classifica ocupações usando o NOC (National Occupational Classification).
+Cada profissão recebe um nível chamado TEER (Training, Education, Experience and Responsibilities).
+
+**Faixas TEER**
+
+TEER 0 → Cargos de gestão (ex.: diretores, gerentes).
+
+TEER 1 → Profissões que normalmente exigem diploma universitário (ex.: engenheiros, médicos, professores).
+
+TEER 2 → Ocupações técnicas ou que exigem diploma de 2–3 anos (ex.: técnicos em TI, paramédicos).
+
+TEER 3 → Ocupações qualificadas que pedem diploma curto, aprendizado ou experiência (ex.: encanadores, eletricistas, cozinheiros).
+
+**Por que importa?**
+
+Para Express Entry (FSW, CEC, FST), apenas ocupações em TEER 0, 1, 2 ou 3 contam como trabalho qualificado.
+
+TEER 4 e 5 são considerados não qualificados e não dão pontos no sistema.
+
+**Dica de preenchimento**
+
+Se sua ocupação está em TEER 0–3, selecione a(s) categoria(s) correspondente(s). Isso garante que seu perfil seja avaliado corretamente.
+
+🔗 [Saiba mais no site oficial do Governo do Canadá](https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/eligibility/find-national-occupation-classification.html)`
+    },
   },
   {
     id: 'continuous_experience',
@@ -102,6 +129,33 @@ O ECA deve ser feito por uma organização reconhecida pelo IRCC, como WES, IQAS
       { id: '1-year', label: '1 ano', value: '1-year' },
       { id: '2+', label: '2+ anos', value: '2+' },
     ],
+    helpInfo: {
+      title: 'ℹ️ O que é TEER 0–3?',
+      content: `O sistema de imigração do Canadá classifica ocupações usando o NOC (National Occupational Classification).
+Cada profissão recebe um nível chamado TEER (Training, Education, Experience and Responsibilities).
+
+**Faixas TEER**
+
+TEER 0 → Cargos de gestão (ex.: diretores, gerentes).
+
+TEER 1 → Profissões que normalmente exigem diploma universitário (ex.: engenheiros, médicos, professores).
+
+TEER 2 → Ocupações técnicas ou que exigem diploma de 2–3 anos (ex.: técnicos em TI, paramédicos).
+
+TEER 3 → Ocupações qualificadas que pedem diploma curto, aprendizado ou experiência (ex.: encanadores, eletricistas, cozinheiros).
+
+**Por que importa?**
+
+Para Express Entry (FSW, CEC, FST), apenas ocupações em TEER 0, 1, 2 ou 3 contam como trabalho qualificado.
+
+TEER 4 e 5 são considerados não qualificados e não dão pontos no sistema.
+
+**Dica de preenchimento**
+
+Se sua ocupação está em TEER 0–3, selecione a(s) categoria(s) correspondente(s). Isso garante que seu perfil seja avaliado corretamente.
+
+🔗 [Saiba mais no site oficial do Governo do Canadá](https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/eligibility/find-national-occupation-classification.html)`
+    },
   },
   {
     id: 'primary_language',
