@@ -106,7 +106,7 @@ TEER 4 e 5 são considerados não qualificados e não dão pontos no sistema.
 
 Se sua ocupação está em TEER 0–3, selecione a(s) categoria(s) correspondente(s). Isso garante que seu perfil seja avaliado corretamente.
 
-🔗 [Saiba mais no site oficial do Governo do Canadá](https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/eligibility/find-national-occupation-classification.html)`
+🔗 [Saiba mais no site oficial do Governo do Canadá](https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/find-national-occupation-code.html)`
     },
   },
   {
@@ -154,7 +154,7 @@ TEER 4 e 5 são considerados não qualificados e não dão pontos no sistema.
 
 Se sua ocupação está em TEER 0–3, selecione a(s) categoria(s) correspondente(s). Isso garante que seu perfil seja avaliado corretamente.
 
-🔗 [Saiba mais no site oficial do Governo do Canadá](https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/eligibility/find-national-occupation-classification.html)`
+🔗 [Saiba mais no site oficial do Governo do Canadá](https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/find-national-occupation-code.html)`
     },
   },
   {
