@@ -4,6 +4,10 @@ export interface QuizQuestion {
   type: 'single' | 'multiple';
   options: QuizOption[];
   required: boolean;
+  helpInfo?: {
+    title: string;
+    content: string;
+  };
 }
 
 export interface QuizOption {

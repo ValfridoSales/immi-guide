@@ -48,6 +48,25 @@ export const quizQuestions: QuizQuestion[] = [
       { id: 'no', label: 'Não tenho ECA', value: 'no' },
       { id: 'not_applicable', label: 'Não se aplica (estudei no Canadá)', value: 'not_applicable' },
     ],
+    helpInfo: {
+      title: 'ℹ️ O que é o ECA?',
+      content: `O Educational Credential Assessment (ECA) é um documento que comprova se seu diploma, certificado ou histórico acadêmico obtido fora do Canadá é válido e equivalente a um título canadense.
+
+**Para que serve?**
+
+• É obrigatório no Federal Skilled Worker (FSW) e pode somar pontos no Express Entry.
+• Ajuda províncias e empregadores a entenderem o valor da sua formação.
+
+**Dica de preenchimento**
+
+Se você já possui um ECA válido ou planeja obtê-lo antes de aplicar, marque "Sim". Isso garante que seu perfil seja avaliado com mais precisão.
+
+**Onde fazer?**
+
+O ECA deve ser feito por uma organização reconhecida pelo IRCC, como WES, IQAS, ICES, MCC (médicos), entre outras.
+
+🔗 [Saiba mais no site oficial do IRCC](https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/education-assessed.html)`
+    },
   },
   {
     id: 'work_experience_teer',
