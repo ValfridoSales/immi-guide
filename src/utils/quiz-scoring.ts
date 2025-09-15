@@ -26,7 +26,7 @@ export function calculateQuizResults(responses: QuizResponse[]): QuizResult[] {
   }, {} as Record<string, string | string[]>);
 
   // Calculate scores for each program
-  const programs = ['fsw', 'cec', 'fst', 'pnp', 'quebec', 'family', 'study', 'startup', 'selfemp'];
+  const programs = ['fsw', 'cec', 'fst', 'pnp', 'quebec', 'family', 'study', 'selfemp'];
   const results: QuizResult[] = [];
 
   programs.forEach(programId => {
@@ -146,15 +146,6 @@ export function calculateQuizResults(responses: QuizResponse[]): QuizResult[] {
         score += fundScore;
       }
 
-      // Entrepreneur scoring for startup - inferred from profile
-      if (weights.empreendedor && programId === 'startup') {
-        // Infer entrepreneurial intent from occupation areas and education
-        const occupationAreas = responseMap.occupation_area as string[];
-        const education = responseMap.education as string;
-        if (occupationAreas?.includes('stem') || education === 'masters' || education === 'phd') {
-          score += 80; // Inferred entrepreneurial potential
-        }
-      }
 
       // Cultural portfolio scoring for self-employed - inferred from profile
       if (weights.port_cultural && programId === 'selfemp') {
@@ -506,11 +497,6 @@ function generateNextSteps(programId: string): string[] {
       'Pesquisar instituições e programas no Canadá',
       'Preparar documentos acadêmicos e financeiros',
       'Aplicar para permit de estudos',
-    ],
-    startup: [
-      'Desenvolver plano de negócios detalhado',
-      'Buscar carta de apoio de organização designada',
-      'Preparar documentos empresariais',
     ],
     selfemp: [
       'Documentar experiência cultural/artística/agrícola',

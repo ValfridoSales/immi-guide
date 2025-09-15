@@ -21,7 +21,6 @@ export const PROGRAM_WEIGHTS: Record<string, ProgramWeights> = {
   pnp: { idade: 15, educ: 10, idioma: 20, exp_teer03: 25, can_exp: 15, vinc_prov: 15, categoria: 0 },
   study: { idade: 5, educ: 20, idioma: 20, exp_teer03: 0, can_exp: 0, vinc_prov: 5, categoria: 0, custo: 50 },
   family: { idade: 0, educ: 0, idioma: 0, exp_teer03: 0, can_exp: 0, vinc_prov: 0, categoria: 0 },
-  startup: { idade: 0, educ: 10, idioma: 10, exp_teer03: 0, can_exp: 0, vinc_prov: 0, categoria: 0, empreendedor: 80 },
   selfemp: { idade: 0, educ: 10, idioma: 10, exp_teer03: 0, can_exp: 0, vinc_prov: 0, categoria: 0, port_cultural: 80 },
 };
 
@@ -141,7 +140,6 @@ export const PROGRAM_THRESHOLDS = {
   quebec: 40,
   family: 30,
   study: 35,
-  startup: 45,
   selfemp: 40,
 };
 

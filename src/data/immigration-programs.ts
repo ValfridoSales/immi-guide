@@ -58,14 +58,6 @@ export const immigrationPrograms: ImmigrationProgram[] = [
     threshold: 35,
   },
   {
-    id: 'startup',
-    name: 'Start-Up Visa',
-    description: 'Para empreendedores com ideias inovadoras e carta de apoio de organização designada. Requer investimento e plano de negócios.',
-    estimatedTime: '12-16 meses',
-    investment: 'CAD 15,000 - 200,000',
-    threshold: 45,
-  },
-  {
     id: 'selfemp',
     name: 'Self-Employed Persons',
     description: 'Para pessoas com experiência e intenção de ser autônomo no Canadá em atividades culturais, artísticas ou agrícolas.',

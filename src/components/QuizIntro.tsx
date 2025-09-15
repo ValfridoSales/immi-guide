@@ -91,7 +91,7 @@ export function QuizIntro({
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Programas avaliados:</h3>
               <div className="flex flex-wrap gap-2 justify-center">
-                {['Express Entry', 'Provincial Nominee Program', 'Quebec Skilled Worker', 'Family Sponsorship', 'Study Permit → PR', 'Startup Visa'].map(program => <Badge key={program} variant="secondary">
+                {['Express Entry', 'Provincial Nominee Program', 'Quebec Skilled Worker', 'Family Sponsorship', 'Study Permit → PR'].map(program => <Badge key={program} variant="secondary">
                     {program}
                   </Badge>)}
               </div>
