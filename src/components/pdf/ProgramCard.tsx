@@ -2,7 +2,9 @@ import { QuizResult } from '@/types/quiz';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Clock, DollarSign, CheckCircle, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Clock, DollarSign, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
+import { immigrationPrograms } from '@/data/immigration-programs';
 
 interface ProgramCardProps {
   result: QuizResult;
@@ -21,6 +23,8 @@ export function ProgramCard({ result, index, printMode = false }: ProgramCardPro
     if (score >= 60) return 'text-yellow-600';
     return 'text-red-600';
   };
+
+  const program = immigrationPrograms.find(p => p.id === result.programId);
 
   return (
     <Card 
@@ -99,6 +103,21 @@ export function ProgramCard({ result, index, printMode = false }: ProgramCardPro
             </ul>
           </div>
         </div>
+
+        {/* Official Website Link */}
+        {program && !printMode && (
+          <div className="pt-2 border-t border-border">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={() => window.open(program.officialUrl, '_blank')}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Ver informações oficiais no site do governo
+            </Button>
+          </div>
+        )}
       </div>
     </Card>
   );

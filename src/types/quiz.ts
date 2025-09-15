@@ -49,6 +49,7 @@ export interface ImmigrationProgram {
   estimatedTime: string;
   investment: string;
   threshold: number;
+  officialUrl: string;
 }
 
 export type QuizState = 'intro' | 'questions' | 'results' | 'lead-capture' | 'thank-you';

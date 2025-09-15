@@ -8,6 +8,7 @@ export const immigrationPrograms: ImmigrationProgram[] = [
     estimatedTime: '6-8 meses',
     investment: 'CAD 4,500 - 6,500',
     threshold: 50,
+    officialUrl: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/who-can-apply/federal-skilled-workers.html',
   },
   {
     id: 'cec',
@@ -16,6 +17,7 @@ export const immigrationPrograms: ImmigrationProgram[] = [
     estimatedTime: '4-6 meses',
     investment: 'CAD 3,500 - 5,000',
     threshold: 45,
+    officialUrl: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/who-can-apply/canadian-experience-class.html',
   },
   {
     id: 'fst',
@@ -24,6 +26,7 @@ export const immigrationPrograms: ImmigrationProgram[] = [
     estimatedTime: '6-10 meses',
     investment: 'CAD 4,000 - 6,000',
     threshold: 40,
+    officialUrl: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/who-can-apply/federal-skilled-trades.html',
   },
   {
     id: 'pnp',
@@ -32,6 +35,7 @@ export const immigrationPrograms: ImmigrationProgram[] = [
     estimatedTime: '12-18 meses',
     investment: 'CAD 5,000 - 8,000',
     threshold: 35,
+    officialUrl: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/provincial-nominees.html',
   },
   {
     id: 'quebec',
@@ -40,6 +44,7 @@ export const immigrationPrograms: ImmigrationProgram[] = [
     estimatedTime: '18-24 meses',
     investment: 'CAD 6,000 - 9,000',
     threshold: 40,
+    officialUrl: 'https://www.quebec.ca/en/immigration',
   },
   {
     id: 'family',
@@ -48,6 +53,7 @@ export const immigrationPrograms: ImmigrationProgram[] = [
     estimatedTime: '8-12 meses',
     investment: 'CAD 2,500 - 4,000',
     threshold: 30,
+    officialUrl: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/family-sponsorship.html',
   },
   {
     id: 'study',
@@ -56,6 +62,7 @@ export const immigrationPrograms: ImmigrationProgram[] = [
     estimatedTime: '2-4 anos',
     investment: 'CAD 25,000 - 50,000',
     threshold: 35,
+    officialUrl: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada.html',
   },
   {
     id: 'selfemp',
@@ -64,5 +71,6 @@ export const immigrationPrograms: ImmigrationProgram[] = [
     estimatedTime: '18-24 meses',
     investment: 'CAD 10,000 - 50,000',
     threshold: 40,
+    officialUrl: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/self-employed-persons.html',
   },
 ];
