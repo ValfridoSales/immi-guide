@@ -133,25 +133,23 @@ Deno.serve(async (req) => {
 
 function parseDrawData(id: number, sourceUrl: string, html: string): DrawData | null {
   try {
-    // Extract invitations
-    const invitationsMatch = html.match(/Number of invitations issued[^\d]*?([\d,]+)/i);
+    // Extract invitations - now matches "Number of invitations issued:** 400"
+    const invitationsMatch = html.match(/Number of invitations issued[:\s*]+(\d+(?:,\d+)*)/i);
     const invitations = invitationsMatch ? parseInt(invitationsMatch[1].replace(/,/g, '')) : 0;
 
-    // Extract CRS score
-    const crsMatch = html.match(/CRS score of lowest[^\d]*?(\d+)/i);
+    // Extract CRS score - matches "CRS score of lowest-ranked candidate invited:** 539"
+    const crsMatch = html.match(/CRS score of lowest-ranked candidate invited[:\s*]+(\d+)/i);
     const crs_min = crsMatch ? parseInt(crsMatch[1]) : 0;
 
-    // Extract date - looking for patterns like "October 6, 2025 at 14:12:29 UTC"
-    const dateMatch = html.match(/Date and time of round[^<]*?<time[^>]*datetime="([^"]+)"/i) ||
-                     html.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d+,\s+\d{4}\s+at\s+\d+:\d+:\d+\s+UTC/i);
+    // Extract date - matches "Date and time of round:** October 22, 2024 at 14:07:18 UTC"
+    const dateMatch = html.match(/Date and time of round[:\s*]+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d+,\s+\d{4}\s+at\s+\d+:\d+:\d+\s+UTC)/i);
     
     let date = new Date().toISOString();
     if (dateMatch) {
-      const dateStr = dateMatch[1] || dateMatch[0];
-      date = new Date(dateStr).toISOString();
+      date = new Date(dateMatch[1]).toISOString();
     }
 
-    // Determine type and category
+    // Determine type and category based on title or specific markers
     let type: 'general' | 'pnp' | 'cec' | 'category' = 'general';
     let category: string | undefined;
 
@@ -162,16 +160,16 @@ function parseDrawData(id: number, sourceUrl: string, html: string): DrawData | 
     } else if (html.includes('Category-based')) {
       type = 'category';
       
-      // Extract category name
-      const categoryMatch = html.match(/Category-based[^:]*:\s*([^<\n]+)/i);
+      // Extract category name from title or headers
+      const categoryMatch = html.match(/Category-based[^:]*:\s*([^\n*]+)/i);
       if (categoryMatch) {
         category = categoryMatch[1].trim();
       }
     }
 
-    // Extract tie-break timestamp if exists
+    // Extract tie-break timestamp - matches "Tie-breaking rule:** October 19, 2024 at 21:53:18 UTC"
     let tiebreak_ts: string | undefined;
-    const tiebreakMatch = html.match(/tie-breaking rule[^<]*?<time[^>]*datetime="([^"]+)"/i);
+    const tiebreakMatch = html.match(/Tie-breaking rule[:\s*]+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d+,\s+\d{4}\s+at\s+\d+:\d+:\d+\s+UTC)/i);
     if (tiebreakMatch) {
       tiebreak_ts = new Date(tiebreakMatch[1]).toISOString();
     }
