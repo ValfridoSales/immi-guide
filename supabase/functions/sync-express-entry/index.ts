@@ -34,13 +34,15 @@ Deno.serve(async (req) => {
       .select('id')
       .order('id', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
-    const startId = lastDraw?.id || 300; // Start from 300 if no draws exist
-    const maxAttempts = 50; // Maximum number of pages to check
+    // Start from ID 250 if no draws exist, or from last ID - 10 to catch any missed draws
+    const startId = lastDraw ? Math.max(lastDraw.id - 10, 250) : 250;
+    const maxAttempts = 100; // Check up to 100 IDs
     let insertCount = 0;
     let updateCount = 0;
     let errorCount = 0;
+    let notFoundCount = 0;
 
     console.log({ event: 'sync_config', start_id: startId, max_attempts: maxAttempts });
 
@@ -52,10 +54,18 @@ Deno.serve(async (req) => {
         const response = await fetch(url);
         
         if (response.status === 404) {
-          // No more draws found, stop searching
-          console.log({ event: 'sync_limit_reached', last_checked_id: id });
-          break;
+          notFoundCount++;
+          console.log({ event: 'draw_not_found', id, consecutive_404s: notFoundCount });
+          // If we get 5 consecutive 404s, stop searching
+          if (notFoundCount >= 5) {
+            console.log({ event: 'sync_limit_reached', last_checked_id: id });
+            break;
+          }
+          continue;
         }
+        
+        // Reset 404 counter on successful fetch
+        notFoundCount = 0;
 
         if (!response.ok) {
           console.log({ event: 'fetch_error', id, status: response.status });
@@ -63,6 +73,9 @@ Deno.serve(async (req) => {
         }
 
         const html = await response.text();
+        
+        console.log({ event: 'parsing_draw', id, html_length: html.length });
+        
         const drawData = parseDrawData(id, url, html);
 
         if (drawData) {
@@ -75,8 +88,17 @@ Deno.serve(async (req) => {
             errorCount++;
           } else {
             insertCount++;
-            console.log({ event: 'draw_synced', id, type: drawData.type, category: drawData.category });
+            console.log({ 
+              event: 'draw_synced', 
+              id, 
+              type: drawData.type, 
+              category: drawData.category,
+              invitations: drawData.invitations,
+              crs: drawData.crs_min
+            });
           }
+        } else {
+          console.log({ event: 'parse_failed', id });
         }
 
         // Rate limiting - wait 500ms between requests
