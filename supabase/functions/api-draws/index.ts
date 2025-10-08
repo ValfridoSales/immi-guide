@@ -11,12 +11,25 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Read parameters from either query params or body
     const url = new URL(req.url);
-    const limit = parseInt(url.searchParams.get('limit') || '20');
-    const type = url.searchParams.get('type') || '';
-    const category = url.searchParams.get('category') || '';
+    let limit = url.searchParams.get('limit');
+    let type = url.searchParams.get('type');
+    let category = url.searchParams.get('category');
 
-    if (limit < 1 || limit > 100) {
+    // If not in query params, try body
+    if (!limit && req.method === 'POST') {
+      const body = await req.json();
+      limit = body.limit;
+      type = body.type;
+      category = body.category;
+    }
+
+    const limitNum = parseInt(limit || '20');
+    type = type || '';
+    category = category || '';
+
+    if (limitNum < 1 || limitNum > 100) {
       return new Response(
         JSON.stringify({ error: 'Limit must be between 1 and 100' }),
         { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -31,7 +44,7 @@ Deno.serve(async (req) => {
       .from('express_entry_draws')
       .select('*')
       .order('date', { ascending: false })
-      .limit(limit);
+      .limit(limitNum);
 
     if (type) {
       query = query.eq('type', type);

@@ -6,13 +6,12 @@ export const useDrawsTable = (filters: DrawFilters = {}) => {
   return useQuery({
     queryKey: ['ee-draws', filters],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      if (filters.limit) params.append('limit', filters.limit.toString());
-      if (filters.type) params.append('type', filters.type);
-      if (filters.category) params.append('category', filters.category);
-
       const { data, error } = await supabase.functions.invoke('api-draws', {
-        method: 'GET',
+        body: {
+          limit: filters.limit,
+          type: filters.type,
+          category: filters.category,
+        },
       });
 
       if (error) throw error;
@@ -26,12 +25,11 @@ export const useDrawsSeries = (filters: DrawSeriesFilters) => {
   return useQuery({
     queryKey: ['ee-draws-series', filters],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append('window', filters.window);
-      if (filters.type) params.append('type', filters.type);
-
       const { data, error } = await supabase.functions.invoke('api-draws-series', {
-        method: 'GET',
+        body: {
+          window: filters.window,
+          type: filters.type,
+        },
       });
 
       if (error) throw error;

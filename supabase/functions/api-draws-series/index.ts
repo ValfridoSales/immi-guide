@@ -11,9 +11,20 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Read parameters from either query params or body
     const url = new URL(req.url);
-    const window = url.searchParams.get('window') || '12m';
-    const type = url.searchParams.get('type') || '';
+    let window = url.searchParams.get('window');
+    let type = url.searchParams.get('type');
+
+    // If not in query params, try body
+    if (!window && req.method === 'POST') {
+      const body = await req.json();
+      window = body.window;
+      type = body.type;
+    }
+
+    window = window || '12m';
+    type = type || '';
 
     // Calculate date range
     const now = new Date();
