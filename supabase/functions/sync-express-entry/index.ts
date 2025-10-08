@@ -36,9 +36,9 @@ Deno.serve(async (req) => {
       .limit(1)
       .maybeSingle();
 
-    // Start from ID 250 if no draws exist, or from last ID - 10 to catch any missed draws
-    const startId = lastDraw ? Math.max(lastDraw.id - 10, 250) : 250;
-    const maxAttempts = 100; // Check up to 100 IDs
+    // Start from ID 290 if no draws exist, or from last ID + 1 to continue from where we left off
+    const startId = lastDraw ? lastDraw.id + 1 : 290;
+    const maxAttempts = 50; // Check up to 50 IDs forward
     let insertCount = 0;
     let updateCount = 0;
     let errorCount = 0;
@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
 
     // Try fetching draws starting from last known ID
     for (let id = startId; id < startId + maxAttempts; id++) {
-      const url = `https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations-${id}.html`;
+      const url = `https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations.html?q=${id}`;
       
       try {
         const response = await fetch(url);

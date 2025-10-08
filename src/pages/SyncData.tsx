@@ -15,11 +15,12 @@ export default function SyncData() {
     setResult(null);
 
     try {
-      // First, delete test data
+      // First, delete test data (IDs 321-325)
       const { error: deleteError } = await supabase
         .from('express_entry_draws')
         .delete()
-        .gte('id', 321);
+        .gte('id', 321)
+        .lte('id', 325);
 
       if (deleteError) {
         throw deleteError;
