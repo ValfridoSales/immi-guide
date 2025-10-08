@@ -74,30 +74,33 @@ export const DrawsChart = ({ data }: DrawsChartProps) => {
           <YAxis 
             yAxisId="left"
             tick={{ fill: 'hsl(var(--foreground))' }}
-            label={{ value: 'CRS Score', angle: -90, position: 'insideLeft', fill: 'hsl(var(--foreground))' }}
+            label={{ value: 'Convites (ITAs)', angle: -90, position: 'insideLeft', fill: 'hsl(var(--foreground))' }}
           />
           <YAxis 
             yAxisId="right"
             orientation="right"
             tick={{ fill: 'hsl(var(--foreground))' }}
-            label={{ value: 'ITAs', angle: 90, position: 'insideRight', fill: 'hsl(var(--foreground))' }}
+            label={{ value: 'CRS Score', angle: 90, position: 'insideRight', fill: 'hsl(var(--foreground))' }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
-          <Bar 
-            yAxisId="right"
-            dataKey="ITAs" 
-            fill="hsl(var(--secondary))"
-            opacity={0.6}
-            name="Convites (ITAs)"
-          />
           <Line 
             yAxisId="left"
             type="monotone" 
-            dataKey="CRS" 
-            stroke="hsl(var(--primary))"
+            dataKey="ITAs" 
+            stroke="#4F46E5"
             strokeWidth={2}
-            dot={{ fill: 'hsl(var(--primary))' }}
+            dot={{ fill: '#4F46E5', r: 4 }}
+            name="Convites (ITAs)"
+          />
+          <Line 
+            yAxisId="right"
+            type="monotone" 
+            dataKey="CRS" 
+            stroke="#EF4444"
+            strokeWidth={2}
+            strokeDasharray="5 5"
+            dot={{ fill: '#EF4444', r: 4 }}
             name="CRS Mínimo"
           />
         </ComposedChart>
