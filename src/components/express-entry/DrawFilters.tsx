@@ -41,7 +41,7 @@ export const DrawFilters = ({ window, type, userCrs, onWindowChange, onTypeChang
         </Select>
       </div>
 
-      <div className="flex-1 min-w-[200px]">
+      <div className="flex-1 min-w-[180px]">
         <label className="text-sm font-medium mb-2 block">Seu CRS Score (opcional)</label>
         <Input
           type="number"
@@ -50,10 +50,8 @@ export const DrawFilters = ({ window, type, userCrs, onWindowChange, onTypeChang
           placeholder="Ex: 480"
           value={userCrs ?? ''}
           onChange={(e) => onUserCrsChange(e.target.value ? parseInt(e.target.value) : null)}
+          className="border-2 border-primary/50 focus-visible:border-primary"
         />
-        <p className="text-xs text-muted-foreground mt-1">
-          Veja draws onde você seria elegível
-        </p>
       </div>
     </div>
   );
