@@ -28,17 +28,9 @@ Deno.serve(async (req) => {
 
     console.log({ event: 'sync_start', timestamp: new Date().toISOString() });
 
-    // Get the last draw ID from database
-    const { data: lastDraw } = await supabase
-      .from('express_entry_draws')
-      .select('id')
-      .order('id', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    // Start from ID 290 if no draws exist, or from last ID + 1 to continue from where we left off
-    const startId = lastDraw ? lastDraw.id + 1 : 290;
-    const maxAttempts = 50; // Check up to 50 IDs forward
+    // Always start from ID 290 to ensure we scan all draws and fix any bad data
+    const startId = 290;
+    const maxAttempts = 100; // Check up to 100 IDs forward
     let insertCount = 0;
     let updateCount = 0;
     let errorCount = 0;
@@ -183,8 +175,15 @@ function parseDrawData(id: number, sourceUrl: string, html: string): DrawData | 
       tiebreak_ts = new Date(tiebreakMatch[1]).toISOString();
     }
 
-    if (!invitations || !crs_min) {
-      console.log({ event: 'parse_incomplete', id, invitations, crs_min });
+    // Validate data - reject clearly invalid values
+    if (!invitations || invitations <= 1 || !crs_min || crs_min <= 10) {
+      console.log({ 
+        event: 'parse_invalid_data', 
+        id, 
+        invitations, 
+        crs_min,
+        reason: 'Invitations must be > 1 and CRS must be > 10'
+      });
       return null;
     }
 
