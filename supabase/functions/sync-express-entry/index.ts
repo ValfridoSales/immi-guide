@@ -28,15 +28,11 @@ Deno.serve(async (req) => {
 
     console.log({ event: 'sync_start', timestamp: new Date().toISOString() });
 
-    // Always start from ID 290 to ensure we scan all draws and fix any bad data
-    const startId = 290;
-    const maxAttempts = 100; // Check up to 100 IDs forward
     let insertCount = 0;
     let updateCount = 0;
     let errorCount = 0;
-    let notFoundCount = 0;
 
-    console.log({ event: 'sync_config', start_id: startId, max_attempts: maxAttempts });
+    console.log({ event: 'sync_config', message: 'Processing all available rounds from JSON' });
 
     // Fetch the JSON data that contains all draws
     console.log({ event: 'fetching_json_data' });
@@ -49,27 +45,20 @@ Deno.serve(async (req) => {
       }
       
       const jsonData = await jsonResponse.json();
-      console.log({ event: 'json_fetched', total_rounds: Object.keys(jsonData.rounds || {}).length });
+      const roundKeys = Object.keys(jsonData.rounds || {});
+      console.log({ event: 'json_fetched', total_rounds: roundKeys.length });
       
       // Process each draw from the JSON
-      for (let id = startId; id < startId + maxAttempts; id++) {
-        const roundKey = `r${id}`;
-        const roundData = jsonData.rounds?.[roundKey];
+      for (const roundKey of roundKeys) {
+        // Extract ID from key (e.g., "r123" -> 123)
+        const id = parseInt(roundKey.substring(1));
         
-        if (!roundData) {
-          notFoundCount++;
-          console.log({ event: 'draw_not_found', id, consecutive_404s: notFoundCount });
-          // If we get 5 consecutive 404s, stop searching
-          if (notFoundCount >= 5) {
-            console.log({ event: 'sync_limit_reached', last_checked_id: id });
-            break;
-          }
+        if (isNaN(id)) {
+          console.log({ event: 'invalid_round_key', roundKey });
           continue;
         }
         
-        // Reset 404 counter on successful find
-        notFoundCount = 0;
-        
+        const roundData = jsonData.rounds[roundKey];
         const url = `https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations.html?q=${id}`;
         
         console.log({ event: 'processing_draw', id, draw_name: roundData.drawName });
