@@ -11,6 +11,7 @@ export const useDrawsTable = (filters: DrawFilters = {}) => {
           limit: filters.limit,
           type: filters.type,
           category: filters.category,
+          minCrs: filters.minCrs,
         },
       });
 
@@ -29,6 +30,7 @@ export const useDrawsSeries = (filters: DrawSeriesFilters) => {
         body: {
           window: filters.window,
           type: filters.type,
+          minCrs: filters.minCrs,
         },
       });
 

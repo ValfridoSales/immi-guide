@@ -16,6 +16,7 @@ Deno.serve(async (req) => {
     let limit = url.searchParams.get('limit');
     let type = url.searchParams.get('type');
     let category = url.searchParams.get('category');
+    let minCrs = url.searchParams.get('minCrs');
 
     // If not in query params, try body
     if (!limit && req.method === 'POST') {
@@ -23,6 +24,7 @@ Deno.serve(async (req) => {
       limit = body.limit;
       type = body.type;
       category = body.category;
+      minCrs = body.minCrs;
     }
 
     const limitNum = parseInt(limit || '20');
@@ -52,6 +54,13 @@ Deno.serve(async (req) => {
 
     if (category) {
       query = query.eq('category', category);
+    }
+
+    if (minCrs) {
+      const minCrsNum = parseInt(minCrs);
+      if (!isNaN(minCrsNum)) {
+        query = query.lte('crs_min', minCrsNum);
+      }
     }
 
     const { data, error, count } = await query;

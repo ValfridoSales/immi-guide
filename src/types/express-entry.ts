@@ -33,9 +33,11 @@ export interface DrawFilters {
   limit?: number;
   type?: string;
   category?: string;
+  minCrs?: number;
 }
 
 export interface DrawSeriesFilters {
   window: '6m' | '12m' | 'all';
   type?: string;
+  minCrs?: number;
 }

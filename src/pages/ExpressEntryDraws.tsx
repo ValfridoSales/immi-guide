@@ -12,6 +12,7 @@ import { AlertCircle, Info } from 'lucide-react';
 const ExpressEntryDraws = () => {
   const [window, setWindow] = useState<'6m' | '12m' | 'all'>('12m');
   const [type, setType] = useState<string>('all');
+  const [userCrs, setUserCrs] = useState<number | null>(null);
 
   const handleTypeChange = (newType: string) => {
     setType(newType === 'all' ? '' : newType);
@@ -19,8 +20,16 @@ const ExpressEntryDraws = () => {
 
   const filterType = type === 'all' ? '' : type;
 
-  const { data: seriesData, isLoading: seriesLoading, error: seriesError } = useDrawsSeries({ window, type: filterType });
-  const { data: tableData, isLoading: tableLoading, error: tableError } = useDrawsTable({ limit: 50, type: filterType });
+  const { data: seriesData, isLoading: seriesLoading, error: seriesError } = useDrawsSeries({ 
+    window, 
+    type: filterType,
+    minCrs: userCrs ?? undefined
+  });
+  const { data: tableData, isLoading: tableLoading, error: tableError } = useDrawsTable({ 
+    limit: 50, 
+    type: filterType,
+    minCrs: userCrs ?? undefined
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -58,8 +67,10 @@ const ExpressEntryDraws = () => {
               <DrawFilters
                 window={window}
                 type={type}
+                userCrs={userCrs}
                 onWindowChange={setWindow}
                 onTypeChange={handleTypeChange}
+                onUserCrsChange={setUserCrs}
               />
             </CardContent>
           </Card>

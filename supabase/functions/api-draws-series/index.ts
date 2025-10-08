@@ -15,12 +15,14 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     let window = url.searchParams.get('window');
     let type = url.searchParams.get('type');
+    let minCrs = url.searchParams.get('minCrs');
 
     // If not in query params, try body
     if (!window && req.method === 'POST') {
       const body = await req.json();
       window = body.window;
       type = body.type;
+      minCrs = body.minCrs;
     }
 
     window = window || '12m';
@@ -59,6 +61,13 @@ Deno.serve(async (req) => {
 
     if (type) {
       query = query.eq('type', type);
+    }
+
+    if (minCrs) {
+      const minCrsNum = parseInt(minCrs);
+      if (!isNaN(minCrsNum)) {
+        query = query.lte('crs_min', minCrsNum);
+      }
     }
 
     const { data: draws, error } = await query;
