@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
-import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.45/deno-dom-wasm.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -29,111 +28,73 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Fetch the official IRCC page with all historical rounds
-    const irccUrl = 'https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds.html';
-    console.log({ event: 'fetching_html', url: irccUrl });
+    // The IRCC page loads data from a JSON file via JavaScript
+    // We need to fetch this JSON directly instead of scraping HTML
+    const jsonUrl = 'https://www.canada.ca/content/dam/ircc/documents/json/ee_rounds_123_en.json';
+    console.log({ event: 'fetching_json', url: jsonUrl });
 
-    const htmlResponse = await fetch(irccUrl);
-    if (!htmlResponse.ok) {
-      throw new Error(`Failed to fetch IRCC page: ${htmlResponse.status}`);
+    const jsonResponse = await fetch(jsonUrl);
+    if (!jsonResponse.ok) {
+      throw new Error(`Failed to fetch JSON: ${jsonResponse.status}`);
     }
 
-    const html = await htmlResponse.text();
-    console.log({ event: 'html_fetched', size: html.length });
+    const jsonData = await jsonResponse.json();
+    console.log({ event: 'json_fetched', rounds_count: jsonData?.rounds?.length || 0 });
 
-    // Parse HTML
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    if (!doc) {
-      throw new Error('Failed to parse HTML');
+    if (!jsonData.rounds || !Array.isArray(jsonData.rounds)) {
+      throw new Error('Invalid JSON structure: missing rounds array');
     }
-
-    // Find the main table with draw data (has data-wb-tables attribute)
-    const table = doc.querySelector('table[data-wb-tables]');
-    if (!table) {
-      throw new Error('Could not find draws table on page');
-    }
-
-    console.log({ event: 'table_found' });
-
-    // Debug: check table structure
-    const tbody = table.querySelector('tbody');
-    console.log({ event: 'tbody_check', found: !!tbody, hasChildren: tbody?.children?.length || 0 });
 
     let drawsData: DrawData[] = [];
     let inserted = 0;
     let updated = 0;
     let errors = 0;
 
-    // Try multiple selectors to find rows
-    let rows = table.querySelectorAll('tbody tr');
-    if (rows.length === 0) {
-      console.log({ event: 'trying_alternative_selector' });
-      rows = table.querySelectorAll('tr');
-    }
-    
-    console.log({ event: 'rows_found', count: rows.length });
-
-    for (const row of rows) {
+    // Process each round from the JSON
+    for (const round of jsonData.rounds) {
       try {
-        const cells = row.querySelectorAll('td');
-        
-        // Skip if not enough cells
-        if (cells.length < 5) {
-          console.log({ event: 'skip_row', reason: 'not_enough_cells', count: cells.length });
-          continue;
-        }
-
-        // Extract draw number from first cell (contains <a href="...?q=371">371</a>)
-        const firstCellLink = cells[0]?.querySelector('a');
-        const drawIdText = firstCellLink?.textContent?.trim() || cells[0]?.textContent?.trim();
-        const drawId = parseInt(drawIdText || '0');
-        
+        // Extract draw number from drawNumber field (format: "371")
+        const drawId = parseInt(round.drawNumber);
         if (isNaN(drawId) || drawId < 1) {
-          console.log({ event: 'skip_row', reason: 'invalid_id', text: drawIdText });
+          console.log({ event: 'skip_round', reason: 'invalid_id', data: round.drawNumber });
           continue;
         }
 
-        // Get date from second cell (format: "October 6, 2025")
-        const dateText = cells[1]?.textContent?.trim() || '';
-        const dateOrder = cells[1]?.getAttribute('data-order'); // Format: "2025-10-06"
-        
-        // Parse date using data-order attribute if available, otherwise parse text
-        let drawDate: Date;
-        try {
-          if (dateOrder) {
-            drawDate = new Date(dateOrder);
-          } else {
-            drawDate = new Date(dateText);
-          }
-          
-          if (isNaN(drawDate.getTime())) {
-            console.log({ event: 'skip_row', reason: 'invalid_date', dateText, dateOrder });
-            continue;
-          }
-        } catch {
-          console.log({ event: 'skip_row', reason: 'date_parse_error', dateText });
+        // Parse date from drawDate field (format: "2025-10-06")
+        const drawDate = new Date(round.drawDate);
+        if (isNaN(drawDate.getTime())) {
+          console.log({ event: 'skip_round', reason: 'invalid_date', data: round.drawDate });
           continue;
         }
 
-        // Get program/category from third cell
-        const programText = cells[2]?.textContent?.trim() || '';
-        
-        // Get invitations from fourth cell (remove commas: "4,500" -> 4500)
-        const invitationsText = cells[3]?.textContent?.trim() || '';
-        const invitations = parseInt(invitationsText.replace(/,/g, ''));
-        
+        // Get invitations (remove commas: "4,500" -> 4500)
+        const invitations = parseInt(String(round.drawSize).replace(/,/g, ''));
         if (isNaN(invitations)) {
-          console.log({ event: 'skip_row', reason: 'invalid_invitations', text: invitationsText });
+          console.log({ event: 'skip_round', reason: 'invalid_invitations', data: round.drawSize });
           continue;
         }
 
-        // Get CRS score from fifth cell
-        const crsText = cells[4]?.textContent?.trim() || '';
-        const crsMin = parseInt(crsText.replace(/,/g, ''));
-        
+        // Get CRS score
+        const crsMin = parseInt(String(round.drawCRS).replace(/,/g, ''));
         if (isNaN(crsMin)) {
-          console.log({ event: 'skip_row', reason: 'invalid_crs', text: crsText });
+          console.log({ event: 'skip_round', reason: 'invalid_crs', data: round.drawCRS });
           continue;
+        }
+
+        // Get program name
+        const programText = round.drawName || '';
+
+        // Parse tiebreak timestamp if available
+        let tiebreakTs: string | undefined;
+        if (round.drawCutOff) {
+          try {
+            const cutoffDate = new Date(round.drawCutOff);
+            if (!isNaN(cutoffDate.getTime())) {
+              tiebreakTs = cutoffDate.toISOString();
+            }
+          } catch {
+            // Ignore invalid tiebreak dates
+          }
         }
 
         // Classify draw type and category
@@ -146,12 +107,13 @@ Deno.serve(async (req) => {
           category,
           invitations,
           crs_min: crsMin,
+          tiebreak_ts: tiebreakTs,
           source_url: `https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations.html?q=${drawId}`,
         };
 
         drawsData.push(drawData);
 
-        // Log only every 50th draw to avoid too many logs
+        // Log every 50th draw to avoid too many logs
         if (drawId % 50 === 0) {
           console.log({
             event: 'draw_parsed',
@@ -165,7 +127,7 @@ Deno.serve(async (req) => {
         }
 
       } catch (error) {
-        console.error({ event: 'row_parse_error', error: error.message });
+        console.error({ event: 'round_parse_error', error: error.message });
         errors++;
       }
     }
