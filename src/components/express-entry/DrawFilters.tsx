@@ -30,10 +30,10 @@ export const DrawFilters = ({ window, type, onWindowChange, onTypeChange }: Draw
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos os tipos</SelectItem>
-            <SelectItem value="general">Geral</SelectItem>
-            <SelectItem value="pnp">Provincial Nominee</SelectItem>
-            <SelectItem value="cec">Canadian Experience</SelectItem>
-            <SelectItem value="category">Categoria Específica</SelectItem>
+            <SelectItem value="general">Geral (General)</SelectItem>
+            <SelectItem value="pnp">Programa de Nomeação Provincial (PNP)</SelectItem>
+            <SelectItem value="cec">Classe de Experiência Canadense (CEC)</SelectItem>
+            <SelectItem value="category">Categoria Específica (Category-based)</SelectItem>
           </SelectContent>
         </Select>
       </div>
