@@ -29,8 +29,8 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Fetch the official IRCC page
-    const irccUrl = 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/rounds-invitations.html';
+    // Fetch the official IRCC page with all historical rounds
+    const irccUrl = 'https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds.html';
     console.log({ event: 'fetching_html', url: irccUrl });
 
     const htmlResponse = await fetch(irccUrl);
@@ -47,79 +47,103 @@ Deno.serve(async (req) => {
       throw new Error('Failed to parse HTML');
     }
 
-    // Find the table with draw data
-    const tables = doc.querySelectorAll('table');
-    console.log({ event: 'tables_found', count: tables.length });
+    // Find the main table with draw data (has data-wb-tables attribute)
+    const table = doc.querySelector('table[data-wb-tables]');
+    if (!table) {
+      throw new Error('Could not find draws table on page');
+    }
+
+    console.log({ event: 'table_found' });
 
     let drawsData: DrawData[] = [];
     let inserted = 0;
     let updated = 0;
     let errors = 0;
 
-    // Process each table (there are multiple tables on the page)
-    for (const table of tables) {
-      const rows = table.querySelectorAll('tbody tr');
-      
-      for (const row of rows) {
+    // Get all rows from tbody
+    const rows = table.querySelectorAll('tbody tr');
+    console.log({ event: 'rows_found', count: rows.length });
+
+    for (const row of rows) {
+      try {
+        const cells = row.querySelectorAll('td');
+        
+        // Skip if not enough cells
+        if (cells.length < 5) {
+          console.log({ event: 'skip_row', reason: 'not_enough_cells', count: cells.length });
+          continue;
+        }
+
+        // Extract draw number from first cell (contains <a href="...?q=371">371</a>)
+        const firstCellLink = cells[0]?.querySelector('a');
+        const drawIdText = firstCellLink?.textContent?.trim() || cells[0]?.textContent?.trim();
+        const drawId = parseInt(drawIdText || '0');
+        
+        if (isNaN(drawId) || drawId < 1) {
+          console.log({ event: 'skip_row', reason: 'invalid_id', text: drawIdText });
+          continue;
+        }
+
+        // Get date from second cell (format: "October 6, 2025")
+        const dateText = cells[1]?.textContent?.trim() || '';
+        const dateOrder = cells[1]?.getAttribute('data-order'); // Format: "2025-10-06"
+        
+        // Parse date using data-order attribute if available, otherwise parse text
+        let drawDate: Date;
         try {
-          const cells = row.querySelectorAll('td, th');
+          if (dateOrder) {
+            drawDate = new Date(dateOrder);
+          } else {
+            drawDate = new Date(dateText);
+          }
           
-          // Skip if not enough cells or header row
-          if (cells.length < 4) continue;
-
-          const firstCell = cells[0]?.textContent?.trim();
-          if (!firstCell || firstCell.includes('Round') || firstCell.includes('Invitation')) continue;
-
-          // Extract draw number from first cell (e.g., "#325" or "325")
-          const drawNumberMatch = firstCell.match(/\d+/);
-          if (!drawNumberMatch) continue;
-
-          const drawId = parseInt(drawNumberMatch[0]);
-          if (isNaN(drawId) || drawId < 1) continue;
-
-          // Get draw data from cells
-          const dateText = cells[1]?.textContent?.trim() || '';
-          const programText = cells[2]?.textContent?.trim() || '';
-          const invitationsText = cells[3]?.textContent?.trim() || '';
-          const crsText = cells[4]?.textContent?.trim() || '';
-
-          // Parse invitations (remove commas)
-          const invitations = parseInt(invitationsText.replace(/,/g, ''));
-          if (isNaN(invitations)) continue;
-
-          // Parse CRS score
-          const crsMin = parseInt(crsText);
-          if (isNaN(crsMin)) continue;
-
-          // Parse date (format: "Month DD, YYYY" or "YYYY-MM-DD")
-          let drawDate: Date;
-          try {
-            if (dateText.match(/^\d{4}-\d{2}-\d{2}/)) {
-              drawDate = new Date(dateText);
-            } else {
-              drawDate = new Date(dateText);
-            }
-            if (isNaN(drawDate.getTime())) continue;
-          } catch {
-            console.log({ event: 'invalid_date', dateText, id: drawId });
+          if (isNaN(drawDate.getTime())) {
+            console.log({ event: 'skip_row', reason: 'invalid_date', dateText, dateOrder });
             continue;
           }
+        } catch {
+          console.log({ event: 'skip_row', reason: 'date_parse_error', dateText });
+          continue;
+        }
 
-          // Classify draw type and category
-          const { type, category } = classifyDraw(programText);
+        // Get program/category from third cell
+        const programText = cells[2]?.textContent?.trim() || '';
+        
+        // Get invitations from fourth cell (remove commas: "4,500" -> 4500)
+        const invitationsText = cells[3]?.textContent?.trim() || '';
+        const invitations = parseInt(invitationsText.replace(/,/g, ''));
+        
+        if (isNaN(invitations)) {
+          console.log({ event: 'skip_row', reason: 'invalid_invitations', text: invitationsText });
+          continue;
+        }
 
-          const drawData: DrawData = {
-            id: drawId,
-            date: drawDate.toISOString(),
-            type,
-            category,
-            invitations,
-            crs_min: crsMin,
-            source_url: `https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations-${drawId}.html`,
-          };
+        // Get CRS score from fifth cell
+        const crsText = cells[4]?.textContent?.trim() || '';
+        const crsMin = parseInt(crsText.replace(/,/g, ''));
+        
+        if (isNaN(crsMin)) {
+          console.log({ event: 'skip_row', reason: 'invalid_crs', text: crsText });
+          continue;
+        }
 
-          drawsData.push(drawData);
+        // Classify draw type and category
+        const { type, category } = classifyDraw(programText);
 
+        const drawData: DrawData = {
+          id: drawId,
+          date: drawDate.toISOString(),
+          type,
+          category,
+          invitations,
+          crs_min: crsMin,
+          source_url: `https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations.html?q=${drawId}`,
+        };
+
+        drawsData.push(drawData);
+
+        // Log only every 50th draw to avoid too many logs
+        if (drawId % 50 === 0) {
           console.log({
             event: 'draw_parsed',
             id: drawId,
@@ -129,11 +153,11 @@ Deno.serve(async (req) => {
             invitations,
             crs: crsMin,
           });
-
-        } catch (error) {
-          console.error({ event: 'row_parse_error', error: error.message });
-          errors++;
         }
+
+      } catch (error) {
+        console.error({ event: 'row_parse_error', error: error.message });
+        errors++;
       }
     }
 
