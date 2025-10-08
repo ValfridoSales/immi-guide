@@ -13,14 +13,14 @@ interface DrawFiltersProps {
 
 export const DrawFilters = ({ window, type, userCrs, onWindowChange, onTypeChange, onUserCrsChange }: DrawFiltersProps) => {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex-1">
+    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
+      <div className="flex-1 min-w-[180px]">
         <label className="text-sm font-medium mb-2 block">Período</label>
         <Tabs value={window} onValueChange={(v) => onWindowChange(v as '6m' | '12m' | 'all')}>
-          <TabsList>
-            <TabsTrigger value="6m">6 meses</TabsTrigger>
-            <TabsTrigger value="12m">12 meses</TabsTrigger>
-            <TabsTrigger value="all">Todos</TabsTrigger>
+          <TabsList className="w-full">
+            <TabsTrigger value="6m" className="flex-1">6m</TabsTrigger>
+            <TabsTrigger value="12m" className="flex-1">12m</TabsTrigger>
+            <TabsTrigger value="all" className="flex-1">Todos</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
