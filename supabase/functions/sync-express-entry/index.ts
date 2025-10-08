@@ -138,10 +138,27 @@ function parseDrawDataFromJSON(id: number, sourceUrl: string, roundData: any): D
     // Extract CRS score
     const crs_min = parseInt(roundData.drawCRS || '0');
     
-    // Parse date - format: "October 06, 2025 at 13:59:15 UTC"
+    // Parse date - handle formats like "November 24, 2021 at 14:01:44 UTC" or "February 02 2022 at 14:16:27 UTC"
     let date = new Date().toISOString();
     if (roundData.drawDateTime) {
-      date = new Date(roundData.drawDateTime).toISOString();
+      try {
+        // Remove " at " and " UTC" to simplify parsing
+        // Also normalize by ensuring comma after day (some dates have it, some don't)
+        let dateStr = roundData.drawDateTime
+          .replace(' at ', ' ')
+          .replace(' UTC', '')
+          .trim();
+        
+        // Parse the date - JavaScript can handle "Month DD YYYY HH:MM:SS"
+        const parsed = new Date(dateStr);
+        if (!isNaN(parsed.getTime())) {
+          date = parsed.toISOString();
+        } else {
+          console.log({ event: 'date_parse_failed', id, dateStr, original: roundData.drawDateTime });
+        }
+      } catch (error) {
+        console.log({ event: 'date_parse_error', id, error: error.message, dateStr: roundData.drawDateTime });
+      }
     }
 
     // Determine type and category based on draw name
@@ -162,10 +179,24 @@ function parseDrawDataFromJSON(id: number, sourceUrl: string, roundData: any): D
       category = drawName;
     }
 
-    // Extract tie-break timestamp - format: "June 13, 2025 at 19:07:01 UTC"
+    // Extract tie-break timestamp - same format handling as drawDateTime
     let tiebreak_ts: string | undefined;
     if (roundData.drawCutOff) {
-      tiebreak_ts = new Date(roundData.drawCutOff).toISOString();
+      try {
+        let dateStr = roundData.drawCutOff
+          .replace(' at ', ' ')
+          .replace(' UTC', '')
+          .replace(' PM', '')  // Remove PM/AM if present
+          .replace(' AM', '')
+          .trim();
+        
+        const parsed = new Date(dateStr);
+        if (!isNaN(parsed.getTime())) {
+          tiebreak_ts = parsed.toISOString();
+        }
+      } catch (error) {
+        console.log({ event: 'tiebreak_parse_error', id, error: error.message });
+      }
     }
 
     // Validate data
