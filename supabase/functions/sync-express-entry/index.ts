@@ -133,13 +133,22 @@ Deno.serve(async (req) => {
 
 function parseDrawData(id: number, sourceUrl: string, html: string): DrawData | null {
   try {
+    // Log HTML snippet for debugging
+    console.log({ 
+      event: 'parse_attempt', 
+      id, 
+      html_snippet: html.substring(0, 500).replace(/\s+/g, ' ')
+    });
+
     // Extract invitations - now matches "Number of invitations issued:** 400"
     const invitationsMatch = html.match(/Number of invitations issued[:\s*]+(\d+(?:,\d+)*)/i);
     const invitations = invitationsMatch ? parseInt(invitationsMatch[1].replace(/,/g, '')) : 0;
+    console.log({ event: 'parse_invitations', id, match: invitationsMatch?.[0], value: invitations });
 
     // Extract CRS score - matches "CRS score of lowest-ranked candidate invited:** 539"
     const crsMatch = html.match(/CRS score of lowest-ranked candidate invited[:\s*]+(\d+)/i);
     const crs_min = crsMatch ? parseInt(crsMatch[1]) : 0;
+    console.log({ event: 'parse_crs', id, match: crsMatch?.[0], value: crs_min });
 
     // Extract date - matches "Date and time of round:** October 22, 2024 at 14:07:18 UTC"
     const dateMatch = html.match(/Date and time of round[:\s*]+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d+,\s+\d{4}\s+at\s+\d+:\d+:\d+\s+UTC)/i);
