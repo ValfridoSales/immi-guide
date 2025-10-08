@@ -11,10 +11,16 @@ import { AlertCircle, Info } from 'lucide-react';
 
 const ExpressEntryDraws = () => {
   const [window, setWindow] = useState<'6m' | '12m' | 'all'>('12m');
-  const [type, setType] = useState<string>('');
+  const [type, setType] = useState<string>('all');
 
-  const { data: seriesData, isLoading: seriesLoading, error: seriesError } = useDrawsSeries({ window, type });
-  const { data: tableData, isLoading: tableLoading, error: tableError } = useDrawsTable({ limit: 50, type });
+  const handleTypeChange = (newType: string) => {
+    setType(newType === 'all' ? '' : newType);
+  };
+
+  const filterType = type === 'all' ? '' : type;
+
+  const { data: seriesData, isLoading: seriesLoading, error: seriesError } = useDrawsSeries({ window, type: filterType });
+  const { data: tableData, isLoading: tableLoading, error: tableError } = useDrawsTable({ limit: 50, type: filterType });
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,7 +59,7 @@ const ExpressEntryDraws = () => {
                 window={window}
                 type={type}
                 onWindowChange={setWindow}
-                onTypeChange={setType}
+                onTypeChange={handleTypeChange}
               />
             </CardContent>
           </Card>

@@ -24,12 +24,12 @@ export const DrawFilters = ({ window, type, onWindowChange, onTypeChange }: Draw
 
       <div className="flex-1 min-w-[200px]">
         <label className="text-sm font-medium mb-2 block">Tipo de Draw</label>
-        <Select value={type} onValueChange={onTypeChange}>
+        <Select value={type || "all"} onValueChange={onTypeChange}>
           <SelectTrigger>
             <SelectValue placeholder="Todos os tipos" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos os tipos</SelectItem>
+            <SelectItem value="all">Todos os tipos</SelectItem>
             <SelectItem value="general">Geral</SelectItem>
             <SelectItem value="pnp">Provincial Nominee</SelectItem>
             <SelectItem value="cec">Canadian Experience</SelectItem>
