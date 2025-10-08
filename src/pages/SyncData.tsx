@@ -25,8 +25,8 @@ export default function SyncData() {
         throw deleteError;
       }
 
-      // Then trigger sync
-      const { data, error } = await supabase.functions.invoke('sync-express-entry', {
+      // Then trigger sync with new v2 function (web scraping)
+      const { data, error } = await supabase.functions.invoke('sync-express-entry-v2', {
         body: {},
       });
 

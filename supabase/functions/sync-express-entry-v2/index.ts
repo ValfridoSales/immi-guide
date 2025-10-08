@@ -1,0 +1,233 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
+import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.45/deno-dom-wasm.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface DrawData {
+  id: number;
+  date: string;
+  type: 'general' | 'pnp' | 'cec' | 'category';
+  category?: string;
+  invitations: number;
+  crs_min: number;
+  tiebreak_ts?: string;
+  source_url: string;
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    console.log({ event: 'sync_started', timestamp: new Date().toISOString() });
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Fetch the official IRCC page
+    const irccUrl = 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/rounds-invitations.html';
+    console.log({ event: 'fetching_html', url: irccUrl });
+
+    const htmlResponse = await fetch(irccUrl);
+    if (!htmlResponse.ok) {
+      throw new Error(`Failed to fetch IRCC page: ${htmlResponse.status}`);
+    }
+
+    const html = await htmlResponse.text();
+    console.log({ event: 'html_fetched', size: html.length });
+
+    // Parse HTML
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    if (!doc) {
+      throw new Error('Failed to parse HTML');
+    }
+
+    // Find the table with draw data
+    const tables = doc.querySelectorAll('table');
+    console.log({ event: 'tables_found', count: tables.length });
+
+    let drawsData: DrawData[] = [];
+    let inserted = 0;
+    let updated = 0;
+    let errors = 0;
+
+    // Process each table (there are multiple tables on the page)
+    for (const table of tables) {
+      const rows = table.querySelectorAll('tbody tr');
+      
+      for (const row of rows) {
+        try {
+          const cells = row.querySelectorAll('td, th');
+          
+          // Skip if not enough cells or header row
+          if (cells.length < 4) continue;
+
+          const firstCell = cells[0]?.textContent?.trim();
+          if (!firstCell || firstCell.includes('Round') || firstCell.includes('Invitation')) continue;
+
+          // Extract draw number from first cell (e.g., "#325" or "325")
+          const drawNumberMatch = firstCell.match(/\d+/);
+          if (!drawNumberMatch) continue;
+
+          const drawId = parseInt(drawNumberMatch[0]);
+          if (isNaN(drawId) || drawId < 1) continue;
+
+          // Get draw data from cells
+          const dateText = cells[1]?.textContent?.trim() || '';
+          const programText = cells[2]?.textContent?.trim() || '';
+          const invitationsText = cells[3]?.textContent?.trim() || '';
+          const crsText = cells[4]?.textContent?.trim() || '';
+
+          // Parse invitations (remove commas)
+          const invitations = parseInt(invitationsText.replace(/,/g, ''));
+          if (isNaN(invitations)) continue;
+
+          // Parse CRS score
+          const crsMin = parseInt(crsText);
+          if (isNaN(crsMin)) continue;
+
+          // Parse date (format: "Month DD, YYYY" or "YYYY-MM-DD")
+          let drawDate: Date;
+          try {
+            if (dateText.match(/^\d{4}-\d{2}-\d{2}/)) {
+              drawDate = new Date(dateText);
+            } else {
+              drawDate = new Date(dateText);
+            }
+            if (isNaN(drawDate.getTime())) continue;
+          } catch {
+            console.log({ event: 'invalid_date', dateText, id: drawId });
+            continue;
+          }
+
+          // Classify draw type and category
+          const { type, category } = classifyDraw(programText);
+
+          const drawData: DrawData = {
+            id: drawId,
+            date: drawDate.toISOString(),
+            type,
+            category,
+            invitations,
+            crs_min: crsMin,
+            source_url: `https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations-${drawId}.html`,
+          };
+
+          drawsData.push(drawData);
+
+          console.log({
+            event: 'draw_parsed',
+            id: drawId,
+            date: drawDate.toISOString().split('T')[0],
+            type,
+            category,
+            invitations,
+            crs: crsMin,
+          });
+
+        } catch (error) {
+          console.error({ event: 'row_parse_error', error: error.message });
+          errors++;
+        }
+      }
+    }
+
+    console.log({ event: 'parsing_complete', total_draws: drawsData.length });
+
+    // Insert/update draws in database
+    for (const drawData of drawsData) {
+      try {
+        const { data, error } = await supabase
+          .from('express_entry_draws')
+          .upsert(drawData, { onConflict: 'id' })
+          .select();
+
+        if (error) {
+          console.error({ event: 'upsert_error', id: drawData.id, error: error.message });
+          errors++;
+        } else {
+          if (data && data.length > 0) {
+            // Check if it was an insert or update based on created_at vs updated_at
+            const record = data[0];
+            if (record.created_at === record.updated_at) {
+              inserted++;
+            } else {
+              updated++;
+            }
+          }
+        }
+      } catch (error) {
+        console.error({ event: 'database_error', id: drawData.id, error: error.message });
+        errors++;
+      }
+    }
+
+    const result = {
+      success: true,
+      total_draws: drawsData.length,
+      inserted,
+      updated,
+      errors,
+      message: `Sincronização concluída: ${drawsData.length} draws processados (${inserted} novos, ${updated} atualizados, ${errors} erros)`,
+    };
+
+    console.log({ event: 'sync_complete', ...result });
+
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
+
+  } catch (error) {
+    console.error({ event: 'sync_failed', error: error.message, stack: error.stack });
+    
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        details: error.stack 
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    );
+  }
+});
+
+function classifyDraw(programText: string): { type: 'general' | 'pnp' | 'cec' | 'category'; category?: string } {
+  const text = programText.toLowerCase();
+
+  if (text.includes('provincial nominee') || text.includes('pnp')) {
+    return { type: 'pnp' };
+  }
+
+  if (text.includes('canadian experience class') || text.includes('cec')) {
+    return { type: 'cec' };
+  }
+
+  if (text.includes('no program specified') || text === 'general') {
+    return { type: 'general' };
+  }
+
+  // Category-based draws
+  if (
+    text.includes('healthcare') ||
+    text.includes('stem') ||
+    text.includes('trade') ||
+    text.includes('transport') ||
+    text.includes('agriculture') ||
+    text.includes('french') ||
+    text.includes('language')
+  ) {
+    return { type: 'category', category: programText };
+  }
+
+  // Default to category with the program name
+  return { type: 'category', category: programText };
+}

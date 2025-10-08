@@ -6,6 +6,9 @@ verify_jwt = false
 [functions.sync-express-entry]
 verify_jwt = false
 
+[functions.sync-express-entry-v2]
+verify_jwt = false
+
 [functions.api-draws]
 verify_jwt = false
 
