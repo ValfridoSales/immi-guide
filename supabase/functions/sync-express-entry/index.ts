@@ -125,7 +125,11 @@ function parseDrawDataFromJSON(id: number, sourceUrl: string, roundData: any): D
       id, 
       draw_name: roundData.drawName,
       draw_size: roundData.drawSize,
-      draw_crs: roundData.drawCRS
+      draw_crs: roundData.drawCRS,
+      drawDateTime_raw: roundData.drawDateTime,
+      drawCutOff_raw: roundData.drawCutOff,
+      drawDateTime_type: typeof roundData.drawDateTime,
+      drawCutOff_type: typeof roundData.drawCutOff
     });
 
     // Extract invitations - remove commas from numbers like "4,500"
