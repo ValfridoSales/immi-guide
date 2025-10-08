@@ -2,3 +2,12 @@ project_id = "ulwatxrssexhbxuhapbb"
 
 [functions.send-welcome-email]
 verify_jwt = false
+
+[functions.sync-express-entry]
+verify_jwt = false
+
+[functions.api-draws]
+verify_jwt = false
+
+[functions.api-draws-series]
+verify_jwt = false

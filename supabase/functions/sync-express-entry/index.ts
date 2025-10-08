@@ -1,0 +1,176 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface DrawData {
+  id: number;
+  date: string;
+  type: 'general' | 'pnp' | 'cec' | 'category';
+  category?: string;
+  invitations: number;
+  crs_min: number;
+  tiebreak_ts?: string;
+  source_url: string;
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    console.log({ event: 'sync_start', timestamp: new Date().toISOString() });
+
+    // Get the last draw ID from database
+    const { data: lastDraw } = await supabase
+      .from('express_entry_draws')
+      .select('id')
+      .order('id', { ascending: false })
+      .limit(1)
+      .single();
+
+    const startId = lastDraw?.id || 300; // Start from 300 if no draws exist
+    const maxAttempts = 50; // Maximum number of pages to check
+    let insertCount = 0;
+    let updateCount = 0;
+    let errorCount = 0;
+
+    console.log({ event: 'sync_config', start_id: startId, max_attempts: maxAttempts });
+
+    // Try fetching draws starting from last known ID
+    for (let id = startId; id < startId + maxAttempts; id++) {
+      const url = `https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations-${id}.html`;
+      
+      try {
+        const response = await fetch(url);
+        
+        if (response.status === 404) {
+          // No more draws found, stop searching
+          console.log({ event: 'sync_limit_reached', last_checked_id: id });
+          break;
+        }
+
+        if (!response.ok) {
+          console.log({ event: 'fetch_error', id, status: response.status });
+          continue;
+        }
+
+        const html = await response.text();
+        const drawData = parseDrawData(id, url, html);
+
+        if (drawData) {
+          const { error } = await supabase
+            .from('express_entry_draws')
+            .upsert(drawData, { onConflict: 'id' });
+
+          if (error) {
+            console.error({ event: 'upsert_error', id, error: error.message });
+            errorCount++;
+          } else {
+            insertCount++;
+            console.log({ event: 'draw_synced', id, type: drawData.type, category: drawData.category });
+          }
+        }
+
+        // Rate limiting - wait 500ms between requests
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (error) {
+        console.error({ event: 'processing_error', id, error: error.message });
+        errorCount++;
+      }
+    }
+
+    const result = {
+      success: true,
+      inserted: insertCount,
+      updated: updateCount,
+      errors: errorCount,
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log({ event: 'sync_complete', ...result });
+
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error({ event: 'sync_error', error: error.message });
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});
+
+function parseDrawData(id: number, sourceUrl: string, html: string): DrawData | null {
+  try {
+    // Extract invitations
+    const invitationsMatch = html.match(/Number of invitations issued[^\d]*?([\d,]+)/i);
+    const invitations = invitationsMatch ? parseInt(invitationsMatch[1].replace(/,/g, '')) : 0;
+
+    // Extract CRS score
+    const crsMatch = html.match(/CRS score of lowest[^\d]*?(\d+)/i);
+    const crs_min = crsMatch ? parseInt(crsMatch[1]) : 0;
+
+    // Extract date - looking for patterns like "October 6, 2025 at 14:12:29 UTC"
+    const dateMatch = html.match(/Date and time of round[^<]*?<time[^>]*datetime="([^"]+)"/i) ||
+                     html.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d+,\s+\d{4}\s+at\s+\d+:\d+:\d+\s+UTC/i);
+    
+    let date = new Date().toISOString();
+    if (dateMatch) {
+      const dateStr = dateMatch[1] || dateMatch[0];
+      date = new Date(dateStr).toISOString();
+    }
+
+    // Determine type and category
+    let type: 'general' | 'pnp' | 'cec' | 'category' = 'general';
+    let category: string | undefined;
+
+    if (html.includes('Provincial Nominee Program')) {
+      type = 'pnp';
+    } else if (html.includes('Canadian Experience Class')) {
+      type = 'cec';
+    } else if (html.includes('Category-based')) {
+      type = 'category';
+      
+      // Extract category name
+      const categoryMatch = html.match(/Category-based[^:]*:\s*([^<\n]+)/i);
+      if (categoryMatch) {
+        category = categoryMatch[1].trim();
+      }
+    }
+
+    // Extract tie-break timestamp if exists
+    let tiebreak_ts: string | undefined;
+    const tiebreakMatch = html.match(/tie-breaking rule[^<]*?<time[^>]*datetime="([^"]+)"/i);
+    if (tiebreakMatch) {
+      tiebreak_ts = new Date(tiebreakMatch[1]).toISOString();
+    }
+
+    if (!invitations || !crs_min) {
+      console.log({ event: 'parse_incomplete', id, invitations, crs_min });
+      return null;
+    }
+
+    return {
+      id,
+      date,
+      type,
+      category,
+      invitations,
+      crs_min,
+      tiebreak_ts,
+      source_url: sourceUrl,
+    };
+  } catch (error) {
+    console.error({ event: 'parse_error', id, error: error.message });
+    return null;
+  }
+}

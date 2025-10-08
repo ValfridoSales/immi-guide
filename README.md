@@ -12,6 +12,99 @@ Um quiz interativo para ajudar pessoas a descobrir os melhores programas de imig
 - Interface responsiva e acessível
 - Sistema de PDF para resultados
 - Integração com email para envio de relatórios
+- **Express Entry Draws**: Visualização de draws recentes com gráficos e atualização automática
+
+## Express Entry Draws
+
+### Funcionalidades
+- **Gráfico interativo**: CRS mínimo e número de ITAs ao longo do tempo
+- **Tabela completa**: Histórico detalhado de todos os draws
+- **Filtros**: Por período (6m, 12m, todos) e tipo (geral, PNP, CEC, categoria)
+- **Links oficiais**: Acesso direto às páginas do IRCC para cada draw
+- **Atualização automática**: Sincronização a cada 6 horas via cron job
+
+### Rotas da API
+
+#### Listar Draws
+```bash
+GET /api-draws?limit=20&type=general&category=Healthcare
+```
+
+**Parâmetros:**
+- `limit`: Número de draws a retornar (1-100, padrão: 20)
+- `type`: Filtrar por tipo (general, pnp, cec, category)
+- `category`: Filtrar por categoria (quando type=category)
+
+**Resposta:**
+```json
+{
+  "draws": [
+    {
+      "id": 325,
+      "date": "2025-10-01T14:12:29Z",
+      "type": "category",
+      "category": "Healthcare occupations",
+      "invitations": 2500,
+      "crs_min": 470,
+      "source_url": "https://..."
+    }
+  ],
+  "count": 1
+}
+```
+
+#### Dados para Gráfico
+```bash
+GET /api-draws-series?window=12m&type=general
+```
+
+**Parâmetros:**
+- `window`: Período (6m, 12m, all)
+- `type`: Filtrar por tipo (opcional)
+
+**Resposta:**
+```json
+{
+  "labels": ["2025-08-19", "2025-09-02"],
+  "crs": [470, 486],
+  "itas": [2500, 4500],
+  "items": [
+    {
+      "date": "2025-08-19",
+      "title": "Category: Healthcare",
+      "points": 470,
+      "invitations": 2500,
+      "category": "Healthcare occupations",
+      "source_url": "https://...",
+      "type": "category"
+    }
+  ],
+  "updatedAt": "2025-10-08T12:00:00Z"
+}
+```
+
+### Sincronização Manual
+
+Para forçar uma sincronização imediata:
+```bash
+curl -X POST "https://ulwatxrssexhbxuhapbb.supabase.co/functions/v1/sync-express-entry" \
+  -H "Authorization: Bearer YOUR_ANON_KEY"
+```
+
+### Arquitetura
+
+1. **Database**: Tabela `express_entry_draws` armazena todos os draws
+2. **Edge Function**: `sync-express-entry` faz scraping incremental do site do IRCC
+3. **Cron Job**: Executa sync a cada 6 horas automaticamente
+4. **APIs Públicas**: `api-draws` e `api-draws-series` servem dados ao frontend
+5. **Frontend**: React com Recharts para visualização
+
+### Fonte de Dados
+
+Os dados são coletados diretamente das páginas oficiais do IRCC:
+```
+https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations-{ID}.html
+```
 
 ## PDF de Resultados
 

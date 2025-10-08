@@ -8,6 +8,7 @@ import { QuizProgress } from '@/components/QuizProgress';
 import { QuizResults } from '@/components/QuizResults';
 import { LeadCaptureForm } from '@/components/LeadCaptureForm';
 import { ThankYouPage } from '@/components/ThankYouPage';
+import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -154,25 +155,19 @@ const Index = () => {
     setResultId(null);
   };
   return <div className="min-h-screen bg-gradient-subtle">
-      {/* Header */}
-      <header className="bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <button onClick={handleRestart} className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-              <span className="text-2xl">🍁</span>
-              <span className="text-xl font-bold text-primary">
-                Canada Immigration Quiz
-              </span>
-            </button>
-            {quizState === 'questions' && <div className="text-sm text-muted-foreground">
-                Pergunta {currentQuestionIndex + 1} de {quizQuestions.length}
-              </div>}
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Progress indicator for questions state */}
+        {quizState === 'questions' && (
+          <div className="max-w-2xl mx-auto mb-4">
+            <div className="text-sm text-muted-foreground text-center">
+              Pergunta {currentQuestionIndex + 1} de {quizQuestions.length}
+            </div>
+          </div>
+        )}
+
         {quizState === 'intro' && <QuizIntro onStart={handleStartQuiz} completionsCount={completionsCount} />}
 
         {quizState === 'questions' && currentQuestion && <div className="max-w-2xl mx-auto space-y-8">

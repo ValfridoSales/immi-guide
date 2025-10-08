@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      express_entry_draws: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          crs_min: number
+          date: string
+          id: number
+          invitations: number
+          source_url: string
+          tiebreak_ts: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          crs_min: number
+          date: string
+          id: number
+          invitations: number
+          source_url: string
+          tiebreak_ts?: string | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          crs_min?: number
+          date?: string
+          id?: number
+          invitations?: number
+          source_url?: string
+          tiebreak_ts?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       quiz_completions: {
         Row: {
           completed_at: string
