@@ -38,14 +38,25 @@ Deno.serve(async (req) => {
 
     console.log({ event: 'sync_config', start_id: startId, max_attempts: maxAttempts });
 
-    // Try fetching draws starting from last known ID
-    for (let id = startId; id < startId + maxAttempts; id++) {
-      const url = `https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations.html?q=${id}`;
+    // Fetch the JSON data that contains all draws
+    console.log({ event: 'fetching_json_data' });
+    const jsonUrl = 'https://www.canada.ca/content/dam/ircc/documents/json/ee_rounds_123_en.json';
+    
+    try {
+      const jsonResponse = await fetch(jsonUrl);
+      if (!jsonResponse.ok) {
+        throw new Error(`Failed to fetch JSON: ${jsonResponse.status}`);
+      }
       
-      try {
-        const response = await fetch(url);
+      const jsonData = await jsonResponse.json();
+      console.log({ event: 'json_fetched', total_rounds: Object.keys(jsonData.rounds || {}).length });
+      
+      // Process each draw from the JSON
+      for (let id = startId; id < startId + maxAttempts; id++) {
+        const roundKey = `r${id}`;
+        const roundData = jsonData.rounds?.[roundKey];
         
-        if (response.status === 404) {
+        if (!roundData) {
           notFoundCount++;
           console.log({ event: 'draw_not_found', id, consecutive_404s: notFoundCount });
           // If we get 5 consecutive 404s, stop searching
@@ -56,19 +67,14 @@ Deno.serve(async (req) => {
           continue;
         }
         
-        // Reset 404 counter on successful fetch
+        // Reset 404 counter on successful find
         notFoundCount = 0;
-
-        if (!response.ok) {
-          console.log({ event: 'fetch_error', id, status: response.status });
-          continue;
-        }
-
-        const html = await response.text();
         
-        console.log({ event: 'parsing_draw', id, html_length: html.length });
+        const url = `https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/policies-operational-instructions-agreements/ministerial-instructions/express-entry-rounds/invitations.html?q=${id}`;
         
-        const drawData = parseDrawData(id, url, html);
+        console.log({ event: 'processing_draw', id, draw_name: roundData.drawName });
+        
+        const drawData = parseDrawDataFromJSON(id, url, roundData);
 
         if (drawData) {
           const { error } = await supabase
@@ -92,13 +98,13 @@ Deno.serve(async (req) => {
         } else {
           console.log({ event: 'parse_failed', id });
         }
-
-        // Rate limiting - wait 500ms between requests
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (error) {
-        console.error({ event: 'processing_error', id, error: error.message });
-        errorCount++;
       }
+    } catch (jsonError) {
+      console.error({ event: 'json_fetch_error', error: jsonError.message });
+      return new Response(
+        JSON.stringify({ error: 'Failed to fetch draw data from JSON source' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const result = {
@@ -123,66 +129,60 @@ Deno.serve(async (req) => {
   }
 });
 
-function parseDrawData(id: number, sourceUrl: string, html: string): DrawData | null {
+function parseDrawDataFromJSON(id: number, sourceUrl: string, roundData: any): DrawData | null {
   try {
-    // Log HTML snippet for debugging
     console.log({ 
-      event: 'parse_attempt', 
+      event: 'parse_json_data', 
       id, 
-      html_snippet: html.substring(0, 500).replace(/\s+/g, ' ')
+      draw_name: roundData.drawName,
+      draw_size: roundData.drawSize,
+      draw_crs: roundData.drawCRS
     });
 
-    // Extract invitations - now matches "Number of invitations issued:** 400"
-    const invitationsMatch = html.match(/Number of invitations issued[:\s*]+(\d+(?:,\d+)*)/i);
-    const invitations = invitationsMatch ? parseInt(invitationsMatch[1].replace(/,/g, '')) : 0;
-    console.log({ event: 'parse_invitations', id, match: invitationsMatch?.[0], value: invitations });
-
-    // Extract CRS score - matches "CRS score of lowest-ranked candidate invited:** 539"
-    const crsMatch = html.match(/CRS score of lowest-ranked candidate invited[:\s*]+(\d+)/i);
-    const crs_min = crsMatch ? parseInt(crsMatch[1]) : 0;
-    console.log({ event: 'parse_crs', id, match: crsMatch?.[0], value: crs_min });
-
-    // Extract date - matches "Date and time of round:** October 22, 2024 at 14:07:18 UTC"
-    const dateMatch = html.match(/Date and time of round[:\s*]+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d+,\s+\d{4}\s+at\s+\d+:\d+:\d+\s+UTC)/i);
+    // Extract invitations - remove commas from numbers like "4,500"
+    const invitations = parseInt(roundData.drawSize?.replace(/,/g, '') || '0');
     
+    // Extract CRS score
+    const crs_min = parseInt(roundData.drawCRS || '0');
+    
+    // Parse date - format: "October 06, 2025 at 13:59:15 UTC"
     let date = new Date().toISOString();
-    if (dateMatch) {
-      date = new Date(dateMatch[1]).toISOString();
+    if (roundData.drawDateTime) {
+      date = new Date(roundData.drawDateTime).toISOString();
     }
 
-    // Determine type and category based on title or specific markers
+    // Determine type and category based on draw name
     let type: 'general' | 'pnp' | 'cec' | 'category' = 'general';
     let category: string | undefined;
 
-    if (html.includes('Provincial Nominee Program')) {
+    const drawName = roundData.drawName || '';
+    
+    if (drawName.includes('Provincial Nominee Program') || drawName.includes('Provincial Nominee')) {
       type = 'pnp';
-    } else if (html.includes('Canadian Experience Class')) {
+    } else if (drawName.includes('Canadian Experience Class')) {
       type = 'cec';
-    } else if (html.includes('Category-based')) {
+    } else if (drawName.includes('General')) {
+      type = 'general';
+    } else {
+      // If it's not PNP, CEC, or explicitly General, it's a category-based draw
       type = 'category';
-      
-      // Extract category name from title or headers
-      const categoryMatch = html.match(/Category-based[^:]*:\s*([^\n*]+)/i);
-      if (categoryMatch) {
-        category = categoryMatch[1].trim();
-      }
+      category = drawName;
     }
 
-    // Extract tie-break timestamp - matches "Tie-breaking rule:** October 19, 2024 at 21:53:18 UTC"
+    // Extract tie-break timestamp - format: "June 13, 2025 at 19:07:01 UTC"
     let tiebreak_ts: string | undefined;
-    const tiebreakMatch = html.match(/Tie-breaking rule[:\s*]+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d+,\s+\d{4}\s+at\s+\d+:\d+:\d+\s+UTC)/i);
-    if (tiebreakMatch) {
-      tiebreak_ts = new Date(tiebreakMatch[1]).toISOString();
+    if (roundData.drawCutOff) {
+      tiebreak_ts = new Date(roundData.drawCutOff).toISOString();
     }
 
-    // Validate data - reject clearly invalid values
-    if (!invitations || invitations <= 1 || !crs_min || crs_min <= 10) {
+    // Validate data
+    if (!invitations || invitations <= 0 || !crs_min || crs_min <= 0) {
       console.log({ 
         event: 'parse_invalid_data', 
         id, 
         invitations, 
         crs_min,
-        reason: 'Invitations must be > 1 and CRS must be > 10'
+        reason: 'Invalid invitation count or CRS score'
       });
       return null;
     }
