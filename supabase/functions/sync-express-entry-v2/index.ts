@@ -55,13 +55,22 @@ Deno.serve(async (req) => {
 
     console.log({ event: 'table_found' });
 
+    // Debug: check table structure
+    const tbody = table.querySelector('tbody');
+    console.log({ event: 'tbody_check', found: !!tbody, hasChildren: tbody?.children?.length || 0 });
+
     let drawsData: DrawData[] = [];
     let inserted = 0;
     let updated = 0;
     let errors = 0;
 
-    // Get all rows from tbody
-    const rows = table.querySelectorAll('tbody tr');
+    // Try multiple selectors to find rows
+    let rows = table.querySelectorAll('tbody tr');
+    if (rows.length === 0) {
+      console.log({ event: 'trying_alternative_selector' });
+      rows = table.querySelectorAll('tr');
+    }
+    
     console.log({ event: 'rows_found', count: rows.length });
 
     for (const row of rows) {
