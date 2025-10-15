@@ -3,6 +3,7 @@ import { Navigation } from '@/components/Navigation';
 import { DrawsChart } from '@/components/express-entry/DrawsChart';
 import { DrawsTable } from '@/components/express-entry/DrawsTable';
 import { DrawFilters } from '@/components/express-entry/DrawFilters';
+import { ChartLineSelector } from '@/components/express-entry/ChartLineSelector';
 import { useDrawsTable, useDrawsSeries } from '@/hooks/useExpressEntryDraws';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,6 +14,7 @@ const ExpressEntryDraws = () => {
   const [window, setWindow] = useState<'6m' | '12m' | 'all'>('12m');
   const [type, setType] = useState<string>('all');
   const [userCrs, setUserCrs] = useState<number | null>(null);
+  const [chartLines, setChartLines] = useState<'both' | 'crs' | 'itas'>('both');
 
   const handleTypeChange = (newType: string) => {
     setType(newType === 'all' ? '' : newType);
@@ -78,10 +80,15 @@ const ExpressEntryDraws = () => {
           {/* Chart */}
           <Card>
             <CardHeader>
-              <CardTitle>Gráfico de Tendências</CardTitle>
-              <CardDescription>
-                CRS mínimo e número de convites (ITAs) ao longo do tempo
-              </CardDescription>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <CardTitle>Gráfico de Tendências</CardTitle>
+                  <CardDescription>
+                    CRS mínimo e número de convites (ITAs) ao longo do tempo
+                  </CardDescription>
+                </div>
+                <ChartLineSelector value={chartLines} onChange={setChartLines} />
+              </div>
             </CardHeader>
             <CardContent>
               {seriesLoading ? (
@@ -95,7 +102,7 @@ const ExpressEntryDraws = () => {
                 </Alert>
               ) : seriesData && seriesData.items.length > 0 ? (
                 <>
-                  <DrawsChart data={seriesData.items} />
+                  <DrawsChart data={seriesData.items} visibleLines={chartLines} />
                   <p className="text-xs text-muted-foreground text-right mt-4">
                     Atualizado em: {new Date(seriesData.updatedAt).toLocaleString('pt-BR')}
                   </p>

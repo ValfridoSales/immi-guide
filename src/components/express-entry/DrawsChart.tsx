@@ -5,9 +5,10 @@ import { ExternalLink } from 'lucide-react';
 
 interface DrawsChartProps {
   data: DrawSeriesItem[];
+  visibleLines?: 'both' | 'crs' | 'itas';
 }
 
-export const DrawsChart = ({ data }: DrawsChartProps) => {
+export const DrawsChart = ({ data, visibleLines = 'both' }: DrawsChartProps) => {
   const chartData = data.map(item => ({
     date: new Date(item.date).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }),
     fullDate: item.date,
@@ -71,38 +72,46 @@ export const DrawsChart = ({ data }: DrawsChartProps) => {
             textAnchor="end"
             height={80}
           />
-          <YAxis 
-            yAxisId="left"
-            tick={{ fill: 'hsl(var(--foreground))' }}
-            label={{ value: 'Convites (ITAs)', angle: -90, position: 'insideLeft', fill: 'hsl(var(--foreground))' }}
-          />
-          <YAxis 
-            yAxisId="right"
-            orientation="right"
-            tick={{ fill: 'hsl(var(--foreground))' }}
-            label={{ value: 'CRS Score', angle: 90, position: 'insideRight', fill: 'hsl(var(--foreground))' }}
-          />
+          {(visibleLines === 'both' || visibleLines === 'itas') && (
+            <YAxis 
+              yAxisId="left"
+              tick={{ fill: 'hsl(var(--foreground))' }}
+              label={{ value: 'Convites (ITAs)', angle: -90, position: 'insideLeft', fill: 'hsl(var(--foreground))' }}
+            />
+          )}
+          {(visibleLines === 'both' || visibleLines === 'crs') && (
+            <YAxis 
+              yAxisId="right"
+              orientation="right"
+              tick={{ fill: 'hsl(var(--foreground))' }}
+              label={{ value: 'CRS Score', angle: 90, position: 'insideRight', fill: 'hsl(var(--foreground))' }}
+            />
+          )}
           <Tooltip content={<CustomTooltip />} />
           <Legend />
-          <Line 
-            yAxisId="left"
-            type="monotone" 
-            dataKey="ITAs" 
-            stroke="#4F46E5"
-            strokeWidth={2}
-            dot={{ fill: '#4F46E5', r: 4 }}
-            name="Convites (ITAs)"
-          />
-          <Line 
-            yAxisId="right"
-            type="monotone" 
-            dataKey="CRS" 
-            stroke="#EF4444"
-            strokeWidth={2}
-            strokeDasharray="5 5"
-            dot={{ fill: '#EF4444', r: 4 }}
-            name="CRS Mínimo"
-          />
+          {(visibleLines === 'both' || visibleLines === 'itas') && (
+            <Line 
+              yAxisId="left"
+              type="monotone" 
+              dataKey="ITAs" 
+              stroke="#4F46E5"
+              strokeWidth={2}
+              dot={{ fill: '#4F46E5', r: 4 }}
+              name="Convites (ITAs)"
+            />
+          )}
+          {(visibleLines === 'both' || visibleLines === 'crs') && (
+            <Line 
+              yAxisId="right"
+              type="monotone" 
+              dataKey="CRS" 
+              stroke="#EF4444"
+              strokeWidth={2}
+              strokeDasharray="5 5"
+              dot={{ fill: '#EF4444', r: 4 }}
+              name="CRS Mínimo"
+            />
+          )}
         </ComposedChart>
       </ResponsiveContainer>
     </div>
