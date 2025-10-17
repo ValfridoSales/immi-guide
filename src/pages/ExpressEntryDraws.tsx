@@ -28,7 +28,7 @@ const ExpressEntryDraws = () => {
     minCrs: userCrs ?? undefined
   });
   const { data: tableData, isLoading: tableLoading, error: tableError } = useDrawsTable({ 
-    limit: 50, 
+    limit: 20, 
     type: filterType,
     minCrs: userCrs ?? undefined
   });
