@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Checkbox } from '@/components/ui/checkbox';
 import { computeCrs, type InputCRS, type EducationKey, type CRSResult } from '@/utils/crs-engine';
-import { mapIELTSGeneralToCLBs, mapCELPIPToCLBs } from '@/utils/language-maps';
+import { mapIELTSGeneralToCLBs, mapCELPIPToCLBs, mapTEFCanadaToCLBs, mapTCFCanadaToCLBs } from '@/utils/language-maps';
 import { Calculator } from 'lucide-react';
 
 const formSchema = z.object({
@@ -22,6 +22,7 @@ const formSchema = z.object({
   firstLangListening: z.string().min(1, 'Insira a pontuação de Listening'),
   firstLangSpeaking: z.string().min(1, 'Insira a pontuação de Speaking'),
   hasSecondLanguage: z.boolean().default(false),
+  secondLanguageTest: z.string().optional(),
   secondLangReading: z.string().optional(),
   secondLangWriting: z.string().optional(),
   secondLangListening: z.string().optional(),
@@ -69,10 +70,37 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
   const hasSecondLanguage = form.watch('hasSecondLanguage');
   const canadianStudy = form.watch('canadianStudy');
   const firstLanguageTest = form.watch('firstLanguageTest');
+  const secondLanguageTest = form.watch('secondLanguageTest');
 
   const withSpouse = (maritalStatus === 'B' || maritalStatus === 'E') && 
                      form.watch('spouseAccompanying') === 'B' && 
                      form.watch('spouseIsPR') === 'A';
+
+  // Helper function to generate score options based on test type
+  const getScoreOptions = (testType: string, skill: 'reading' | 'writing' | 'listening' | 'speaking') => {
+    if (testType === 'B') { // IELTS
+      return ['4.0', '4.5', '5.0', '5.5', '6.0', '6.5', '7.0', '7.5', '8.0', '8.5', '9.0'].map(v => (
+        <SelectItem key={v} value={v}>{v}</SelectItem>
+      ));
+    } else if (testType === 'A') { // CELPIP
+      return Array.from({length: 9}, (_, i) => i + 4).map(v => (
+        <SelectItem key={v} value={String(v)}>{v}</SelectItem>
+      ));
+    } else if (testType === 'C') { // TEF Canada
+      const maxScores = { reading: 300, writing: 450, listening: 360, speaking: 450 };
+      const step = skill === 'reading' ? 10 : 15;
+      return Array.from({length: Math.floor(maxScores[skill] / step) + 1}, (_, i) => i * step).map(v => (
+        <SelectItem key={v} value={String(v)}>{v}</SelectItem>
+      ));
+    } else if (testType === 'D') { // TCF Canada
+      const maxScores = { reading: 699, writing: 20, listening: 699, speaking: 20 };
+      const step = (skill === 'writing' || skill === 'speaking') ? 1 : 20;
+      return Array.from({length: Math.floor(maxScores[skill] / step) + 1}, (_, i) => i * step).map(v => (
+        <SelectItem key={v} value={String(v)}>{v}</SelectItem>
+      ));
+    }
+    return [];
+  };
 
   const onSubmit = (values: FormValues) => {
     try {
@@ -107,19 +135,56 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
           listening: parseInt(values.firstLangListening),
           speaking: parseInt(values.firstLangSpeaking),
         });
+      } else if (values.firstLanguageTest === 'C') { // TEF Canada
+        firstOfficial = mapTEFCanadaToCLBs({
+          reading: parseFloat(values.firstLangReading),
+          writing: parseFloat(values.firstLangWriting),
+          listening: parseFloat(values.firstLangListening),
+          speaking: parseFloat(values.firstLangSpeaking),
+        });
+      } else if (values.firstLanguageTest === 'D') { // TCF Canada
+        firstOfficial = mapTCFCanadaToCLBs({
+          reading: parseFloat(values.firstLangReading),
+          writing: parseFloat(values.firstLangWriting),
+          listening: parseFloat(values.firstLangListening),
+          speaking: parseFloat(values.firstLangSpeaking),
+        });
       } else {
-        throw new Error('Tipo de teste não suportado ainda. Use IELTS ou CELPIP.');
+        throw new Error('Tipo de teste não suportado. Por favor, selecione um teste válido.');
       }
 
       // Map second language (if applicable)
       let secondOfficial;
-      if (values.hasSecondLanguage && values.secondLangReading) {
-        secondOfficial = mapIELTSGeneralToCLBs({
-          reading: parseFloat(values.secondLangReading),
-          writing: parseFloat(values.secondLangWriting || '0'),
-          listening: parseFloat(values.secondLangListening || '0'),
-          speaking: parseFloat(values.secondLangSpeaking || '0'),
-        });
+      if (values.hasSecondLanguage && values.secondLangReading && values.secondLanguageTest) {
+        if (values.secondLanguageTest === 'B') { // IELTS
+          secondOfficial = mapIELTSGeneralToCLBs({
+            reading: parseFloat(values.secondLangReading),
+            writing: parseFloat(values.secondLangWriting || '0'),
+            listening: parseFloat(values.secondLangListening || '0'),
+            speaking: parseFloat(values.secondLangSpeaking || '0'),
+          });
+        } else if (values.secondLanguageTest === 'A') { // CELPIP
+          secondOfficial = mapCELPIPToCLBs({
+            reading: parseInt(values.secondLangReading),
+            writing: parseInt(values.secondLangWriting || '0'),
+            listening: parseInt(values.secondLangListening || '0'),
+            speaking: parseInt(values.secondLangSpeaking || '0'),
+          });
+        } else if (values.secondLanguageTest === 'C') { // TEF Canada
+          secondOfficial = mapTEFCanadaToCLBs({
+            reading: parseFloat(values.secondLangReading),
+            writing: parseFloat(values.secondLangWriting || '0'),
+            listening: parseFloat(values.secondLangListening || '0'),
+            speaking: parseFloat(values.secondLangSpeaking || '0'),
+          });
+        } else if (values.secondLanguageTest === 'D') { // TCF Canada
+          secondOfficial = mapTCFCanadaToCLBs({
+            reading: parseFloat(values.secondLangReading),
+            writing: parseFloat(values.secondLangWriting || '0'),
+            listening: parseFloat(values.secondLangListening || '0'),
+            speaking: parseFloat(values.secondLangSpeaking || '0'),
+          });
+        }
       }
 
       // Map experience
@@ -390,16 +455,17 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
                       <SelectContent>
                         <SelectItem value="A">CELPIP-G</SelectItem>
                         <SelectItem value="B">IELTS General</SelectItem>
+                        <SelectItem value="C">TEF Canada</SelectItem>
+                        <SelectItem value="D">TCF Canada</SelectItem>
                         <SelectItem value="E">PTE Core (em breve)</SelectItem>
-                        <SelectItem value="C">TEF Canada (em breve)</SelectItem>
-                        <SelectItem value="D">TCF Canada (em breve)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormDescription>
                       {firstLanguageTest === 'B' && 'IELTS: pontuações de 0.0 a 9.0 (incrementos de 0.5)'}
                       {firstLanguageTest === 'A' && 'CELPIP: níveis de 4 a 12'}
-                      {(firstLanguageTest === 'E' || firstLanguageTest === 'C' || firstLanguageTest === 'D') && 
-                        'Este teste ainda não está implementado. Use IELTS ou CELPIP por enquanto.'}
+                      {firstLanguageTest === 'C' && 'TEF Canada: Reading (0-300), Writing (0-450), Listening (0-360), Speaking (0-450)'}
+                      {firstLanguageTest === 'D' && 'TCF Canada: Reading (0-699), Writing (0-20), Listening (0-699), Speaking (0-20)'}
+                      {firstLanguageTest === 'E' && 'PTE Core ainda não está implementado. Use outro teste por enquanto.'}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -419,14 +485,7 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
                             <SelectValue placeholder="Pontuação" />
                           </SelectTrigger>
                           <SelectContent>
-                            {firstLanguageTest === 'B' ? 
-                              ['4.0', '4.5', '5.0', '5.5', '6.0', '6.5', '7.0', '7.5', '8.0', '8.5', '9.0'].map(v => (
-                                <SelectItem key={v} value={v}>{v}</SelectItem>
-                              )) :
-                              Array.from({length: 9}, (_, i) => i + 4).map(v => (
-                                <SelectItem key={v} value={String(v)}>{v}</SelectItem>
-                              ))
-                            }
+                            {getScoreOptions(firstLanguageTest, 'reading')}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -447,14 +506,7 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
                             <SelectValue placeholder="Pontuação" />
                           </SelectTrigger>
                           <SelectContent>
-                            {firstLanguageTest === 'B' ? 
-                              ['4.0', '4.5', '5.0', '5.5', '6.0', '6.5', '7.0', '7.5', '8.0', '8.5', '9.0'].map(v => (
-                                <SelectItem key={v} value={v}>{v}</SelectItem>
-                              )) :
-                              Array.from({length: 9}, (_, i) => i + 4).map(v => (
-                                <SelectItem key={v} value={String(v)}>{v}</SelectItem>
-                              ))
-                            }
+                            {getScoreOptions(firstLanguageTest, 'writing')}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -475,14 +527,7 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
                             <SelectValue placeholder="Pontuação" />
                           </SelectTrigger>
                           <SelectContent>
-                            {firstLanguageTest === 'B' ? 
-                              ['4.0', '4.5', '5.0', '5.5', '6.0', '6.5', '7.0', '7.5', '8.0', '8.5', '9.0'].map(v => (
-                                <SelectItem key={v} value={v}>{v}</SelectItem>
-                              )) :
-                              Array.from({length: 9}, (_, i) => i + 4).map(v => (
-                                <SelectItem key={v} value={String(v)}>{v}</SelectItem>
-                              ))
-                            }
+                            {getScoreOptions(firstLanguageTest, 'listening')}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -503,14 +548,7 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
                             <SelectValue placeholder="Pontuação" />
                           </SelectTrigger>
                           <SelectContent>
-                            {firstLanguageTest === 'B' ? 
-                              ['4.0', '4.5', '5.0', '5.5', '6.0', '6.5', '7.0', '7.5', '8.0', '8.5', '9.0'].map(v => (
-                                <SelectItem key={v} value={v}>{v}</SelectItem>
-                              )) :
-                              Array.from({length: 9}, (_, i) => i + 4).map(v => (
-                                <SelectItem key={v} value={String(v)}>{v}</SelectItem>
-                              ))
-                            }
+                            {getScoreOptions(firstLanguageTest, 'speaking')}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -542,6 +580,126 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
                   </FormItem>
                 )}
               />
+
+              {hasSecondLanguage && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="secondLanguageTest"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo de Teste (Segundo Idioma) *</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o teste" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="A">CELPIP-G</SelectItem>
+                            <SelectItem value="B">IELTS General</SelectItem>
+                            <SelectItem value="C">TEF Canada</SelectItem>
+                            <SelectItem value="D">TCF Canada</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          {secondLanguageTest === 'B' && 'IELTS: pontuações de 0.0 a 9.0 (incrementos de 0.5)'}
+                          {secondLanguageTest === 'A' && 'CELPIP: níveis de 4 a 12'}
+                          {secondLanguageTest === 'C' && 'TEF Canada: Reading (0-300), Writing (0-450), Listening (0-360), Speaking (0-450)'}
+                          {secondLanguageTest === 'D' && 'TCF Canada: Reading (0-699), Writing (0-20), Listening (0-699), Speaking (0-20)'}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="secondLangReading"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Reading</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pontuação" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {secondLanguageTest && getScoreOptions(secondLanguageTest, 'reading')}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="secondLangWriting"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Writing</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pontuação" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {secondLanguageTest && getScoreOptions(secondLanguageTest, 'writing')}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="secondLangListening"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Listening</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pontuação" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {secondLanguageTest && getScoreOptions(secondLanguageTest, 'listening')}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="secondLangSpeaking"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Speaking</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pontuação" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {secondLanguageTest && getScoreOptions(secondLanguageTest, 'speaking')}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </>
+              )}
             </AccordionContent>
           </AccordionItem>
 
