@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { FileQuestion, TrendingUp } from 'lucide-react';
+import { FileQuestion, TrendingUp, Calculator } from 'lucide-react';
 
 export const Navigation = () => {
   const location = useLocation();
@@ -35,6 +35,17 @@ export const Navigation = () => {
               <Link to="/express-entry/draws">
                 <TrendingUp className="w-4 h-4 mr-2" />
                 Express Entry Draws
+              </Link>
+            </Button>
+            
+            <Button
+              variant={location.pathname === '/crs-calculator' ? 'default' : 'ghost'}
+              size="sm"
+              asChild
+            >
+              <Link to="/crs-calculator">
+                <Calculator className="w-4 h-4 mr-2" />
+                Calculadora CRS
               </Link>
             </Button>
           </div>
