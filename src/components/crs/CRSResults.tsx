@@ -4,16 +4,68 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { TrendingUp, Award, Users, Briefcase, Gift, ArrowRight } from 'lucide-react';
+import { TrendingUp, Award, Users, Briefcase, Gift, ArrowRight, Save, Check } from 'lucide-react';
 import type { CRSResult } from '@/utils/crs-engine';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 interface CRSResultsProps {
   result: CRSResult;
+  formData?: any;
 }
 
-export function CRSResults({ result }: CRSResultsProps) {
+export function CRSResults({ result, formData }: CRSResultsProps) {
+  const { user, isPro } = useAuth();
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  
   const maxCore = 500; // Simplified for display
   const maxTotal = 1200; // PNP can add 600
+
+  const handleSaveCalculation = async () => {
+    if (!user) {
+      toast({
+        title: 'Login necessário',
+        description: 'Faça login para salvar seus cálculos.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('crs_calculations')
+        .insert({
+          user_id: user.id,
+          total_score: result.total,
+          core_score: result.core,
+          spouse_score: result.spouse,
+          transferability_score: result.transferability,
+          additional_score: result.additional,
+          calculation_data: formData || {},
+        });
+
+      if (error) throw error;
+
+      setIsSaved(true);
+      toast({
+        title: 'Cálculo salvo!',
+        description: 'Seu cálculo CRS foi salvo no histórico.',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao salvar',
+        description: error.message || 'Não foi possível salvar o cálculo.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const getScoreColor = (score: number) => {
     if (score >= 500) return 'text-green-600 dark:text-green-400';
@@ -44,15 +96,49 @@ export function CRSResults({ result }: CRSResultsProps) {
             <Badge variant={scoreLevel.variant}>{scoreLevel.label}</Badge>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <Progress 
             value={(result.total / maxTotal) * 100} 
             className="h-3"
             variant="canadian"
           />
-          <p className="text-sm text-muted-foreground text-center mt-2">
+          <p className="text-sm text-muted-foreground text-center">
             {result.total} de {maxTotal} pontos possíveis
           </p>
+          
+          {/* Save Button */}
+          {user && (
+            <div className="pt-2 border-t">
+              <Button
+                onClick={handleSaveCalculation}
+                disabled={isSaving || isSaved || !isPro}
+                className="w-full"
+                variant={isSaved ? "outline" : "default"}
+              >
+                {isSaved ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Salvo no Histórico
+                  </>
+                ) : isSaving ? (
+                  <>
+                    <Save className="mr-2 h-4 w-4 animate-pulse" />
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Salvar no Histórico {!isPro && '(Pro)'}
+                  </>
+                )}
+              </Button>
+              {!isPro && (
+                <p className="text-xs text-muted-foreground text-center mt-2">
+                  Faça upgrade para Pro para salvar cálculos no histórico
+                </p>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 

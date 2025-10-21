@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      crs_calculations: {
+        Row: {
+          additional_score: number
+          calculation_data: Json
+          core_score: number
+          created_at: string | null
+          id: string
+          spouse_score: number
+          total_score: number
+          transferability_score: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          additional_score: number
+          calculation_data: Json
+          core_score: number
+          created_at?: string | null
+          id?: string
+          spouse_score: number
+          total_score: number
+          transferability_score: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          additional_score?: number
+          calculation_data?: Json
+          core_score?: number
+          created_at?: string | null
+          id?: string
+          spouse_score?: number
+          total_score?: number
+          transferability_score?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       crs_history: {
         Row: {
           calculation_data: Json
@@ -397,6 +436,48 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
+      }
+      user_alert_preferences: {
+        Row: {
+          created_at: string | null
+          crs_drops_enabled: boolean | null
+          id: string
+          new_draws_enabled: boolean | null
+          notification_email: string | null
+          notification_whatsapp: string | null
+          target_crs_score: number | null
+          target_score_enabled: boolean | null
+          updated_at: string | null
+          user_id: string
+          weekly_digest_enabled: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          crs_drops_enabled?: boolean | null
+          id?: string
+          new_draws_enabled?: boolean | null
+          notification_email?: string | null
+          notification_whatsapp?: string | null
+          target_crs_score?: number | null
+          target_score_enabled?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          weekly_digest_enabled?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          crs_drops_enabled?: boolean | null
+          id?: string
+          new_draws_enabled?: boolean | null
+          notification_email?: string | null
+          notification_whatsapp?: string | null
+          target_crs_score?: number | null
+          target_score_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          weekly_digest_enabled?: boolean | null
+        }
+        Relationships: []
       }
     }
     Views: {

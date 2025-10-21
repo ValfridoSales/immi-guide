@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ProFeatureGuard } from '@/components/dashboard/ProFeatureGuard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,34 +6,115 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Bell, BellOff, TrendingDown, Calendar, Target, Mail } from 'lucide-react';
+import { Bell, BellOff, TrendingDown, Calendar, Target, Mail, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Alerts() {
   const { toast } = useToast();
+  const { user, profile } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [alerts, setAlerts] = useState({
     newDraws: true,
     crsDrops: true,
-    targetScore: true,
+    targetScore: false,
     weeklyDigest: false,
   });
   const [targetCRS, setTargetCRS] = useState<string>('');
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
 
-  const handleToggle = (key: keyof typeof alerts) => {
-    setAlerts(prev => ({ ...prev, [key]: !prev[key] }));
-    toast({
-      title: 'Configuração atualizada',
-      description: `Alerta ${alerts[key] ? 'desativado' : 'ativado'} com sucesso.`,
+  useEffect(() => {
+    if (user && profile) {
+      loadPreferences();
+      setEmail(profile.email || '');
+      setWhatsapp(profile.whatsapp || '');
+    }
+  }, [user, profile]);
+
+  const loadPreferences = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_alert_preferences')
+        .select('*')
+        .eq('user_id', user?.id)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') throw error;
+
+      if (data) {
+        setAlerts({
+          newDraws: data.new_draws_enabled,
+          crsDrops: data.crs_drops_enabled,
+          targetScore: data.target_score_enabled,
+          weeklyDigest: data.weekly_digest_enabled,
+        });
+        setTargetCRS(data.target_crs_score?.toString() || '');
+        setEmail(data.notification_email || profile?.email || '');
+        setWhatsapp(data.notification_whatsapp || profile?.whatsapp || '');
+      }
+    } catch (error: any) {
+      console.error('Error loading preferences:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleToggle = async (key: keyof typeof alerts) => {
+    const newValue = !alerts[key];
+    setAlerts(prev => ({ ...prev, [key]: newValue }));
+    
+    await savePreferences({
+      ...alerts,
+      [key]: newValue,
     });
   };
 
-  const handleSavePreferences = () => {
-    toast({
-      title: 'Preferências salvas!',
-      description: 'Suas configurações de alerta foram atualizadas.',
-    });
+  const savePreferences = async (alertsToSave = alerts) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_alert_preferences')
+        .upsert({
+          user_id: user.id,
+          new_draws_enabled: alertsToSave.newDraws,
+          crs_drops_enabled: alertsToSave.crsDrops,
+          target_score_enabled: alertsToSave.targetScore,
+          weekly_digest_enabled: alertsToSave.weeklyDigest,
+          target_crs_score: targetCRS ? parseInt(targetCRS) : null,
+          notification_email: email,
+          notification_whatsapp: whatsapp,
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (error) throw error;
+    } catch (error: any) {
+      console.error('Error saving preferences:', error);
+      throw error;
+    }
+  };
+
+  const handleSavePreferences = async () => {
+    setIsSaving(true);
+    try {
+      await savePreferences();
+      toast({
+        title: 'Preferências salvas!',
+        description: 'Suas configurações de alerta foram atualizadas.',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao salvar',
+        description: error.message || 'Não foi possível salvar as preferências.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -208,9 +289,17 @@ export default function Alerts() {
 
               <Button 
                 onClick={handleSavePreferences}
+                disabled={isSaving}
                 className="w-full bg-gradient-canadian border-0"
               >
-                Salvar Preferências
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  'Salvar Preferências'
+                )}
               </Button>
             </CardContent>
           </Card>
