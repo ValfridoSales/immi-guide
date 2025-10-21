@@ -1,14 +1,44 @@
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
-import { Sparkles, CreditCard, Calendar, AlertCircle } from 'lucide-react';
+import { Sparkles, CreditCard, Calendar, AlertCircle, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Subscription() {
-  const { subscription, isPro } = useAuth();
+  const { subscription, isPro, session } = useAuth();
+  const { toast } = useToast();
+  const [isLoadingPortal, setIsLoadingPortal] = useState(false);
+
+  const handleManageSubscription = async () => {
+    setIsLoadingPortal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-customer-portal', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Erro',
+        description: error.message || 'Não foi possível abrir o portal de gerenciamento.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoadingPortal(false);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -79,11 +109,25 @@ export default function Subscription() {
                 )}
 
                 <div className="pt-4 border-t">
-                  <Button variant="outline" disabled>
-                    Gerenciar Pagamento
+                  <Button 
+                    variant="outline" 
+                    onClick={handleManageSubscription}
+                    disabled={isLoadingPortal}
+                  >
+                    {isLoadingPortal ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Carregando...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        Gerenciar Pagamento
+                      </>
+                    )}
                   </Button>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Portal de gerenciamento será implementado em breve
+                    Atualize seu método de pagamento ou cancele sua assinatura
                   </p>
                 </div>
               </>

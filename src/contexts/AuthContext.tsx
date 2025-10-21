@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -94,6 +94,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const refreshSubscription = useCallback(async () => {
+    if (!user || !session) return;
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data) {
+        // Update subscription state from Stripe
+        const { data: updatedSub } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (updatedSub) {
+          setSubscription(updatedSub as Subscription);
+        }
+      }
+    } catch (error: any) {
+      console.error('Erro ao verificar assinatura:', error);
+    }
+  }, [user, session]);
+
   useEffect(() => {
     // Verificar sessão inicial
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -124,6 +153,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => authListener.unsubscribe();
   }, []);
+
+  // Auto-refresh subscription periodically
+  useEffect(() => {
+    if (user && session) {
+      // Initial check after login
+      const timeout = setTimeout(() => {
+        refreshSubscription();
+      }, 2000);
+
+      // Periodic refresh every 5 minutes
+      const interval = setInterval(() => {
+        refreshSubscription();
+      }, 5 * 60 * 1000);
+
+      return () => {
+        clearTimeout(timeout);
+        clearInterval(interval);
+      };
+    }
+  }, [user, session, refreshSubscription]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -195,12 +244,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         variant: 'destructive',
       });
       throw error;
-    }
-  };
-
-  const refreshSubscription = async () => {
-    if (user) {
-      await loadUserData(user.id);
     }
   };
 
