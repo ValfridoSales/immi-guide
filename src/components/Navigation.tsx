@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FileQuestion, TrendingUp, Calculator } from 'lucide-react';
+import { UserMenu } from '@/components/auth/UserMenu';
 
 export const Navigation = () => {
   const location = useLocation();
@@ -15,7 +16,7 @@ export const Navigation = () => {
             </div>
           </Link>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <Button
               variant={location.pathname === '/' ? 'default' : 'ghost'}
               size="sm"
@@ -48,6 +49,10 @@ export const Navigation = () => {
                 Calculadora CRS
               </Link>
             </Button>
+            
+            <div className="border-l border-border pl-4 h-8 flex items-center">
+              <UserMenu />
+            </div>
           </div>
         </div>
       </div>
