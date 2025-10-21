@@ -13,6 +13,8 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Settings from "./pages/dashboard/Settings";
 import Subscription from "./pages/dashboard/Subscription";
+import CRSHistory from "./pages/dashboard/CRSHistory";
+import Simulations from "./pages/dashboard/Simulations";
 import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +37,8 @@ const App = () => (
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/dashboard/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
+            <Route path="/dashboard/crs-history" element={<ProtectedRoute><CRSHistory /></ProtectedRoute>} />
+            <Route path="/dashboard/simulations" element={<ProtectedRoute><Simulations /></ProtectedRoute>} />
             <Route path="/pricing" element={<Pricing />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
