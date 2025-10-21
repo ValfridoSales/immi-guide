@@ -10,7 +10,7 @@ interface DrawsChartProps {
 
 export const DrawsChart = ({ data, visibleLines = 'both' }: DrawsChartProps) => {
   const chartData = data.map(item => ({
-    date: new Date(item.date).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }),
+    date: new Date(item.date).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric', timeZone: 'UTC' }),
     fullDate: item.date,
     CRS: item.points,
     ITAs: item.invitations,
@@ -27,7 +27,7 @@ export const DrawsChart = ({ data, visibleLines = 'both' }: DrawsChartProps) => 
           <div className="space-y-2">
             <p className="font-semibold">{data.title}</p>
             <p className="text-sm text-muted-foreground">
-              Data: {new Date(data.fullDate).toLocaleDateString('pt-BR')}
+              Data: {new Date(data.fullDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
             </p>
             <div className="flex gap-4">
               <div>
