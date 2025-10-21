@@ -384,6 +384,7 @@ export type Database = {
           current_period_end: string | null
           current_period_start: string | null
           id: string
+          is_manual: boolean | null
           plan_type: string
           status: string
           stripe_price_id: string | null
@@ -398,6 +399,7 @@ export type Database = {
           current_period_end?: string | null
           current_period_start?: string | null
           id?: string
+          is_manual?: boolean | null
           plan_type?: string
           status?: string
           stripe_price_id?: string | null
@@ -412,6 +414,7 @@ export type Database = {
           current_period_end?: string | null
           current_period_start?: string | null
           id?: string
+          is_manual?: boolean | null
           plan_type?: string
           status?: string
           stripe_price_id?: string | null
