@@ -49,6 +49,7 @@ Deno.serve(async (req) => {
     let inserted = 0;
     let updated = 0;
     let errors = 0;
+    let newDraws: any[] = [];
 
     // Process each round from the JSON
     for (const round of jsonData.rounds) {
@@ -151,6 +152,7 @@ Deno.serve(async (req) => {
             const record = data[0];
             if (record.created_at === record.updated_at) {
               inserted++;
+              newDraws.push(record);
             } else {
               updated++;
             }
@@ -172,6 +174,36 @@ Deno.serve(async (req) => {
     };
 
     console.log({ event: 'sync_complete', ...result });
+
+    // Send alerts for new draws to Pro users
+    if (newDraws.length > 0) {
+      console.log({ event: 'sending_alerts', new_draws: newDraws.length });
+      
+      // Send alert for the most recent draw only (to avoid spam)
+      const mostRecentDraw = newDraws.reduce((latest, draw) => 
+        new Date(draw.draw_date) > new Date(latest.draw_date) ? draw : latest
+      );
+
+      try {
+        const alertResponse = await fetch(`${supabaseUrl}/functions/v1/send-draw-alert`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseKey}`,
+          },
+          body: JSON.stringify({ drawData: mostRecentDraw }),
+        });
+
+        if (alertResponse.ok) {
+          const alertResult = await alertResponse.json();
+          console.log({ event: 'alerts_sent', ...alertResult });
+        } else {
+          console.error({ event: 'alert_error', status: alertResponse.status });
+        }
+      } catch (error) {
+        console.error({ event: 'alert_send_failed', error: error.message });
+      }
+    }
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

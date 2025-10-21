@@ -16,6 +16,7 @@ import Subscription from "./pages/dashboard/Subscription";
 import CRSHistory from "./pages/dashboard/CRSHistory";
 import Simulations from "./pages/dashboard/Simulations";
 import Reports from "./pages/dashboard/Reports";
+import Alerts from "./pages/dashboard/Alerts";
 import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/dashboard/crs-history" element={<ProtectedRoute><CRSHistory /></ProtectedRoute>} />
             <Route path="/dashboard/simulations" element={<ProtectedRoute><Simulations /></ProtectedRoute>} />
             <Route path="/dashboard/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+            <Route path="/dashboard/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
             <Route path="/pricing" element={<Pricing />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
