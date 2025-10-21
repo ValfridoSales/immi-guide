@@ -20,8 +20,8 @@ const sidebarLinks = [
   { href: '/dashboard', label: 'Overview', icon: Home },
   { href: '/dashboard/crs-history', label: 'Histórico CRS', icon: TrendingUp, pro: true },
   { href: '/dashboard/simulations', label: 'Simulações', icon: Target, pro: true },
-  { href: '/dashboard/alerts', label: 'Alertas', icon: Bell, pro: true },
   { href: '/dashboard/reports', label: 'Relatórios', icon: FileText, pro: true },
+  { href: '/dashboard/alerts', label: 'Alertas', icon: Bell, pro: true },
   { href: '/dashboard/settings', label: 'Configurações', icon: Settings },
   { href: '/dashboard/subscription', label: 'Assinatura', icon: CreditCard },
 ];
