@@ -1,6 +1,7 @@
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Calculator, TrendingUp, ClipboardList, Award, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import airportImage from '@/assets/airport-journey.png';
@@ -198,73 +199,161 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Testimonial 1 */}
-            <Card className="hover-scale transition-all">
-              <CardHeader>
-                <div className="flex gap-1 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className="text-yellow-500 text-xl">★</span>
-                  ))}
-                </div>
-                <CardTitle className="text-lg">Ferramenta Essencial</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-6">
-                  A calculadora CRS e as simulações me ajudaram a entender exatamente o que preciso melhorar. 
-                  Consegui aumentar minha pontuação de 420 para 480 em 6 meses seguindo as recomendações!
-                </p>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="font-medium">Maria Silva</span>
-                  <span className="text-muted-foreground">Mar 15, 2025</span>
-                </div>
-              </CardContent>
-            </Card>
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent>
+              {/* Testimonial 1 */}
+              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
+                <Card className="hover-scale transition-all h-full">
+                  <CardHeader>
+                    <div className="flex gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className="text-yellow-500 text-xl">★</span>
+                      ))}
+                    </div>
+                    <CardTitle className="text-lg">Ferramenta Essencial</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-6">
+                      A calculadora CRS e as simulações me ajudaram a entender exatamente o que preciso melhorar. 
+                      Consegui aumentar minha pontuação de 420 para 480 em 6 meses seguindo as recomendações!
+                    </p>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium">Maria Silva</span>
+                      <span className="text-muted-foreground">Mar 15, 2025</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
 
-            {/* Testimonial 2 */}
-            <Card className="hover-scale transition-all">
-              <CardHeader>
-                <div className="flex gap-1 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className="text-yellow-500 text-xl">★</span>
-                  ))}
-                </div>
-                <CardTitle className="text-lg">Dados Confiáveis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-6">
-                  Finalmente encontrei uma plataforma que mostra os draws do Express Entry de forma clara e atualizada. 
-                  Os gráficos me ajudaram a entender as tendências e planejar melhor minha aplicação.
-                </p>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="font-medium">João Santos</span>
-                  <span className="text-muted-foreground">Fev 28, 2025</span>
-                </div>
-              </CardContent>
-            </Card>
+              {/* Testimonial 2 */}
+              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
+                <Card className="hover-scale transition-all h-full">
+                  <CardHeader>
+                    <div className="flex gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className="text-yellow-500 text-xl">★</span>
+                      ))}
+                    </div>
+                    <CardTitle className="text-lg">Dados Confiáveis</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-6">
+                      Finalmente encontrei uma plataforma que mostra os draws do Express Entry de forma clara e atualizada. 
+                      Os gráficos me ajudaram a entender as tendências e planejar melhor minha aplicação.
+                    </p>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium">João Santos</span>
+                      <span className="text-muted-foreground">Fev 28, 2025</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
 
-            {/* Testimonial 3 */}
-            <Card className="hover-scale transition-all">
-              <CardHeader>
-                <div className="flex gap-1 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className="text-yellow-500 text-xl">★</span>
-                  ))}
-                </div>
-                <CardTitle className="text-lg">Muito Útil</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-6">
-                  O quiz de imigração me deu uma direção clara sobre qual programa seguir. 
-                  Antes estava perdida com tantas opções, agora sei exatamente o que fazer. Recomendo muito! 💝
-                </p>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="font-medium">Ana Costa</span>
-                  <span className="text-muted-foreground">Jan 10, 2025</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              {/* Testimonial 3 */}
+              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
+                <Card className="hover-scale transition-all h-full">
+                  <CardHeader>
+                    <div className="flex gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className="text-yellow-500 text-xl">★</span>
+                      ))}
+                    </div>
+                    <CardTitle className="text-lg">Muito Útil</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-6">
+                      O quiz de imigração me deu uma direção clara sobre qual programa seguir. 
+                      Antes estava perdida com tantas opções, agora sei exatamente o que fazer. Recomendo muito!
+                    </p>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium">Ana Costa</span>
+                      <span className="text-muted-foreground">Jan 10, 2025</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+
+              {/* Testimonial 4 */}
+              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
+                <Card className="hover-scale transition-all h-full">
+                  <CardHeader>
+                    <div className="flex gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className="text-yellow-500 text-xl">★</span>
+                      ))}
+                    </div>
+                    <CardTitle className="text-lg">Mudou Minha Estratégia</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-6">
+                      Com as simulações, percebi que melhorar meu francês seria mais rápido do que esperar por mais experiência. 
+                      Fui de 440 para 510 pontos em apenas 4 meses! Incrível!
+                    </p>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium">Pedro Oliveira</span>
+                      <span className="text-muted-foreground">Abr 02, 2025</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+
+              {/* Testimonial 5 */}
+              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
+                <Card className="hover-scale transition-all h-full">
+                  <CardHeader>
+                    <div className="flex gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className="text-yellow-500 text-xl">★</span>
+                      ))}
+                    </div>
+                    <CardTitle className="text-lg">Interface Perfeita</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-6">
+                      Muito intuitivo e fácil de usar. Testei várias calculadoras CRS, mas essa é disparada a melhor. 
+                      O histórico de pontuações me ajuda a acompanhar meu progresso ao longo do tempo.
+                    </p>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium">Carla Mendes</span>
+                      <span className="text-muted-foreground">Mar 20, 2025</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+
+              {/* Testimonial 6 */}
+              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
+                <Card className="hover-scale transition-all h-full">
+                  <CardHeader>
+                    <div className="flex gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className="text-yellow-500 text-xl">★</span>
+                      ))}
+                    </div>
+                    <CardTitle className="text-lg">Informação Sempre Atualizada</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-6">
+                      Receber alertas dos draws do Express Entry em tempo real faz toda a diferença. 
+                      Consegui aplicar logo após um draw com score próximo ao meu. Valeu muito a pena!
+                    </p>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium">Rafael Lima</span>
+                      <span className="text-muted-foreground">Fev 14, 2025</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
         </div>
       </section>
 
