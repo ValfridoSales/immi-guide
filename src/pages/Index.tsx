@@ -14,7 +14,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <Navigation fixed />
+      <div className="pt-16">
 
       {/* Hero Section with Video Background */}
       <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
@@ -421,6 +422,7 @@ const Index = () => {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 };

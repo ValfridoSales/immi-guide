@@ -5,7 +5,7 @@ import { FileQuestion, TrendingUp, Calculator, Menu } from 'lucide-react';
 import { UserMenu } from '@/components/auth/UserMenu';
 import { useState } from 'react';
 
-export const Navigation = () => {
+export const Navigation = ({ fixed = false }: { fixed?: boolean }) => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   
@@ -50,7 +50,7 @@ export const Navigation = () => {
   );
   
   return (
-    <nav className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className={`border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ${fixed ? 'fixed top-0 left-0 right-0 z-50' : ''}`}>
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
