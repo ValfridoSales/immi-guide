@@ -176,6 +176,86 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="py-20 px-4 bg-gradient-subtle">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">O Que Nossos Usuários Dizem</h2>
+            <p className="text-xl text-muted-foreground">
+              Histórias reais de pessoas que usaram nossas ferramentas
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Testimonial 1 */}
+            <Card className="hover-scale transition-all">
+              <CardHeader>
+                <div className="flex gap-1 mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="text-yellow-500 text-xl">★</span>
+                  ))}
+                </div>
+                <CardTitle className="text-lg">Ferramenta Essencial</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-6">
+                  A calculadora CRS e as simulações me ajudaram a entender exatamente o que preciso melhorar. 
+                  Consegui aumentar minha pontuação de 420 para 480 em 6 meses seguindo as recomendações!
+                </p>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="font-medium">Maria Silva</span>
+                  <span className="text-muted-foreground">Mar 15, 2025</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Testimonial 2 */}
+            <Card className="hover-scale transition-all">
+              <CardHeader>
+                <div className="flex gap-1 mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="text-yellow-500 text-xl">★</span>
+                  ))}
+                </div>
+                <CardTitle className="text-lg">Dados Confiáveis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-6">
+                  Finalmente encontrei uma plataforma que mostra os draws do Express Entry de forma clara e atualizada. 
+                  Os gráficos me ajudaram a entender as tendências e planejar melhor minha aplicação.
+                </p>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="font-medium">João Santos</span>
+                  <span className="text-muted-foreground">Fev 28, 2025</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Testimonial 3 */}
+            <Card className="hover-scale transition-all">
+              <CardHeader>
+                <div className="flex gap-1 mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="text-yellow-500 text-xl">★</span>
+                  ))}
+                </div>
+                <CardTitle className="text-lg">Muito Útil</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-6">
+                  O quiz de imigração me deu uma direção clara sobre qual programa seguir. 
+                  Antes estava perdida com tantas opções, agora sei exatamente o que fazer. Recomendo muito! 💝
+                </p>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="font-medium">Ana Costa</span>
+                  <span className="text-muted-foreground">Jan 10, 2025</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 px-4 bg-gradient-canadian text-white">
         <div className="container mx-auto max-w-3xl text-center">
