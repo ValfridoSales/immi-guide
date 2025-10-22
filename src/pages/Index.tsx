@@ -2,11 +2,39 @@ import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Calculator, TrendingUp, ClipboardList, Award, ArrowRight } from 'lucide-react';
+import { Calculator, TrendingUp, ClipboardList, Award, ArrowRight, ArrowDownRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import airportImage from '@/assets/airport-journey.png';
+import { useScrollProgress } from '@/hooks/useScrollProgress';
+import { useInView } from '@/hooks/useInView';
+import { useRef } from 'react';
 
 const Index = () => {
+  const toolsSectionRef = useRef<HTMLElement>(null);
+  const scrollProgress = useScrollProgress(toolsSectionRef);
+  
+  // Interpolate background color from red to white
+  const interpolateColor = (progress: number) => {
+    const red = { h: 0, s: 84, l: 60 }; // --primary
+    const white = { h: 0, s: 0, l: 100 }; // --background
+    
+    const h = red.h + (white.h - red.h) * progress;
+    const s = red.s + (white.s - red.s) * progress;
+    const l = red.l + (white.l - red.l) * progress;
+    
+    return `hsl(${h}, ${s}%, ${l}%)`;
+  };
+  
+  const backgroundColor = interpolateColor(scrollProgress);
+  const textColor = scrollProgress > 0.5 ? 'hsl(220 15% 15%)' : 'hsl(0 0% 100%)';
+  
+  // Scale effect for viewport expansion
+  const scale = 1 + scrollProgress * 0.1; // Scale from 1 to 1.1
+  
+  const { ref: card1Ref, isInView: card1InView } = useInView(0.2);
+  const { ref: card2Ref, isInView: card2InView } = useInView(0.2);
+  const { ref: card3Ref, isInView: card3InView } = useInView(0.2);
+  
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -46,26 +74,150 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-4 bg-gradient-subtle">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Ferramentas Essenciais</h2>
-            <p className="text-xl text-muted-foreground">
-              Tudo que você precisa para planejar sua imigração
+      {/* Essential Tools Section - Ladder Layout */}
+      <section 
+        ref={toolsSectionRef}
+        className="py-24 min-h-[140vh] relative overflow-hidden transition-colors duration-700"
+        style={{ backgroundColor }}
+      >
+        <div 
+          className="container px-4 mx-auto transition-transform duration-500"
+          style={{ transform: `scale(${scale})` }}
+        >
+          <div className="text-center mb-24 animate-fade-in">
+            <h2 
+              className="text-4xl font-bold mb-4 transition-colors duration-700"
+              style={{ color: textColor }}
+            >
+              Ferramentas Essenciais
+            </h2>
+            <p 
+              className="text-xl max-w-2xl mx-auto transition-colors duration-700"
+              style={{ color: textColor, opacity: 0.8 }}
+            >
+              Tudo que você precisa para planejar sua imigração para o Canadá
             </p>
           </div>
+          
+          {/* Ladder Layout Container - Desktop Only */}
+          <div className="relative min-h-[80vh] hidden lg:block">
+            {/* Card 1 - Quiz (Top Left) */}
+            <div
+              ref={card1Ref}
+              className={`absolute left-0 top-0 w-[380px] transition-all duration-1000 ${
+                card1InView ? 'opacity-100 surge-in' : 'opacity-0 translate-y-12'
+              }`}
+            >
+              <Card className="hover-scale transition-all duration-300 hover:shadow-2xl bg-card/90 backdrop-blur-sm">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
+                    <ClipboardList className="w-6 h-6 text-white" />
+                  </div>
+                  <CardTitle>Quiz de Imigração</CardTitle>
+                  <CardDescription>
+                    Descubra qual programa é ideal para você em 3 minutos
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
+                    <li>✓ Análise personalizada do seu perfil</li>
+                    <li>✓ Recomendações de programas</li>
+                    <li>✓ Próximos passos detalhados</li>
+                  </ul>
+                  <Button asChild variant="quiz" className="w-full">
+                    <Link to="/quiz">Fazer Quiz Gratuito</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Quiz de Imigração */}
-            <Card className="hover-scale border-2 hover:border-primary transition-all">
+            {/* Arrow 1 to 2 */}
+            <ArrowDownRight 
+              className={`absolute left-[340px] top-[280px] w-16 h-16 transition-all duration-1000 delay-300 ${
+                card1InView ? 'opacity-60 arrow-draw' : 'opacity-0'
+              }`}
+              style={{ color: textColor }}
+            />
+
+            {/* Card 2 - Express Entry (Middle Center) */}
+            <div
+              ref={card2Ref}
+              className={`absolute left-1/2 top-[35vh] -translate-x-1/2 w-[380px] transition-all duration-1000 delay-300 ${
+                card2InView ? 'opacity-100 surge-in' : 'opacity-0 translate-y-12'
+              }`}
+            >
+              <Card className="hover-scale transition-all duration-300 hover:shadow-2xl bg-card/90 backdrop-blur-sm">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
+                    <TrendingUp className="w-6 h-6 text-white" />
+                  </div>
+                  <CardTitle>Express Entry Draws</CardTitle>
+                  <CardDescription>
+                    Acompanhe os sorteios em tempo real
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
+                    <li>✓ Dados atualizados dos draws</li>
+                    <li>✓ Gráficos e tendências</li>
+                    <li>✓ Análise histórica completa</li>
+                  </ul>
+                  <Button asChild variant="quiz" className="w-full">
+                    <Link to="/express-entry/draws">Ver Draws</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Arrow 2 to 3 */}
+            <ArrowDownRight 
+              className={`absolute right-[340px] top-[calc(35vh+280px)] w-16 h-16 transition-all duration-1000 delay-700 ${
+                card2InView ? 'opacity-60 arrow-draw' : 'opacity-0'
+              }`}
+              style={{ color: textColor }}
+            />
+
+            {/* Card 3 - CRS Calculator (Bottom Right) */}
+            <div
+              ref={card3Ref}
+              className={`absolute right-0 top-[70vh] w-[380px] transition-all duration-1000 delay-700 ${
+                card3InView ? 'opacity-100 surge-in' : 'opacity-0 translate-y-12'
+              }`}
+            >
+              <Card className="hover-scale transition-all duration-300 hover:shadow-2xl bg-card/90 backdrop-blur-sm">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
+                    <Calculator className="w-6 h-6 text-white" />
+                  </div>
+                  <CardTitle>Calculadora CRS</CardTitle>
+                  <CardDescription>
+                    Calcule sua pontuação oficial
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
+                    <li>✓ Cálculo preciso e oficial</li>
+                    <li>✓ Simulações de cenários</li>
+                    <li>✓ Histórico de pontuações</li>
+                  </ul>
+                  <Button asChild variant="quiz" className="w-full">
+                    <Link to="/crs-calculator">Calcular Agora</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Mobile/Tablet Stacked Layout */}
+          <div className="grid gap-8 lg:hidden">
+            <Card className="hover-scale transition-all duration-300 hover:shadow-lg border-2 hover:border-primary">
               <CardHeader>
                 <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
                   <ClipboardList className="w-6 h-6 text-white" />
                 </div>
                 <CardTitle>Quiz de Imigração</CardTitle>
                 <CardDescription>
-                  Descubra qual programa de imigração é ideal para você em apenas 3 minutos
+                  Descubra qual programa é ideal para você em 3 minutos
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -75,20 +227,19 @@ const Index = () => {
                   <li>✓ Próximos passos detalhados</li>
                 </ul>
                 <Button asChild variant="quiz" className="w-full">
-                  <a href="/quiz">Fazer Quiz Gratuito</a>
+                  <Link to="/quiz">Fazer Quiz Gratuito</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Express Entry Draws */}
-            <Card className="hover-scale border-2 hover:border-primary transition-all">
+            <Card className="hover-scale transition-all duration-300 hover:shadow-lg border-2 hover:border-primary">
               <CardHeader>
                 <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
                   <TrendingUp className="w-6 h-6 text-white" />
                 </div>
                 <CardTitle>Express Entry Draws</CardTitle>
                 <CardDescription>
-                  Acompanhe os sorteios do Express Entry em tempo real
+                  Acompanhe os sorteios em tempo real
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -103,15 +254,14 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            {/* Calculadora CRS */}
-            <Card className="hover-scale border-2 hover:border-primary transition-all">
+            <Card className="hover-scale transition-all duration-300 hover:shadow-lg border-2 hover:border-primary">
               <CardHeader>
                 <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
                   <Calculator className="w-6 h-6 text-white" />
                 </div>
                 <CardTitle>Calculadora CRS</CardTitle>
                 <CardDescription>
-                  Calcule sua pontuação CRS e descubra suas chances
+                  Calcule sua pontuação oficial
                 </CardDescription>
               </CardHeader>
               <CardContent>
