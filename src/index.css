@@ -115,37 +115,6 @@ All colors MUST be HSL.
   }
 }
 
-/* Custom Animations for Landing Page */
-@keyframes surge-in {
-  from {
-    opacity: 0;
-    transform: scale(0.85) translateY(60px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes arrow-draw {
-  from {
-    opacity: 0;
-    transform: scale(0.5) rotate(-45deg);
-  }
-  to {
-    opacity: 0.6;
-    transform: scale(1) rotate(0deg);
-  }
-}
-
-.surge-in {
-  animation: surge-in 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-.arrow-draw {
-  animation: arrow-draw 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
 /* Print Styles */
 @media print {
   @page {
