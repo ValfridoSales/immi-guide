@@ -50,10 +50,35 @@ export function useSimulations() {
     }
   };
 
-  // Carregar simulações ao montar ou quando user muda
+  // Carregar último cálculo de CRS como base se não houver currentBaseInput
+  const loadLastCRSCalculation = async () => {
+    if (!user || currentBaseInput) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('crs_calculations')
+        .select('calculation_data')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (error) throw error;
+      
+      if (data?.calculation_data) {
+        // O calculation_data contém o InputCRS completo
+        setCurrentBaseInput(data.calculation_data as any as InputCRS);
+      }
+    } catch (error: any) {
+      console.error('Erro ao carregar último cálculo CRS:', error);
+    }
+  };
+
+  // Carregar simulações e último CRS ao montar ou quando user muda
   useEffect(() => {
     if (user && isPro) {
       loadSimulations();
+      loadLastCRSCalculation();
     }
   }, [user, isPro]);
 
