@@ -5,7 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { TrendingUp, Award, Users, Briefcase, Gift, ArrowRight, Save, Check } from 'lucide-react';
-import type { CRSResult } from '@/utils/crs-engine';
+import type { CRSResult, InputCRS } from '@/utils/crs-engine';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -13,10 +13,10 @@ import { useState } from 'react';
 
 interface CRSResultsProps {
   result: CRSResult;
-  formData?: any;
+  inputData?: InputCRS;
 }
 
-export function CRSResults({ result, formData }: CRSResultsProps) {
+export function CRSResults({ result, inputData }: CRSResultsProps) {
   const { user, isPro } = useAuth();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
@@ -46,7 +46,7 @@ export function CRSResults({ result, formData }: CRSResultsProps) {
           spouse_score: result.spouse,
           transferability_score: result.transferability,
           additional_score: result.additional,
-          calculation_data: formData || {},
+          calculation_data: inputData || {},
         });
 
       if (error) throw error;

@@ -61,7 +61,9 @@ const CRSCalculator = () => {
             </CardContent>
           </Card>
 
-          {result && <CRSResults result={result} />}
+          {result && currentInput && (
+            <CRSResults result={result} inputData={currentInput} />
+          )}
         </div>
       </main>
     </div>
