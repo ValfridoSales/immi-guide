@@ -52,7 +52,17 @@ export function useSimulations() {
 
   // Carregar último cálculo de CRS como base se não houver currentBaseInput
   const loadLastCRSCalculation = async () => {
-    if (!user || currentBaseInput) return;
+    if (!user) {
+      console.log('❌ Sem usuário para carregar CRS');
+      return;
+    }
+    
+    if (currentBaseInput) {
+      console.log('✅ CRS já carregado:', currentBaseInput);
+      return;
+    }
+    
+    console.log('🔍 Buscando último cálculo CRS no banco...');
     
     try {
       const { data, error } = await supabase
@@ -63,20 +73,32 @@ export function useSimulations() {
         .limit(1)
         .maybeSingle();
       
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Erro ao buscar cálculo:', error);
+        throw error;
+      }
       
-      if (data?.calculation_data) {
+      if (!data) {
+        console.warn('⚠️ Nenhum cálculo encontrado no banco');
+        return;
+      }
+      
+      console.log('📦 Dados carregados do banco:', data.calculation_data);
+      
+      if (data.calculation_data) {
         const inputData = data.calculation_data as any;
         
         // Validar se tem a estrutura mínima necessária
         if (inputData && inputData.firstOfficial && inputData.education) {
+          console.log('✅ Dados válidos, setando currentBaseInput');
           setCurrentBaseInput(inputData as InputCRS);
         } else {
-          console.warn('Calculation data incompleto:', inputData);
+          console.warn('⚠️ Calculation data incompleto ou inválido:', inputData);
+          console.log('Campos presentes:', Object.keys(inputData || {}));
         }
       }
     } catch (error: any) {
-      console.error('Erro ao carregar último cálculo CRS:', error);
+      console.error('❌ Erro ao carregar último cálculo CRS:', error);
     }
   };
 
