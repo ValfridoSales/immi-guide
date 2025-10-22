@@ -45,7 +45,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface CRSFormProps {
-  onCalculate: (result: CRSResult) => void;
+  onCalculate: (result: CRSResult, input: InputCRS) => void;
 }
 
 export function CRSForm({ onCalculate }: CRSFormProps) {
@@ -234,7 +234,7 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
       };
 
       const result = computeCrs(input);
-      onCalculate(result);
+      onCalculate(result, input);
     } catch (error: any) {
       console.error('Erro ao calcular CRS:', error);
       alert(`Erro: ${error.message}`);

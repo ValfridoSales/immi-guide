@@ -1,14 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { CRSForm } from '@/components/crs/CRSForm';
 import { CRSResults } from '@/components/crs/CRSResults';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info } from 'lucide-react';
-import type { CRSResult } from '@/utils/crs-engine';
+import type { CRSResult, InputCRS } from '@/utils/crs-engine';
+import { useSimulations } from '@/hooks/useSimulations';
 
 const CRSCalculator = () => {
   const [result, setResult] = useState<CRSResult | null>(null);
+  const [currentInput, setCurrentInput] = useState<InputCRS | null>(null);
+  const { setCurrentBaseInput } = useSimulations();
+
+  // Atualizar base input no hook de simulações quando houver cálculo
+  useEffect(() => {
+    if (currentInput) {
+      setCurrentBaseInput(currentInput);
+    }
+  }, [currentInput, setCurrentBaseInput]);
+
+  const handleCalculate = (calcResult: CRSResult, input: InputCRS) => {
+    setResult(calcResult);
+    setCurrentInput(input);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -42,7 +57,7 @@ const CRSCalculator = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <CRSForm onCalculate={setResult} />
+              <CRSForm onCalculate={handleCalculate} />
             </CardContent>
           </Card>
 

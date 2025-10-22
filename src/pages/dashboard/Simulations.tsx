@@ -1,10 +1,51 @@
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ProFeatureGuard } from '@/components/dashboard/ProFeatureGuard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Target, Plus, TrendingUp } from 'lucide-react';
+import { Target, Plus, TrendingUp, Loader2 } from 'lucide-react';
+import { useSimulations } from '@/hooks/useSimulations';
+import { SimulationWizard } from '@/components/simulations/SimulationWizard';
+import { SimulationCard } from '@/components/simulations/SimulationCard';
+import { SimulationComparison } from '@/components/simulations/SimulationComparison';
+import { SCENARIO_PRESETS } from '@/utils/simulation-engine';
+import { ScenarioPresetCard } from '@/components/simulations/ScenarioPresetCard';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Info } from 'lucide-react';
 
 export default function Simulations() {
+  const {
+    simulations,
+    loading,
+    currentBaseInput,
+    deleteSimulation,
+    parseSimulation,
+    runSimulation,
+  } = useSimulations();
+
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [viewSimulation, setViewSimulation] = useState<any>(null);
+
+  const handleOpenWizard = () => {
+    if (!currentBaseInput) {
+      // Mostrar alerta para calcular CRS primeiro
+      alert('Por favor, calcule seu CRS primeiro na página Calculadora CRS antes de criar simulações.');
+      return;
+    }
+    setWizardOpen(true);
+  };
+
+  const handleViewSimulation = (simulation: any) => {
+    const result = parseSimulation(simulation);
+    setViewSimulation(result);
+  };
+
+  // Executar algumas simulações automáticas se não houver nenhuma salva
+  const autoSimulations = currentBaseInput && simulations.length === 0 
+    ? SCENARIO_PRESETS.slice(0, 4).map(preset => runSimulation(currentBaseInput, preset))
+    : [];
+
   return (
     <DashboardLayout>
       <ProFeatureGuard feature="simulations">
@@ -16,13 +57,30 @@ export default function Simulations() {
                 Teste diferentes cenários e veja o impacto na sua pontuação CRS
               </p>
             </div>
-            <Button className="bg-gradient-canadian border-0">
+            <Button 
+              className="bg-gradient-canadian border-0"
+              onClick={handleOpenWizard}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Nova Simulação
             </Button>
           </div>
 
-          {/* Scenarios Info */}
+          {/* Info sobre CRS base */}
+          {!currentBaseInput && (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Você precisa calcular seu CRS primeiro na página{' '}
+                <a href="/crs-calculator" className="underline font-semibold">
+                  Calculadora CRS
+                </a>
+                {' '}antes de criar simulações.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Como funcionam as simulações */}
           <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -52,78 +110,26 @@ export default function Simulations() {
             </CardContent>
           </Card>
 
-          {/* Example Scenarios */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                  <CardTitle className="text-base">Melhorar Inglês</CardTitle>
-                </div>
-                <CardDescription>
-                  Veja o impacto de melhorar sua nota no IELTS
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full">
-                  Criar esta simulação
-                </Button>
-              </CardContent>
-            </Card>
+          {/* Presets sugeridos (apenas se tiver CRS calculado) */}
+          {currentBaseInput && (
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Cenários Sugeridos</h2>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {SCENARIO_PRESETS.slice(0, 6).map(preset => (
+                  <ScenarioPresetCard
+                    key={preset.id}
+                    preset={preset}
+                    onSelect={(p) => {
+                      const result = runSimulation(currentBaseInput, p);
+                      setViewSimulation(result);
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                  <CardTitle className="text-base">Experiência Adicional</CardTitle>
-                </div>
-                <CardDescription>
-                  Simule o ganho de pontos com mais tempo de experiência
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full">
-                  Criar esta simulação
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                  <CardTitle className="text-base">Adicionar Francês</CardTitle>
-                </div>
-                <CardDescription>
-                  Calcule os pontos extras ao aprender francês
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full">
-                  Criar esta simulação
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                  <CardTitle className="text-base">Candidato Principal</CardTitle>
-                </div>
-                <CardDescription>
-                  Compare ser candidato principal vs. cônjuge
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full">
-                  Criar esta simulação
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Saved Simulations */}
+          {/* Simulações Salvas */}
           <Card>
             <CardHeader>
               <CardTitle>Suas Simulações Salvas</CardTitle>
@@ -132,20 +138,119 @@ export default function Simulations() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[200px] flex items-center justify-center bg-muted/20 rounded-lg border-2 border-dashed">
-                <div className="text-center">
-                  <p className="text-muted-foreground mb-4">
-                    Você ainda não criou nenhuma simulação
-                  </p>
-                  <Button className="bg-gradient-canadian border-0">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Criar Primeira Simulação
-                  </Button>
+              {loading ? (
+                <div className="h-[200px] flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 </div>
-              </div>
+              ) : simulations.length === 0 ? (
+                <div className="h-[200px] flex items-center justify-center bg-muted/20 rounded-lg border-2 border-dashed">
+                  <div className="text-center">
+                    <p className="text-muted-foreground mb-4">
+                      Você ainda não criou nenhuma simulação
+                    </p>
+                    <Button 
+                      className="bg-gradient-canadian border-0"
+                      onClick={handleOpenWizard}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Criar Primeira Simulação
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {simulations.map(sim => (
+                      <SimulationCard
+                        key={sim.id}
+                        simulation={sim}
+                        onDelete={deleteSimulation}
+                        onView={handleViewSimulation}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Comparação se houver múltiplas simulações */}
+                  {simulations.length > 1 && (
+                    <SimulationComparison 
+                      results={simulations.map(s => parseSimulation(s)!).filter(Boolean)} 
+                    />
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
+
+          {/* Preview de simulações automáticas */}
+          {autoSimulations.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Preview de Cenários</CardTitle>
+                <CardDescription>
+                  Baseado no seu perfil atual - salve as que você gostar!
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SimulationComparison results={autoSimulations} />
+              </CardContent>
+            </Card>
+          )}
         </div>
+
+        {/* Wizard Dialog */}
+        <SimulationWizard
+          open={wizardOpen}
+          onOpenChange={setWizardOpen}
+          baseInput={currentBaseInput}
+        />
+
+        {/* View Simulation Dialog */}
+        <Dialog open={!!viewSimulation} onOpenChange={() => setViewSimulation(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>{viewSimulation?.scenarioName}</DialogTitle>
+              <DialogDescription>{viewSimulation?.description}</DialogDescription>
+            </DialogHeader>
+            {viewSimulation && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <div className="text-sm text-muted-foreground mb-1">Score Base</div>
+                    <div className="text-2xl font-bold">{viewSimulation.baseScore.total}</div>
+                  </div>
+                  <div className="text-center p-4 bg-primary/10 rounded-lg">
+                    <div className="text-sm text-muted-foreground mb-1">Score Projetado</div>
+                    <div className="text-2xl font-bold text-primary">{viewSimulation.projectedScore.total}</div>
+                  </div>
+                  <div className={`text-center p-4 rounded-lg ${
+                    viewSimulation.difference > 0 ? 'bg-green-500/10' : 'bg-red-500/10'
+                  }`}>
+                    <div className="text-sm text-muted-foreground mb-1">Diferença</div>
+                    <div className={`text-2xl font-bold ${
+                      viewSimulation.difference > 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {viewSimulation.difference > 0 ? '+' : ''}{viewSimulation.difference}
+                    </div>
+                  </div>
+                </div>
+
+                {viewSimulation.recommendations.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Recomendações:</h4>
+                    <ul className="space-y-1 text-sm">
+                      {viewSimulation.recommendations.map((rec: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <span className="text-primary">•</span>
+                          <span>{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </ProFeatureGuard>
     </DashboardLayout>
   );
