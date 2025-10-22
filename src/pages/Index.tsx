@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calculator, TrendingUp, ClipboardList, Award, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import airportImage from '@/assets/airport-journey.png';
 
 const Index = () => {
   return (
@@ -128,38 +129,49 @@ const Index = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-20 px-4 bg-background">
-        <div className="container mx-auto max-w-4xl text-center">
+      <section className="relative py-20 px-4 overflow-hidden">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={airportImage} 
+            alt="Journey to Canada" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-background/95" />
+        </div>
+
+        {/* Content */}
+        <div className="container mx-auto max-w-4xl text-center relative z-10">
           <div className="mb-12">
-            <Award className="w-16 h-16 mx-auto mb-6 text-primary" />
-            <h2 className="text-4xl font-bold mb-4">
+            <Award className="w-16 h-16 mx-auto mb-6 text-primary animate-fade-in" />
+            <h2 className="text-4xl font-bold mb-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
               A Ferramenta Mais Completa Disponível
             </h2>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-xl text-muted-foreground animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Combine todas as ferramentas essenciais em um único lugar
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-12">
-            <div className="p-6 bg-gradient-subtle rounded-lg border border-border">
+            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <h3 className="font-semibold text-lg mb-2">Dados Oficiais</h3>
               <p className="text-muted-foreground">
                 Baseado em informações oficiais do governo canadense
               </p>
             </div>
-            <div className="p-6 bg-gradient-subtle rounded-lg border border-border">
+            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <h3 className="font-semibold text-lg mb-2">Atualizações Constantes</h3>
               <p className="text-muted-foreground">
                 Sistema sincronizado com os draws mais recentes
               </p>
             </div>
-            <div className="p-6 bg-gradient-subtle rounded-lg border border-border">
+            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all animate-fade-in" style={{ animationDelay: '0.5s' }}>
               <h3 className="font-semibold text-lg mb-2">Simulações Inteligentes</h3>
               <p className="text-muted-foreground">
                 Teste diferentes cenários e otimize sua estratégia
               </p>
             </div>
-            <div className="p-6 bg-gradient-subtle rounded-lg border border-border">
+            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all animate-fade-in" style={{ animationDelay: '0.6s' }}>
               <h3 className="font-semibold text-lg mb-2">Interface Intuitiva</h3>
               <p className="text-muted-foreground">
                 Fácil de usar, mesmo para iniciantes
@@ -167,7 +179,7 @@ const Index = () => {
             </div>
           </div>
 
-          <Button asChild size="lg" variant="canadian" className="text-lg group">
+          <Button asChild size="lg" variant="canadian" className="text-lg group animate-fade-in" style={{ animationDelay: '0.7s' }}>
             <Link to="/auth">
               Criar Conta Gratuita
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
