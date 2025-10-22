@@ -5,8 +5,13 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Calculator, TrendingUp, ClipboardList, Award, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import airportImage from '@/assets/airport-journey.png';
+import { useInView } from '@/hooks/useInView';
 
 const Index = () => {
+  const [headerRef, headerInView] = useInView();
+  const [gridRef, gridInView] = useInView();
+  const [ctaRef, ctaInView] = useInView();
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -143,36 +148,50 @@ const Index = () => {
 
         {/* Content */}
         <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <div className="mb-12">
-            <Award className="w-16 h-16 mx-auto mb-6 text-primary animate-fade-in" />
-            <h2 className="text-4xl font-bold mb-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <div 
+            ref={headerRef}
+            className={`mb-12 transition-all duration-1000 ${
+              headerInView 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <Award className="w-16 h-16 mx-auto mb-6 text-primary" />
+            <h2 className="text-4xl font-bold mb-4">
               A Ferramenta Mais Completa Disponível
             </h2>
-            <p className="text-xl text-muted-foreground animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <p className="text-xl text-muted-foreground">
               Combine todas as ferramentas essenciais em um único lugar
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-12">
-            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <div 
+            ref={gridRef}
+            className={`grid md:grid-cols-2 gap-6 mb-12 transition-all duration-1000 ${
+              gridInView 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all">
               <h3 className="font-semibold text-lg mb-2">Dados Oficiais</h3>
               <p className="text-muted-foreground">
                 Baseado em informações oficiais do governo canadense
               </p>
             </div>
-            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all">
               <h3 className="font-semibold text-lg mb-2">Atualizações Constantes</h3>
               <p className="text-muted-foreground">
                 Sistema sincronizado com os draws mais recentes
               </p>
             </div>
-            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all animate-fade-in" style={{ animationDelay: '0.5s' }}>
+            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all">
               <h3 className="font-semibold text-lg mb-2">Simulações Inteligentes</h3>
               <p className="text-muted-foreground">
                 Teste diferentes cenários e otimize sua estratégia
               </p>
             </div>
-            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all">
               <h3 className="font-semibold text-lg mb-2">Interface Intuitiva</h3>
               <p className="text-muted-foreground">
                 Fácil de usar, mesmo para iniciantes
@@ -180,12 +199,21 @@ const Index = () => {
             </div>
           </div>
 
-          <Button asChild size="lg" variant="canadian" className="text-lg group animate-fade-in" style={{ animationDelay: '0.7s' }}>
-            <Link to="/auth">
-              Criar Conta Gratuita
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </Button>
+          <div
+            ref={ctaRef}
+            className={`transition-all duration-1000 ${
+              ctaInView 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <Button asChild size="lg" variant="canadian" className="text-lg group">
+              <Link to="/auth">
+                Criar Conta Gratuita
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
 
