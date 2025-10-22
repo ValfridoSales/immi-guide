@@ -61,13 +61,19 @@ export function useSimulations() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       
       if (data?.calculation_data) {
-        // O calculation_data contém o InputCRS completo
-        setCurrentBaseInput(data.calculation_data as any as InputCRS);
+        const inputData = data.calculation_data as any;
+        
+        // Validar se tem a estrutura mínima necessária
+        if (inputData && inputData.firstOfficial && inputData.education) {
+          setCurrentBaseInput(inputData as InputCRS);
+        } else {
+          console.warn('Calculation data incompleto:', inputData);
+        }
       }
     } catch (error: any) {
       console.error('Erro ao carregar último cálculo CRS:', error);

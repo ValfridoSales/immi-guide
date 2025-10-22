@@ -43,7 +43,14 @@ export default function Simulations() {
 
   // Executar algumas simulações automáticas se não houver nenhuma salva
   const autoSimulations = currentBaseInput && simulations.length === 0 
-    ? SCENARIO_PRESETS.slice(0, 4).map(preset => runSimulation(currentBaseInput, preset))
+    ? SCENARIO_PRESETS.slice(0, 4).map(preset => {
+        try {
+          return runSimulation(currentBaseInput, preset);
+        } catch (error) {
+          console.error('Erro ao rodar simulação preset:', preset.id, error);
+          return null;
+        }
+      }).filter(Boolean) as any[]
     : [];
 
   return (
