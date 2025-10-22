@@ -108,7 +108,14 @@ function generateRecommendations(
     recs.push(`Ganho de ${difference} pontos neste cenário`);
     
     if (patch.category === 'language') {
-      recs.push('Considere investir em cursos preparatórios para IELTS/CELPIP');
+      // Detectar se é inglês ou francês
+      const isFrench = patch.changes.secondOfficial !== undefined;
+      
+      if (isFrench) {
+        recs.push('Considere investir em cursos preparatórios para TEF Canada/TCF Canada');
+      } else {
+        recs.push('Considere investir em cursos preparatórios para IELTS/CELPIP');
+      }
       recs.push('Prática regular de 2-3h por dia pode levar a progressos significativos');
     }
     
