@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
+import Quiz from "./pages/Quiz";
 import ExpressEntryDraws from "./pages/ExpressEntryDraws";
 import CRSCalculator from "./pages/CRSCalculator";
 import SyncData from "./pages/SyncData";
@@ -31,6 +32,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/quiz" element={<Quiz />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/express-entry/draws" element={<ExpressEntryDraws />} />
             <Route path="/crs-calculator" element={<CRSCalculator />} />

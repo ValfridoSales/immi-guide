@@ -1,206 +1,203 @@
-import { useState, useEffect } from 'react';
-import { QuizState, QuizResponse, QuizResult, Lead } from '@/types/quiz';
-import { quizQuestions } from '@/data/quiz-questions';
-import { calculateQuizResults } from '@/utils/quiz-scoring';
-import { QuizIntro } from '@/components/QuizIntro';
-import { QuizQuestion } from '@/components/QuizQuestion';
-import { QuizProgress } from '@/components/QuizProgress';
-import { QuizResults } from '@/components/QuizResults';
-import { LeadCaptureForm } from '@/components/LeadCaptureForm';
-import { ThankYouPage } from '@/components/ThankYouPage';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { sendWelcomeEmail } from '@/utils/pdf';
-import { storeQuizResults, updateQuizResultsWithLead } from '@/utils/quiz-results';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Calculator, TrendingUp, ClipboardList, Award, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 const Index = () => {
-  const [quizState, setQuizState] = useState<QuizState>('intro');
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [responses, setResponses] = useState<QuizResponse[]>([]);
-  const [results, setResults] = useState<QuizResult[]>([]);
-  const [completionsCount, setCompletionsCount] = useState<number>(0);
-  const [sessionId] = useState(() => Math.random().toString(36).substring(2) + Date.now().toString(36));
-  const [resultId, setResultId] = useState<string | null>(null);
-  const {
-    toast
-  } = useToast();
-  useEffect(() => {
-    fetchCompletionsCount();
-  }, []);
-  const fetchCompletionsCount = async () => {
-    try {
-      const {
-        data,
-        error
-      } = await supabase.rpc('get_quiz_completions_count');
-      if (error) throw error;
-      setCompletionsCount(data || 0);
-    } catch (error) {
-      console.error('Error fetching completions count:', error);
-    }
-  };
-  const trackQuizCompletion = async () => {
-    try {
-      const {
-        error
-      } = await supabase.from('quiz_completions').insert([{
-        session_id: sessionId
-      }]);
-      if (error) throw error;
-
-      // Update the count locally
-      setCompletionsCount(prev => prev + 1);
-    } catch (error) {
-      console.error('Error tracking quiz completion:', error);
-    }
-  };
-  const currentQuestion = quizQuestions[currentQuestionIndex];
-  const currentResponse = responses.find(r => r.questionId === currentQuestion?.id);
-  const handleStartQuiz = () => {
-    setQuizState('questions');
-    setCurrentQuestionIndex(0);
-    setResponses([]);
-  };
-  const handleAnswer = (value: string) => {
-    const newResponses = responses.filter(r => r.questionId !== currentQuestion.id);
-    newResponses.push({
-      questionId: currentQuestion.id,
-      selectedValues: [value]
-    });
-    setResponses(newResponses);
-  };
-  const handleNext = async () => {
-    if (!currentResponse) {
-      toast({
-        title: "Resposta obrigatória",
-        description: "Por favor, selecione uma opção antes de continuar.",
-        variant: "destructive"
-      });
-      return;
-    }
-    if (currentQuestionIndex < quizQuestions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      try {
-        // Calculate results
-        const calculatedResults = calculateQuizResults(responses);
-        setResults(calculatedResults);
-
-        // Store quiz results and get the resultId
-        const storedResultId = await storeQuizResults(sessionId, calculatedResults);
-        setResultId(storedResultId);
-        
-        setQuizState('results');
-
-        // Track quiz completion
-        await trackQuizCompletion();
-      } catch (error) {
-        console.error('Error storing quiz results:', error);
-        toast({
-          title: "Erro",
-          description: "Houve um problema ao salvar os resultados. Tente novamente.",
-          variant: "destructive"
-        });
-      }
-    }
-  };
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
-  const handleStartLeadCapture = () => {
-    setQuizState('lead-capture');
-  };
-  const handleLeadSubmit = async (lead: Lead) => {
-    try {
-      console.log('Lead captured:', lead);
-      
-      if (!resultId) {
-        toast({
-          title: "Erro!",
-          description: "Resultados não encontrados. Refaça o quiz.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Update quiz results with lead data
-      await updateQuizResultsWithLead(resultId, lead);
-      
-      // Send welcome email with PDF using resultId
-      await sendWelcomeEmail(lead.email, resultId);
-      
-      toast({
-        title: "Sucesso!",
-        description: "Sua análise foi enviada para seu email."
-      });
-      setQuizState('thank-you');
-    } catch (error) {
-      console.error('Error sending email:', error);
-      toast({
-        title: "Erro!",
-        description: "Houve um problema ao enviar o email. Tente novamente.",
-        variant: "destructive"
-      });
-    }
-  };
-  const handleRestart = () => {
-    setQuizState('intro');
-    setCurrentQuestionIndex(0);
-    setResponses([]);
-    setResults([]);
-    setResultId(null);
-  };
-  return <div className="min-h-screen bg-gradient-subtle">
+  return (
+    <div className="min-h-screen bg-background">
       <Navigation />
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        {/* Progress indicator for questions state */}
-        {quizState === 'questions' && (
-          <div className="max-w-2xl mx-auto mb-4">
-            <div className="text-sm text-muted-foreground text-center">
-              Pergunta {currentQuestionIndex + 1} de {quizQuestions.length}
+      {/* Hero Section with Video Background */}
+      <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
+        {/* Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/videos/hero-background.mp4" type="video/mp4" />
+        </video>
+        
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/50" />
+        
+        {/* Content */}
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
+            Acelere o seu plano Canadá
+          </h1>
+          <p className="text-xl md:text-2xl text-white/90 mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            A plataforma mais completa para sua jornada de imigração
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <Button asChild size="lg" variant="canadian" className="text-lg">
+              <Link to="/auth">Começar Agora</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="text-lg bg-white/10 text-white border-white hover:bg-white/20">
+              <Link to="/crs-calculator">Calcular CRS</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-4 bg-gradient-subtle">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Ferramentas Essenciais</h2>
+            <p className="text-xl text-muted-foreground">
+              Tudo que você precisa para planejar sua imigração
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Quiz de Imigração */}
+            <Card className="hover-scale border-2 hover:border-primary transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
+                  <ClipboardList className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle>Quiz de Imigração</CardTitle>
+                <CardDescription>
+                  Descubra qual programa de imigração é ideal para você em apenas 3 minutos
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
+                  <li>✓ Análise personalizada do seu perfil</li>
+                  <li>✓ Recomendações de programas</li>
+                  <li>✓ Próximos passos detalhados</li>
+                </ul>
+                <Button asChild variant="quiz" className="w-full">
+                  <a href="/quiz">Fazer Quiz Gratuito</a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Express Entry Draws */}
+            <Card className="hover-scale border-2 hover:border-primary transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle>Express Entry Draws</CardTitle>
+                <CardDescription>
+                  Acompanhe os sorteios do Express Entry em tempo real
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
+                  <li>✓ Dados atualizados dos draws</li>
+                  <li>✓ Gráficos e tendências</li>
+                  <li>✓ Análise histórica completa</li>
+                </ul>
+                <Button asChild variant="quiz" className="w-full">
+                  <Link to="/express-entry/draws">Ver Draws</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Calculadora CRS */}
+            <Card className="hover-scale border-2 hover:border-primary transition-all">
+              <CardHeader>
+                <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
+                  <Calculator className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle>Calculadora CRS</CardTitle>
+                <CardDescription>
+                  Calcule sua pontuação CRS e descubra suas chances
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
+                  <li>✓ Cálculo preciso e oficial</li>
+                  <li>✓ Simulações de cenários</li>
+                  <li>✓ Histórico de pontuações</li>
+                </ul>
+                <Button asChild variant="quiz" className="w-full">
+                  <Link to="/crs-calculator">Calcular Agora</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-20 px-4 bg-background">
+        <div className="container mx-auto max-w-4xl text-center">
+          <div className="mb-12">
+            <Award className="w-16 h-16 mx-auto mb-6 text-primary" />
+            <h2 className="text-4xl font-bold mb-4">
+              A Ferramenta Mais Completa Disponível
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Combine todas as ferramentas essenciais em um único lugar
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-12">
+            <div className="p-6 bg-gradient-subtle rounded-lg border border-border">
+              <h3 className="font-semibold text-lg mb-2">Dados Oficiais</h3>
+              <p className="text-muted-foreground">
+                Baseado em informações oficiais do governo canadense
+              </p>
+            </div>
+            <div className="p-6 bg-gradient-subtle rounded-lg border border-border">
+              <h3 className="font-semibold text-lg mb-2">Atualizações Constantes</h3>
+              <p className="text-muted-foreground">
+                Sistema sincronizado com os draws mais recentes
+              </p>
+            </div>
+            <div className="p-6 bg-gradient-subtle rounded-lg border border-border">
+              <h3 className="font-semibold text-lg mb-2">Simulações Inteligentes</h3>
+              <p className="text-muted-foreground">
+                Teste diferentes cenários e otimize sua estratégia
+              </p>
+            </div>
+            <div className="p-6 bg-gradient-subtle rounded-lg border border-border">
+              <h3 className="font-semibold text-lg mb-2">Interface Intuitiva</h3>
+              <p className="text-muted-foreground">
+                Fácil de usar, mesmo para iniciantes
+              </p>
             </div>
           </div>
-        )}
 
-        {quizState === 'intro' && <QuizIntro onStart={handleStartQuiz} completionsCount={completionsCount} />}
+          <Button asChild size="lg" variant="canadian" className="text-lg group">
+            <Link to="/auth">
+              Criar Conta Gratuita
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </Button>
+        </div>
+      </section>
 
-        {quizState === 'questions' && currentQuestion && <div className="max-w-2xl mx-auto space-y-8">
-            <QuizProgress currentStep={currentQuestionIndex + 1} totalSteps={quizQuestions.length} />
-            
-            <QuizQuestion question={currentQuestion} selectedValue={currentResponse?.selectedValues[0]} onSelect={handleAnswer} />
-
-            <div className="flex justify-between">
-              <Button variant="outline" onClick={handlePrevious} disabled={currentQuestionIndex === 0} className="flex items-center space-x-2">
-                <ChevronLeft className="w-4 h-4" />
-                <span>Anterior</span>
-              </Button>
-
-              <Button variant="canadian" onClick={handleNext} className="flex items-center space-x-2">
-                <span>
-                  {currentQuestionIndex === quizQuestions.length - 1 ? 'Ver Resultados' : 'Próximo'}
-                </span>
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>}
-
-        {quizState === 'results' && <div className="max-w-4xl mx-auto">
-            <QuizResults results={results} onStartLeadCapture={handleStartLeadCapture} />
-          </div>}
-
-        {quizState === 'lead-capture' && <LeadCaptureForm onSubmit={handleLeadSubmit} results={results} />}
-
-        {quizState === 'thank-you' && <ThankYouPage onRestart={handleRestart} />}
-      </main>
+      {/* CTA Section */}
+      <section className="py-20 px-4 bg-gradient-canadian text-white">
+        <div className="container mx-auto max-w-3xl text-center">
+          <h2 className="text-4xl font-bold mb-6">
+            Pronto para começar sua jornada?
+          </h2>
+          <p className="text-xl mb-8 text-white/90">
+            Junte-se a milhares de pessoas que já estão planejando sua imigração para o Canadá
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" variant="outline" className="text-lg bg-white text-primary hover:bg-white/90">
+              <Link to="/crs-calculator">Calcular Minha Pontuação</Link>
+            </Button>
+            <Button asChild size="lg" variant="secondary" className="text-lg">
+              <a href="/quiz">Fazer Quiz Gratuito</a>
+            </Button>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer className="bg-background border-t border-border mt-16">
+      <footer className="bg-background border-t border-border">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center space-y-4">
             <p className="text-sm text-muted-foreground">
@@ -211,10 +208,12 @@ const Index = () => {
               </a>{' '}
               ou um consultor de imigração regulamentado (RCIC).
             </p>
-            <p className="text-xs text-muted-foreground">© 2025 Canada Immigration Quiz. Baseado em dados oficiais do governo canadense.</p>
+            <p className="text-xs text-muted-foreground">© 2025 Canada Immigration Platform. Baseado em dados oficiais do governo canadense.</p>
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
