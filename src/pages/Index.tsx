@@ -129,8 +129,51 @@ const Index = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-20 px-4 bg-background">
-        <div className="container mx-auto max-w-4xl text-center">
+      <section className="relative py-20 px-4 bg-background overflow-hidden">
+        {/* Decorative Maple Leaves */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Maple Leaf 1 - Top Left */}
+          <svg 
+            className="absolute top-10 left-10 w-48 h-48 text-primary/5 animate-float-slow"
+            style={{ animationDelay: '0s' }}
+            viewBox="0 0 100 100"
+            fill="currentColor"
+          >
+            <path d="M50 10 L45 35 L25 25 L35 45 L10 50 L35 55 L25 75 L45 65 L50 90 L55 65 L75 75 L65 55 L90 50 L65 45 L75 25 L55 35 Z" />
+          </svg>
+          
+          {/* Maple Leaf 2 - Top Right */}
+          <svg 
+            className="absolute top-20 right-16 w-32 h-32 text-primary/6 animate-pulse-glow"
+            style={{ animationDelay: '2s' }}
+            viewBox="0 0 100 100"
+            fill="currentColor"
+          >
+            <path d="M50 10 L45 35 L25 25 L35 45 L10 50 L35 55 L25 75 L45 65 L50 90 L55 65 L75 75 L65 55 L90 50 L65 45 L75 25 L55 35 Z" />
+          </svg>
+          
+          {/* Maple Leaf 3 - Bottom Left */}
+          <svg 
+            className="absolute bottom-24 left-20 w-40 h-40 text-primary/4 animate-rotate-slow"
+            style={{ animationDelay: '4s' }}
+            viewBox="0 0 100 100"
+            fill="currentColor"
+          >
+            <path d="M50 10 L45 35 L25 25 L35 45 L10 50 L35 55 L25 75 L45 65 L50 90 L55 65 L75 75 L65 55 L90 50 L65 45 L75 25 L55 35 Z" />
+          </svg>
+          
+          {/* Maple Leaf 4 - Bottom Right */}
+          <svg 
+            className="absolute bottom-16 right-24 w-56 h-56 text-primary/7 animate-float-slow"
+            style={{ animationDelay: '6s' }}
+            viewBox="0 0 100 100"
+            fill="currentColor"
+          >
+            <path d="M50 10 L45 35 L25 25 L35 45 L10 50 L35 55 L25 75 L45 65 L50 90 L55 65 L75 75 L65 55 L90 50 L65 45 L75 25 L55 35 Z" />
+          </svg>
+        </div>
+
+        <div className="container mx-auto max-w-4xl text-center relative z-10">
           <div className="mb-12">
             <Award className="w-16 h-16 mx-auto mb-6 text-primary" />
             <h2 className="text-4xl font-bold mb-4">
