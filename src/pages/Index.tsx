@@ -64,7 +64,7 @@ const Index = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Quiz de Imigração */}
-            <Card className="hover-scale border-2 hover:border-primary transition-all">
+            <Card className="border-2 border-primary transition-all duration-300 hover:scale-105 hover:shadow-elevated">
               <CardHeader>
                 <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
                   <ClipboardList className="w-6 h-6 text-white" />
@@ -87,7 +87,7 @@ const Index = () => {
             </Card>
 
             {/* Express Entry Draws */}
-            <Card className="hover-scale border-2 hover:border-primary transition-all">
+            <Card className="border-2 border-primary transition-all duration-300 hover:scale-105 hover:shadow-elevated">
               <CardHeader>
                 <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
                   <TrendingUp className="w-6 h-6 text-white" />
@@ -110,7 +110,7 @@ const Index = () => {
             </Card>
 
             {/* Calculadora CRS */}
-            <Card className="hover-scale border-2 hover:border-primary transition-all">
+            <Card className="border-2 border-primary transition-all duration-300 hover:scale-105 hover:shadow-elevated">
               <CardHeader>
                 <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
                   <Calculator className="w-6 h-6 text-white" />
