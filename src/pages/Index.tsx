@@ -34,14 +34,14 @@ const Index = () => {
         <div className="absolute inset-0 bg-black/50" />
         
         {/* Content */}
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+        <div className="relative z-10 text-left px-4 max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
             Acelere o seu plano Canadá
           </h1>
           <p className="text-xl md:text-2xl text-white/90 mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             A plataforma mais completa para sua jornada de imigração
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-start animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <Button asChild size="lg" variant="canadian" className="text-lg">
               <Link to="/auth">Começar Agora</Link>
             </Button>
