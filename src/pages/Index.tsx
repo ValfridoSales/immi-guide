@@ -2,7 +2,7 @@ import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Calculator, TrendingUp, ClipboardList, Award, ArrowRight } from 'lucide-react';
+import { Calculator, TrendingUp, ClipboardList, Award, ArrowRight, Shield, Bell, Target, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import airportImage from '@/assets/airport-journey.png';
 import { useInView } from '@/hooks/useInView';
@@ -175,27 +175,39 @@ const Index = () => {
                 : 'opacity-0 translate-y-10'
             }`}
           >
-            <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
-              <h3 className="font-semibold text-lg mb-2">Precisão Oficial</h3>
-              <p className="text-muted-foreground">
+            <div className="p-8 bg-card rounded-lg border-2 border-primary/20 hover:border-primary shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
+              <div className="w-12 h-12 rounded-lg bg-gradient-canadian flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-xl mb-3 text-primary">Precisão Oficial</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 Resultados baseados em dados autênticos do Governo do Canadá.
               </p>
             </div>
-            <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
-              <h3 className="font-semibold text-lg mb-2">Monitoramento Constante</h3>
-              <p className="text-muted-foreground">
+            <div className="p-8 bg-card rounded-lg border-2 border-primary/20 hover:border-primary shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
+              <div className="w-12 h-12 rounded-lg bg-gradient-canadian flex items-center justify-center mb-4">
+                <Bell className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-xl mb-3 text-primary">Monitoramento Constante</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 Sistema que acompanha automaticamente os draws e mudanças do IRCC.
               </p>
             </div>
-            <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
-              <h3 className="font-semibold text-lg mb-2">Simulações Personalizadas</h3>
-              <p className="text-muted-foreground">
+            <div className="p-8 bg-card rounded-lg border-2 border-primary/20 hover:border-primary shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
+              <div className="w-12 h-12 rounded-lg bg-gradient-canadian flex items-center justify-center mb-4">
+                <Target className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-xl mb-3 text-primary">Simulações Personalizadas</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 Ajuste seu perfil, teste cenários e veja como alcançar a pontuação ideal.
               </p>
             </div>
-            <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
-              <h3 className="font-semibold text-lg mb-2">Design Feito para Você</h3>
-              <p className="text-muted-foreground">
+            <div className="p-8 bg-card rounded-lg border-2 border-primary/20 hover:border-primary shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
+              <div className="w-12 h-12 rounded-lg bg-gradient-canadian flex items-center justify-center mb-4">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-xl mb-3 text-primary">Design Feito para Você</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 Intuitivo, rápido e acessível — sem burocracia, sem complicações.
               </p>
             </div>
