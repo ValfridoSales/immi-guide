@@ -136,19 +136,20 @@ const Index = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="relative py-20 px-4 overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src={airportImage} 
-            alt="Journey to Canada" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-background/95" />
-        </div>
+      <section className="relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row min-h-[600px]">
+          {/* Left Half - Background Image */}
+          <div className="lg:w-1/2 h-64 lg:h-auto">
+            <img 
+              src={airportImage} 
+              alt="Journey to Canada" 
+              className="w-full h-full object-cover"
+            />
+          </div>
 
-        {/* Content */}
-        <div className="container mx-auto max-w-4xl text-center relative z-10">
+          {/* Right Half - Content with White Background */}
+          <div className="lg:w-1/2 bg-white py-20 px-8 flex items-center">
+            <div className="max-w-2xl mx-auto text-center w-full">
           <div 
             ref={headerRef}
             className={`mb-12 transition-all duration-1000 ${
@@ -174,25 +175,25 @@ const Index = () => {
                 : 'opacity-0 translate-y-10'
             }`}
           >
-            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all">
+            <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
               <h3 className="font-semibold text-lg mb-2">Dados Oficiais</h3>
               <p className="text-muted-foreground">
                 Baseado em informações oficiais do governo canadense
               </p>
             </div>
-            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all">
+            <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
               <h3 className="font-semibold text-lg mb-2">Atualizações Constantes</h3>
               <p className="text-muted-foreground">
                 Sistema sincronizado com os draws mais recentes
               </p>
             </div>
-            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all">
+            <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
               <h3 className="font-semibold text-lg mb-2">Simulações Inteligentes</h3>
               <p className="text-muted-foreground">
                 Teste diferentes cenários e otimize sua estratégia
               </p>
             </div>
-            <div className="p-6 bg-card/80 backdrop-blur-sm rounded-lg border border-border hover-scale transition-all">
+            <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
               <h3 className="font-semibold text-lg mb-2">Interface Intuitiva</h3>
               <p className="text-muted-foreground">
                 Fácil de usar, mesmo para iniciantes
@@ -214,6 +215,8 @@ const Index = () => {
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
+          </div>
+            </div>
           </div>
         </div>
       </section>
