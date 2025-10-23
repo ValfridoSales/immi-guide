@@ -160,10 +160,10 @@ const Index = () => {
           >
             <Award className="w-16 h-16 mx-auto mb-6 text-primary" />
             <h2 className="text-4xl font-bold mb-4">
-              A Ferramenta Mais Completa Disponível
+              Transforme o Sonho Canadense em um Plano Real
             </h2>
             <p className="text-xl text-muted-foreground">
-              Combine todas as ferramentas essenciais em um único lugar
+              A única plataforma que combina inteligência, dados e estratégia para acelerar sua imigração.
             </p>
           </div>
 
@@ -176,27 +176,27 @@ const Index = () => {
             }`}
           >
             <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
-              <h3 className="font-semibold text-lg mb-2">Dados Oficiais</h3>
+              <h3 className="font-semibold text-lg mb-2">Precisão Oficial</h3>
               <p className="text-muted-foreground">
-                Baseado em informações oficiais do governo canadense
+                Resultados baseados em dados autênticos do Governo do Canadá.
               </p>
             </div>
             <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
-              <h3 className="font-semibold text-lg mb-2">Atualizações Constantes</h3>
+              <h3 className="font-semibold text-lg mb-2">Monitoramento Constante</h3>
               <p className="text-muted-foreground">
-                Sistema sincronizado com os draws mais recentes
+                Sistema que acompanha automaticamente os draws e mudanças do IRCC.
               </p>
             </div>
             <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
-              <h3 className="font-semibold text-lg mb-2">Simulações Inteligentes</h3>
+              <h3 className="font-semibold text-lg mb-2">Simulações Personalizadas</h3>
               <p className="text-muted-foreground">
-                Teste diferentes cenários e otimize sua estratégia
+                Ajuste seu perfil, teste cenários e veja como alcançar a pontuação ideal.
               </p>
             </div>
             <div className="p-6 bg-accent/50 rounded-lg border border-border hover-scale transition-all">
-              <h3 className="font-semibold text-lg mb-2">Interface Intuitiva</h3>
+              <h3 className="font-semibold text-lg mb-2">Design Feito para Você</h3>
               <p className="text-muted-foreground">
-                Fácil de usar, mesmo para iniciantes
+                Intuitivo, rápido e acessível — sem burocracia, sem complicações.
               </p>
             </div>
           </div>
@@ -211,7 +211,7 @@ const Index = () => {
           >
             <Button asChild size="lg" variant="canadian" className="text-lg group">
               <Link to="/auth">
-                Criar Conta Gratuita
+                Comece sua jornada hoje mesmo. É gratuito.
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
