@@ -46,76 +46,46 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <div className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-2">
           <Input
             id="email"
             type="email"
-            placeholder="seu@email.com"
-            className="pl-9"
+            placeholder="Digite seu email"
+            className="h-12"
             {...register('email')}
             disabled={isLoading}
           />
+          {errors.email && (
+            <p className="text-sm text-destructive animate-fade-in">{errors.email.message}</p>
+          )}
         </div>
-        {errors.email && (
-          <p className="text-sm text-destructive animate-fade-in">{errors.email.message}</p>
-        )}
-      </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">Senha</Label>
-          <Link 
-            to="/auth/reset" 
-            className="text-sm text-primary hover:underline"
-            tabIndex={-1}
-          >
-            Esqueceu?
-          </Link>
-        </div>
-        <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-          <PasswordInput
-            id="password"
-            placeholder="••••••••"
-            className="pl-9"
-            {...register('password')}
-            disabled={isLoading}
-            error={!!errors.password}
-          />
-        </div>
-        {errors.password && (
-          <p className="text-sm text-destructive animate-fade-in">{errors.password.message}</p>
-        )}
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <Checkbox 
-          id="remember" 
-          checked={rememberMe}
-          onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-        />
-        <label
-          htmlFor="remember"
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+        <Button 
+          type="submit" 
+          className="w-full h-12 bg-foreground text-background hover:bg-foreground/90" 
+          disabled={isLoading}
         >
-          Lembrar-me
-        </label>
-      </div>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Continuando...
+            </>
+          ) : (
+            'Continuar com email'
+          )}
+        </Button>
+      </form>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Entrando...
-          </>
-        ) : (
-          'Entrar'
-        )}
-      </Button>
-    </form>
+      <div className="text-center">
+        <Link 
+          to="/auth/reset" 
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Esqueceu sua senha?
+        </Link>
+      </div>
+    </div>
   );
 }

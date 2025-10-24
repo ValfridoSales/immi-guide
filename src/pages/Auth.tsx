@@ -3,33 +3,41 @@ import { Link } from 'react-router-dom';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Auth() {
-  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
 
   return (
     <AuthLayout
-      title={activeTab === 'login' ? 'Bem-vindo de volta' : 'Criar conta'}
-      subtitle={
-        activeTab === 'login'
-          ? 'Entre para acessar suas ferramentas premium'
-          : 'Comece sua jornada para o Canadá'
-      }
+      title={mode === 'login' ? 'Impossível? Possível.' : 'Comece sua jornada'}
+      subtitle={mode === 'login' ? 'Transforme seu sonho canadense em realidade' : 'Crie sua conta e acesse todas as ferramentas'}
     >
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'login' | 'signup')}>
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="login">Entrar</TabsTrigger>
-          <TabsTrigger value="signup">Cadastrar</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="login">
+      {mode === 'login' ? (
+        <>
           <LoginForm />
-        </TabsContent>
-
-        <TabsContent value="signup">
+          <div className="mt-6 text-center text-sm text-muted-foreground">
+            Não tem uma conta?{' '}
+            <button
+              onClick={() => setMode('signup')}
+              className="text-primary hover:underline font-medium"
+            >
+              Cadastre-se
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
           <SignupForm />
-          <div className="mt-6 text-center text-xs text-muted-foreground">
+          <div className="mt-6 text-center text-sm text-muted-foreground">
+            Já tem uma conta?{' '}
+            <button
+              onClick={() => setMode('login')}
+              className="text-primary hover:underline font-medium"
+            >
+              Fazer login
+            </button>
+          </div>
+          <div className="mt-4 text-center text-xs text-muted-foreground">
             Ao criar uma conta, você concorda com nossos{' '}
             <Link to="/terms" className="text-primary hover:underline">
               Termos de Uso
@@ -39,8 +47,8 @@ export default function Auth() {
               Política de Privacidade
             </Link>
           </div>
-        </TabsContent>
-      </Tabs>
+        </>
+      )}
     </AuthLayout>
   );
 }

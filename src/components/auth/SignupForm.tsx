@@ -56,91 +56,83 @@ export function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="fullName">Nome completo</Label>
-        <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <div className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-2">
           <Input
             id="fullName"
             type="text"
-            placeholder="Seu nome"
-            className="pl-9"
+            placeholder="Nome completo"
+            className="h-12"
             {...register('fullName')}
             disabled={isLoading}
           />
+          {errors.fullName && (
+            <p className="text-sm text-destructive animate-fade-in">{errors.fullName.message}</p>
+          )}
         </div>
-        {errors.fullName && (
-          <p className="text-sm text-destructive animate-fade-in">{errors.fullName.message}</p>
-        )}
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="space-y-2">
           <Input
             id="email"
             type="email"
-            placeholder="seu@email.com"
-            className="pl-9"
+            placeholder="Digite seu email"
+            className="h-12"
             {...register('email')}
             disabled={isLoading}
           />
+          {errors.email && (
+            <p className="text-sm text-destructive animate-fade-in">{errors.email.message}</p>
+          )}
         </div>
-        {errors.email && (
-          <p className="text-sm text-destructive animate-fade-in">{errors.email.message}</p>
-        )}
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="password">Senha</Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+        <div className="space-y-2">
           <PasswordInput
             id="password"
-            placeholder="••••••••"
-            className="pl-9"
+            placeholder="Crie uma senha forte"
+            className="h-12"
             {...register('password')}
             disabled={isLoading}
             error={!!errors.password}
           />
+          {errors.password && (
+            <p className="text-sm text-destructive animate-fade-in">{errors.password.message}</p>
+          )}
+          
+          {passwordValue && (
+            <PasswordStrengthIndicator password={passwordValue} />
+          )}
         </div>
-        {errors.password && (
-          <p className="text-sm text-destructive animate-fade-in">{errors.password.message}</p>
-        )}
-      </div>
 
-      {passwordValue && <PasswordStrengthIndicator password={passwordValue} />}
-
-      <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirmar senha</Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+        <div className="space-y-2">
           <PasswordInput
             id="confirmPassword"
-            placeholder="••••••••"
-            className="pl-9"
+            placeholder="Confirme sua senha"
+            className="h-12"
             {...register('confirmPassword')}
             disabled={isLoading}
             error={!!errors.confirmPassword}
           />
+          {errors.confirmPassword && (
+            <p className="text-sm text-destructive animate-fade-in">{errors.confirmPassword.message}</p>
+          )}
         </div>
-        {errors.confirmPassword && (
-          <p className="text-sm text-destructive animate-fade-in">{errors.confirmPassword.message}</p>
-        )}
-      </div>
 
-      <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Criando conta...
-          </>
-        ) : (
-          'Criar conta'
-        )}
-      </Button>
-    </form>
+        <Button 
+          type="submit" 
+          className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 mt-6" 
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Criando conta...
+            </>
+          ) : (
+            'Criar conta'
+          )}
+        </Button>
+      </form>
+    </div>
   );
 }
