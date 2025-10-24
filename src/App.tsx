@@ -11,6 +11,7 @@ import ExpressEntryDraws from "./pages/ExpressEntryDraws";
 import CRSCalculator from "./pages/CRSCalculator";
 import SyncData from "./pages/SyncData";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Settings from "./pages/dashboard/Settings";
 import Subscription from "./pages/dashboard/Subscription";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/quiz" element={<Quiz />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/reset" element={<ResetPassword />} />
             <Route path="/express-entry/draws" element={<ExpressEntryDraws />} />
             <Route path="/crs-calculator" element={<CRSCalculator />} />
             <Route path="/sync-data" element={<SyncData />} />

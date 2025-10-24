@@ -181,7 +181,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Enhanced error messages
+        if (error.message.includes('Email not confirmed')) {
+          throw new Error('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.');
+        }
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Email ou senha incorretos. Verifique suas credenciais e tente novamente.');
+        }
+        throw error;
+      }
 
       toast({
         title: 'Bem-vindo de volta!',
@@ -189,7 +198,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     } catch (error: any) {
       toast({
-        title: 'Erro no login',
+        title: 'Erro ao fazer login',
         description: error.message || 'Não foi possível fazer login.',
         variant: 'destructive',
       });
@@ -199,6 +208,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
+      const redirectUrl = `${window.location.origin}/`;
+      
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -206,19 +217,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           data: {
             full_name: fullName,
           },
+          emailRedirectTo: redirectUrl,
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        // Enhanced error messages
+        if (error.message.includes('User already registered')) {
+          throw new Error('Este email já está cadastrado. Deseja fazer login?');
+        }
+        throw error;
+      }
 
       toast({
-        title: 'Conta criada!',
-        description: 'Verifique seu email para confirmar a conta.',
+        title: 'Conta criada com sucesso!',
+        description: 'Verifique seu email para confirmar sua conta antes de fazer login.',
       });
     } catch (error: any) {
       toast({
-        title: 'Erro no cadastro',
-        description: error.message || 'Não foi possível criar a conta.',
+        title: 'Erro ao criar conta',
+        description: error.message || 'Não foi possível criar sua conta.',
         variant: 'destructive',
       });
       throw error;

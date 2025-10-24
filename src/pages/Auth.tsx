@@ -25,30 +25,22 @@ export default function Auth() {
 
         <TabsContent value="login">
           <LoginForm />
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            Esqueceu a senha?{' '}
-            <Link to="/auth/reset" className="text-primary hover:underline">
-              Recuperar
-            </Link>
-          </div>
         </TabsContent>
 
         <TabsContent value="signup">
           <SignupForm />
-          <div className="mt-4 text-center text-sm text-muted-foreground">
+          <div className="mt-6 text-center text-xs text-muted-foreground">
             Ao criar uma conta, você concorda com nossos{' '}
             <Link to="/terms" className="text-primary hover:underline">
               Termos de Uso
             </Link>
+            {' '}e{' '}
+            <Link to="/privacy" className="text-primary hover:underline">
+              Política de Privacidade
+            </Link>
           </div>
         </TabsContent>
       </Tabs>
-
-      <div className="mt-6 pt-6 border-t border-border text-center">
-        <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-          ← Voltar para o início
-        </Link>
-      </div>
     </AuthLayout>
   );
 }
