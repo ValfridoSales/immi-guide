@@ -2,13 +2,14 @@ import { useState, forwardRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
 }
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-  ({ error, ...props }, ref) => {
+  ({ error, className, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
@@ -17,7 +18,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           {...props}
           ref={ref}
           type={showPassword ? 'text' : 'password'}
-          className={error ? 'border-destructive' : ''}
+          className={cn(className, error && 'border-destructive')}
         />
         <Button
           type="button"
