@@ -36,7 +36,7 @@ export const DrawsChart = ({ data, visibleLines = 'both' }: DrawsChartProps) => 
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Convites (ITAs)</p>
-                <p className="text-lg font-bold text-secondary">{data.ITAs.toLocaleString()}</p>
+                <p className="text-lg font-bold" style={{ color: '#4F46E5' }}>{data.ITAs.toLocaleString()}</p>
               </div>
             </div>
             {data.category && (
