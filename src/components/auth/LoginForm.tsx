@@ -62,6 +62,20 @@ export function LoginForm() {
           )}
         </div>
 
+        <div className="space-y-2">
+          <PasswordInput
+            id="password"
+            placeholder="Digite sua senha"
+            className="h-12"
+            {...register('password')}
+            disabled={isLoading}
+            error={!!errors.password}
+          />
+          {errors.password && (
+            <p className="text-sm text-destructive animate-fade-in">{errors.password.message}</p>
+          )}
+        </div>
+
         <Button 
           type="submit" 
           className="w-full h-12 bg-foreground text-background hover:bg-foreground/90" 
@@ -70,7 +84,7 @@ export function LoginForm() {
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Continuando...
+              Entrando...
             </>
           ) : (
             'Continuar com email'
