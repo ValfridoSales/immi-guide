@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { QuizState, QuizResponse, QuizResult } from '@/types/quiz';
 import { quizQuestions } from '@/data/quiz-questions';
 import { calculateQuizResults } from '@/utils/quiz-scoring';
@@ -10,41 +10,13 @@ import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { storeQuizResults } from '@/utils/quiz-results';
 
 const Quiz = () => {
   const [quizState, setQuizState] = useState<QuizState>('intro');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState<QuizResponse[]>([]);
   const [results, setResults] = useState<QuizResult[]>([]);
-  const [completionsCount, setCompletionsCount] = useState<number>(0);
-  const [sessionId] = useState(() => Math.random().toString(36).substring(2) + Date.now().toString(36));
   const { toast } = useToast();
-
-  useEffect(() => {
-    fetchCompletionsCount();
-  }, []);
-
-  const fetchCompletionsCount = async () => {
-    try {
-      const { data, error } = await supabase.rpc('get_quiz_completions_count');
-      if (error) throw error;
-      setCompletionsCount(data || 0);
-    } catch (error) {
-      console.error('Error fetching completions count:', error);
-    }
-  };
-
-  const trackQuizCompletion = async () => {
-    try {
-      const { error } = await supabase.from('quiz_completions').insert([{ session_id: sessionId }]);
-      if (error) throw error;
-      setCompletionsCount(prev => prev + 1);
-    } catch (error) {
-      console.error('Error tracking quiz completion:', error);
-    }
-  };
 
   const currentQuestion = quizQuestions[currentQuestionIndex];
   const currentResponse = responses.find(r => r.questionId === currentQuestion?.id);
@@ -64,7 +36,7 @@ const Quiz = () => {
     setResponses(newResponses);
   };
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (!currentResponse) {
       toast({
         title: "Resposta obrigatória",
@@ -77,20 +49,9 @@ const Quiz = () => {
     if (currentQuestionIndex < quizQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      try {
-        const calculatedResults = calculateQuizResults(responses);
-        setResults(calculatedResults);
-        await storeQuizResults(sessionId, calculatedResults);
-        setQuizState('results');
-        await trackQuizCompletion();
-      } catch (error) {
-        console.error('Error storing quiz results:', error);
-        toast({
-          title: "Erro",
-          description: "Houve um problema ao salvar os resultados. Tente novamente.",
-          variant: "destructive"
-        });
-      }
+      const calculatedResults = calculateQuizResults(responses);
+      setResults(calculatedResults);
+      setQuizState('results');
     }
   };
 
@@ -120,7 +81,7 @@ const Quiz = () => {
           </div>
         )}
 
-        {quizState === 'intro' && <QuizIntro onStart={handleStartQuiz} completionsCount={completionsCount} />}
+        {quizState === 'intro' && <QuizIntro onStart={handleStartQuiz} />}
 
         {quizState === 'questions' && currentQuestion && (
           <div className="max-w-2xl mx-auto space-y-8">

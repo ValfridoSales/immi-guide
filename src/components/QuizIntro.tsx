@@ -4,11 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { Clock, Users, CheckCircle } from 'lucide-react';
 interface QuizIntroProps {
   onStart: () => void;
-  completionsCount: number;
+  completionsCount?: number;
 }
 export function QuizIntro({
   onStart,
-  completionsCount
+  completionsCount = 0
 }: QuizIntroProps) {
   return <div className="max-w-4xl mx-auto animate-fade-in">
       <div className="text-center space-y-8">
