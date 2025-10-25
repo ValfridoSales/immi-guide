@@ -91,33 +91,31 @@ export default function Dashboard() {
         </div>
 
         {/* Cards de Informação */}
-        <div className="grid gap-4 md:grid-cols-2">
-
-
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
           {/* Card CRS - apenas para premium */}
           {isPro && (
-            <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+            <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 md:col-span-1">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-medium text-muted-foreground text-center">
                   Seu CRS Mais Recente
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pb-4">
+              <CardContent className="pb-3 pt-1">
                 {isLoadingCRS ? (
-                  <div className="flex items-center justify-center h-16">
+                  <div className="flex items-center justify-center h-20">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
                 ) : latestCRS ? (
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-primary">{latestCRS}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">pontos</p>
+                    <p className="text-4xl font-bold text-primary">{latestCRS}</p>
+                    <p className="text-xs text-muted-foreground mt-1">pontos</p>
                   </div>
                 ) : (
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
+                  <div className="text-center py-2">
+                    <p className="text-xs text-muted-foreground">
                       Nenhum cálculo ainda
                     </p>
-                    <Button variant="link" size="sm" asChild className="mt-1 p-0 h-auto">
+                    <Button variant="link" size="sm" asChild className="mt-1 p-0 h-auto text-xs">
                       <Link to="/crs-calculator">Calcular agora</Link>
                     </Button>
                   </div>
@@ -127,7 +125,7 @@ export default function Dashboard() {
           )}
 
           {/* Card Último Draw */}
-          <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
+          <Card className={`border-primary/20 bg-gradient-to-br from-card to-primary/5 ${isPro ? 'md:col-span-2' : 'md:col-span-3'}`}>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
