@@ -501,14 +501,8 @@ export type Database = {
       }
     }
     Functions: {
-      count_user_pdf_reports: {
-        Args: { user_uuid: string }
-        Returns: number
-      }
-      get_quiz_completions_count: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      count_user_pdf_reports: { Args: { user_uuid: string }; Returns: number }
+      get_quiz_completions_count: { Args: never; Returns: number }
       get_user_subscription: {
         Args: { user_uuid: string }
         Returns: {
@@ -520,10 +514,7 @@ export type Database = {
           trial_end: string
         }[]
       }
-      is_pro_user: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
+      is_pro_user: { Args: { user_uuid: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
