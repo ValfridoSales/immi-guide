@@ -97,23 +97,23 @@ export default function Dashboard() {
           {/* Card CRS - apenas para premium */}
           {isPro && (
             <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Seu CRS Mais Recente
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pb-4">
                 {isLoadingCRS ? (
-                  <div className="flex items-center justify-center h-12">
+                  <div className="flex items-center justify-center h-16">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
                 ) : latestCRS ? (
                   <div className="text-center">
-                    <p className="text-4xl font-bold text-primary">{latestCRS}</p>
-                    <p className="text-xs text-muted-foreground mt-1">pontos</p>
+                    <p className="text-3xl font-bold text-primary">{latestCRS}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">pontos</p>
                   </div>
                 ) : (
-                  <div className="text-center py-2">
+                  <div className="text-center">
                     <p className="text-sm text-muted-foreground">
                       Nenhum cálculo ainda
                     </p>
@@ -128,14 +128,21 @@ export default function Dashboard() {
 
           {/* Card Último Draw */}
           <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Último Sorteio Express Entry
-              </CardTitle>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Último Sorteio Express Entry
+                </CardTitle>
+                {!isLoadingDraw && latestDraw && (
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(latestDraw.date).toLocaleDateString('pt-BR')}
+                  </span>
+                )}
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-4">
               {isLoadingDraw ? (
-                <div className="flex items-center justify-center h-12">
+                <div className="flex items-center justify-center h-16">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                 </div>
               ) : latestDraw ? (
@@ -151,12 +158,9 @@ export default function Dashboard() {
                     <span className="text-xs text-muted-foreground">ITAs:</span>
                     <span className="text-lg font-semibold">{latestDraw.invitations.toLocaleString('pt-BR')}</span>
                   </div>
-                  <div className="text-xs text-muted-foreground text-center pt-2 border-t border-border/50">
-                    {new Date(latestDraw.date).toLocaleDateString('pt-BR')}
-                  </div>
                 </div>
               ) : (
-                <div className="text-center py-2">
+                <div className="text-center">
                   <p className="text-sm text-muted-foreground">
                     Nenhum sorteio disponível
                   </p>
