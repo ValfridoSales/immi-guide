@@ -20,6 +20,8 @@ export default function Dashboard() {
   const { profile, subscription, isPro } = useAuth();
   const [latestCRS, setLatestCRS] = useState<number | null>(null);
   const [isLoadingCRS, setIsLoadingCRS] = useState(true);
+  const [latestDraw, setLatestDraw] = useState<any | null>(null);
+  const [isLoadingDraw, setIsLoadingDraw] = useState(true);
 
   useEffect(() => {
     const fetchLatestCRS = async () => {
@@ -50,6 +52,30 @@ export default function Dashboard() {
 
     fetchLatestCRS();
   }, [isPro, profile?.id]);
+
+  useEffect(() => {
+    const fetchLatestDraw = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('express_entry_draws')
+          .select('date, type, category, invitations, crs_min')
+          .order('date', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (data) {
+          setLatestDraw(data);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar último draw:', error);
+      } finally {
+        setIsLoadingDraw(false);
+      }
+    };
+
+    fetchLatestDraw();
+  }, []);
 
   return (
     <DashboardLayout>
@@ -96,6 +122,46 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           )}
+
+          {/* Card Último Draw */}
+          <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 shrink-0 min-w-[220px]">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Último Sorteio Express Entry
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoadingDraw ? (
+                <div className="flex items-center justify-center h-12">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                </div>
+              ) : latestDraw ? (
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">Categoria:</span>
+                    <span className="text-sm font-semibold">{latestDraw.category || latestDraw.type}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">CRS Mínimo:</span>
+                    <span className="text-lg font-bold text-primary">{latestDraw.crs_min}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">ITAs:</span>
+                    <span className="text-sm font-semibold">{latestDraw.invitations.toLocaleString('pt-BR')}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground text-center mt-2">
+                    {new Date(latestDraw.date).toLocaleDateString('pt-BR')}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-2">
+                  <p className="text-sm text-muted-foreground">
+                    Nenhum sorteio disponível
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Status Card */}
