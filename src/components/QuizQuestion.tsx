@@ -35,13 +35,17 @@ export function QuizQuestion({ question, selectedValue, onSelect }: QuizQuestion
         <div className="text-center space-y-4">
           <div className="text-4xl">{getIcon(question.id)}</div>
           <h2 className="text-2xl font-bold text-foreground leading-tight">
-            {question.title.split('Canadá').map((part, index, array) => (
-              index < array.length - 1 ? (
-                <span key={index}>
-                  {part}<span className="text-canadian-red">Canadá</span>
-                </span>
-              ) : part
-            ))}
+            {question.id === 'canada_experience' ? (
+              question.title.split('Canadá').map((part, index, array) => (
+                index < array.length - 1 ? (
+                  <span key={index}>
+                    {part}<span className="text-canadian-red">Canadá</span>
+                  </span>
+                ) : part
+              ))
+            ) : (
+              question.title
+            )}
           </h2>
         </div>
 
