@@ -191,59 +191,71 @@ function computeTransferability(
   foreignExpYears: number|undefined,
   hasTradeCertificate: boolean|undefined
 ): number {
-  let pts = 0;
-
   const eduClass = eduBucket(edu);
   const clb7_all = isAllAtLeast(firstLang, 7);
   const clb9_all = isAllAtLeast(firstLang, 9);
 
-  // Educação x Idioma
+  // CATEGORIA 1: EDUCATION (máx 50)
+  let educationCategory = 0;
+  
+  // A) Educação x Idioma
   if (clb9_all) {
-    if (eduClass === "one_year_plus") pts += 25;
-    if (eduClass === "two_or_more_or_masters_or_phd") pts += 50;
+    if (eduClass === "one_year_plus") educationCategory += 25;
+    if (eduClass === "two_or_more_or_masters_or_phd") educationCategory += 50;
   } else if (clb7_all) {
-    if (eduClass === "one_year_plus") pts += 13;
-    if (eduClass === "two_or_more_or_masters_or_phd") pts += 25;
+    if (eduClass === "one_year_plus") educationCategory += 13;
+    if (eduClass === "two_or_more_or_masters_or_phd") educationCategory += 25;
   }
 
-  // Educação x Experiência canadense
+  // B) Educação x Experiência canadense
   const cdnBucket = cdnYearsBucket(cdnExpYears);
   if (cdnBucket === "one") {
-    if (eduClass === "one_year_plus") pts += 13;
-    if (eduClass === "two_or_more_or_masters_or_phd") pts += 25;
+    if (eduClass === "one_year_plus") educationCategory += 13;
+    if (eduClass === "two_or_more_or_masters_or_phd") educationCategory += 25;
   } else if (cdnBucket === "two") {
-    if (eduClass === "one_year_plus") pts += 25;
-    if (eduClass === "two_or_more_or_masters_or_phd") pts += 50;
+    if (eduClass === "one_year_plus") educationCategory += 25;
+    if (eduClass === "two_or_more_or_masters_or_phd") educationCategory += 50;
   }
+  
+  educationCategory = Math.min(educationCategory, 50);
 
-  // Exp. estrangeira x Idioma
+  // CATEGORIA 2: FOREIGN WORK EXPERIENCE (máx 50)
+  let foreignCategory = 0;
   const foreignBucket = foreignYearsBucket(foreignExpYears);
+  
+  // A) Exp. estrangeira x Idioma
   if (clb9_all) {
-    if (foreignBucket === "1_2") pts += 25;
-    if (foreignBucket === "3plus") pts += 50;
+    if (foreignBucket === "1_2") foreignCategory += 25;
+    if (foreignBucket === "3plus") foreignCategory += 50;
   } else if (clb7_all) {
-    if (foreignBucket === "1_2") pts += 13;
-    if (foreignBucket === "3plus") pts += 25;
+    if (foreignBucket === "1_2") foreignCategory += 13;
+    if (foreignBucket === "3plus") foreignCategory += 25;
   }
 
-  // Exp. estrangeira x Exp. canadense
+  // B) Exp. estrangeira x Exp. canadense
   if (cdnBucket === "one") {
-    if (foreignBucket === "1_2") pts += 13;
-    if (foreignBucket === "3plus") pts += 25;
+    if (foreignBucket === "1_2") foreignCategory += 13;
+    if (foreignBucket === "3plus") foreignCategory += 25;
   } else if (cdnBucket === "two") {
-    if (foreignBucket === "1_2") pts += 25;
-    if (foreignBucket === "3plus") pts += 50;
+    if (foreignBucket === "1_2") foreignCategory += 25;
+    if (foreignBucket === "3plus") foreignCategory += 50;
   }
+  
+  foreignCategory = Math.min(foreignCategory, 50);
 
-  // Certificado de ofício x Idioma
+  // CATEGORIA 3: CERTIFICATE OF QUALIFICATION (máx 50)
+  let certificateCategory = 0;
   if (hasTradeCertificate) {
     const clb5_all_min_one_under7 =
       isAllAtLeast(firstLang, 5) && !(isAllAtLeast(firstLang, 7));
-    if (clb5_all_min_one_under7) pts += 25;
-    if (clb7_all) pts += 50;
+    if (clb5_all_min_one_under7) certificateCategory += 25;
+    if (clb7_all) certificateCategory += 50;
   }
+  
+  certificateCategory = Math.min(certificateCategory, 50);
 
-  return Math.min(pts, 100);
+  // TOTAL: soma das categorias com cap de 100
+  return Math.min(educationCategory + foreignCategory + certificateCategory, 100);
 }
 
 function computeSpousePoints(sp?: SpouseBlock): number {
