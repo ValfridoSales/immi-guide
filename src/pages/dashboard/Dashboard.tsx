@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
 import { 
   TrendingUp, 
   Target, 
@@ -16,18 +18,84 @@ import {
 
 export default function Dashboard() {
   const { profile, subscription, isPro } = useAuth();
+  const [latestCRS, setLatestCRS] = useState<number | null>(null);
+  const [isLoadingCRS, setIsLoadingCRS] = useState(true);
+
+  useEffect(() => {
+    const fetchLatestCRS = async () => {
+      if (!isPro || !profile?.id) {
+        setIsLoadingCRS(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('crs_calculations')
+          .select('total_score, created_at')
+          .eq('user_id', profile.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (data) {
+          setLatestCRS(data.total_score);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar CRS:', error);
+      } finally {
+        setIsLoadingCRS(false);
+      }
+    };
+
+    fetchLatestCRS();
+  }, [isPro, profile?.id]);
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold">
-            Olá, {profile?.full_name || 'Usuário'}! 👋
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Bem-vindo ao seu dashboard de imigração para o Canadá
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">
+              Olá, {profile?.full_name || 'Usuário'}! 👋
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Bem-vindo ao seu dashboard de imigração para o Canadá
+            </p>
+          </div>
+
+          {/* Card CRS - apenas para premium */}
+          {isPro && (
+            <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 shrink-0 min-w-[200px]">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Seu CRS Mais Recente
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoadingCRS ? (
+                  <div className="flex items-center justify-center h-12">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                  </div>
+                ) : latestCRS ? (
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-primary">{latestCRS}</p>
+                    <p className="text-xs text-muted-foreground mt-1">pontos</p>
+                  </div>
+                ) : (
+                  <div className="text-center py-2">
+                    <p className="text-sm text-muted-foreground">
+                      Nenhum cálculo ainda
+                    </p>
+                    <Button variant="link" size="sm" asChild className="mt-1 p-0 h-auto">
+                      <Link to="/crs-calculator">Calcular agora</Link>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Status Card */}
