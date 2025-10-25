@@ -52,4 +52,4 @@ export interface ImmigrationProgram {
   officialUrl: string;
 }
 
-export type QuizState = 'intro' | 'questions' | 'results' | 'lead-capture' | 'thank-you';
+export type QuizState = 'intro' | 'questions' | 'results';

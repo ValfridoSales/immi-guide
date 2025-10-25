@@ -80,7 +80,7 @@ export function QuizIntro({
             <div className="bg-gradient-subtle p-6 rounded-lg">
               <h3 className="text-lg font-semibold mb-4">O que você vai receber:</h3>
               <div className="grid md:grid-cols-2 gap-3">
-                {['Ranking dos melhores programas para você', 'Análise de compatibilidade personalizada', 'Tempo estimado e custos por programa', 'Seus pontos fortes e áreas a melhorar', 'Próximos passos práticos e detalhados', 'Análise completa gratuita por email'].map((item, index) => <div key={index} className="flex items-start space-x-2">
+                {['Ranking dos melhores programas para você', 'Análise de compatibilidade personalizada', 'Tempo estimado e custos por programa', 'Seus pontos fortes e áreas a melhorar', 'Próximos passos práticos e detalhados', 'Resultados instantâneos na tela'].map((item, index) => <div key={index} className="flex items-start space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                     <span className="text-sm">{item}</span>
                   </div>)}

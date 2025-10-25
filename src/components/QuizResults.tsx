@@ -6,10 +6,10 @@ import { ProgramCard } from '@/components/pdf/ProgramCard';
 
 interface QuizResultsProps {
   results: QuizResult[];
-  onStartLeadCapture: () => void;
+  onRestart: () => void;
 }
 
-export function QuizResults({ results, onStartLeadCapture }: QuizResultsProps) {
+export function QuizResults({ results, onRestart }: QuizResultsProps) {
   const topResults = results.slice(0, 3);
 
 
@@ -38,43 +38,17 @@ export function QuizResults({ results, onStartLeadCapture }: QuizResultsProps) {
         ))}
       </div>
 
-      {/* CTA */}
-      <Card className="p-8 bg-gradient-subtle text-center shadow-elevated">
-        <div className="space-y-4">
-          <h3 className="text-2xl font-bold text-foreground">
-            Quer uma Análise Completa Personalizada?
-          </h3>
-          <p className="text-muted-foreground">
-            Receba um cronograma detalhado, checklist de documentos, calculadora do CRS Score e muito mais!
-          </p>
-          <div className="space-y-2">
-            <div className="text-sm text-muted-foreground">Inclui:</div>
-            <div className="flex flex-wrap justify-center gap-2">
-              {[
-                'Calculadora CRS Score',
-                'Cronograma personalizado',
-                'Checklist de documentos',
-                'Guia de custos detalhado',
-                'Contatos de consultores'
-              ].map((item) => (
-                <Badge key={item} variant="secondary" className="text-xs">
-                  {item}
-                </Badge>
-              ))}
-            </div>
-          </div>
-          <div className="flex justify-center">
-            <Button 
-              variant="canadian" 
-              size="lg" 
-              onClick={onStartLeadCapture}
-              className="text-lg px-8 py-3"
-            >
-              Quero Minha Análise Completa Gratuita
-            </Button>
-          </div>
-        </div>
-      </Card>
+      {/* Action */}
+      <div className="flex justify-center">
+        <Button 
+          variant="outline" 
+          size="lg" 
+          onClick={onRestart}
+          className="text-lg px-8 py-3"
+        >
+          Refazer Quiz
+        </Button>
+      </div>
     </div>
   );
 }

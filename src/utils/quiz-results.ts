@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { QuizResult, Lead } from '@/types/quiz';
+import { QuizResult } from '@/types/quiz';
 
 export interface StoredQuizResult {
   id: string;
@@ -16,19 +16,13 @@ export interface StoredQuizResult {
 
 export async function storeQuizResults(
   sessionId: string,
-  results: QuizResult[],
-  leadData?: Lead
+  results: QuizResult[]
 ): Promise<string> {
   const { data, error } = await supabase
     .from('quiz_results')
     .insert({
       session_id: sessionId,
       results: results as any, // Cast to any to handle Json type
-      user_email: leadData?.email,
-      user_name: leadData?.name,
-      user_whatsapp: leadData?.whatsapp,
-      user_location: leadData?.location,
-      user_timeline: leadData?.immigrationTimeline,
     })
     .select('id')
     .single();
@@ -58,24 +52,4 @@ export async function getQuizResults(resultId: string): Promise<StoredQuizResult
     ...data,
     results: data.results as unknown as QuizResult[] // Cast through unknown first
   };
-}
-
-export async function updateQuizResultsWithLead(
-  resultId: string,
-  leadData: Lead
-): Promise<void> {
-  const { error } = await supabase
-    .from('quiz_results')
-    .update({
-      user_email: leadData.email,
-      user_name: leadData.name,
-      user_whatsapp: leadData.whatsapp,
-      user_location: leadData.location,
-      user_timeline: leadData.immigrationTimeline,
-    })
-    .eq('id', resultId);
-
-  if (error) {
-    throw new Error(`Failed to update quiz results: ${error.message}`);
-  }
 }

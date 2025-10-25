@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react';
-import { QuizState, QuizResponse, QuizResult, Lead } from '@/types/quiz';
+import { QuizState, QuizResponse, QuizResult } from '@/types/quiz';
 import { quizQuestions } from '@/data/quiz-questions';
 import { calculateQuizResults } from '@/utils/quiz-scoring';
 import { QuizIntro } from '@/components/QuizIntro';
 import { QuizQuestion } from '@/components/QuizQuestion';
 import { QuizProgress } from '@/components/QuizProgress';
 import { QuizResults } from '@/components/QuizResults';
-import { LeadCaptureForm } from '@/components/LeadCaptureForm';
-import { ThankYouPage } from '@/components/ThankYouPage';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { sendWelcomeEmail } from '@/utils/pdf';
-import { storeQuizResults, updateQuizResultsWithLead } from '@/utils/quiz-results';
+import { storeQuizResults } from '@/utils/quiz-results';
 
 const Quiz = () => {
   const [quizState, setQuizState] = useState<QuizState>('intro');
@@ -23,7 +20,6 @@ const Quiz = () => {
   const [results, setResults] = useState<QuizResult[]>([]);
   const [completionsCount, setCompletionsCount] = useState<number>(0);
   const [sessionId] = useState(() => Math.random().toString(36).substring(2) + Date.now().toString(36));
-  const [resultId, setResultId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -84,8 +80,7 @@ const Quiz = () => {
       try {
         const calculatedResults = calculateQuizResults(responses);
         setResults(calculatedResults);
-        const storedResultId = await storeQuizResults(sessionId, calculatedResults);
-        setResultId(storedResultId);
+        await storeQuizResults(sessionId, calculatedResults);
         setQuizState('results');
         await trackQuizCompletion();
       } catch (error) {
@@ -105,47 +100,11 @@ const Quiz = () => {
     }
   };
 
-  const handleStartLeadCapture = () => {
-    setQuizState('lead-capture');
-  };
-
-  const handleLeadSubmit = async (lead: Lead) => {
-    try {
-      console.log('Lead captured:', lead);
-      
-      if (!resultId) {
-        toast({
-          title: "Erro!",
-          description: "Resultados não encontrados. Refaça o quiz.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      await updateQuizResultsWithLead(resultId, lead);
-      await sendWelcomeEmail(lead.email, resultId);
-      
-      toast({
-        title: "Sucesso!",
-        description: "Sua análise foi enviada para seu email."
-      });
-      setQuizState('thank-you');
-    } catch (error) {
-      console.error('Error sending email:', error);
-      toast({
-        title: "Erro!",
-        description: "Houve um problema ao enviar o email. Tente novamente.",
-        variant: "destructive"
-      });
-    }
-  };
-
   const handleRestart = () => {
     setQuizState('intro');
     setCurrentQuestionIndex(0);
     setResponses([]);
     setResults([]);
-    setResultId(null);
   };
 
   return (
@@ -187,13 +146,9 @@ const Quiz = () => {
 
         {quizState === 'results' && (
           <div className="max-w-4xl mx-auto">
-            <QuizResults results={results} onStartLeadCapture={handleStartLeadCapture} />
+            <QuizResults results={results} onRestart={handleRestart} />
           </div>
         )}
-
-        {quizState === 'lead-capture' && <LeadCaptureForm onSubmit={handleLeadSubmit} results={results} />}
-
-        {quizState === 'thank-you' && <ThankYouPage onRestart={handleRestart} />}
       </main>
 
       <footer className="bg-background border-t border-border mt-16">
