@@ -125,7 +125,7 @@ export default function Dashboard() {
           )}
 
           {/* Card Último Draw */}
-          <Card className={`border-primary/20 bg-gradient-to-br from-card to-primary/5 ${isPro ? 'md:col-span-2' : 'md:col-span-3'}`}>
+          <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 md:col-span-1">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
