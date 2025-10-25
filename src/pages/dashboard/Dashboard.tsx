@@ -81,19 +81,22 @@ export default function Dashboard() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">
-              Olá, {profile?.full_name || 'Usuário'}! 👋
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Bem-vindo ao seu dashboard de imigração para o Canadá
-            </p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold">
+            Olá, {profile?.full_name || 'Usuário'}! 👋
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Bem-vindo ao seu dashboard de imigração para o Canadá
+          </p>
+        </div>
+
+        {/* Cards de Informação */}
+        <div className="grid gap-4 md:grid-cols-2">
+
 
           {/* Card CRS - apenas para premium */}
           {isPro && (
-            <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 shrink-0 min-w-[200px]">
+            <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Seu CRS Mais Recente
@@ -124,7 +127,7 @@ export default function Dashboard() {
           )}
 
           {/* Card Último Draw */}
-          <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 shrink-0 min-w-[220px]">
+          <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Último Sorteio Express Entry
@@ -136,20 +139,19 @@ export default function Dashboard() {
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                 </div>
               ) : latestDraw ? (
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Categoria:</span>
-                    <span className="text-sm font-semibold">{latestDraw.category || latestDraw.type}</span>
+                <div className="space-y-2">
+                  <div className="text-center pb-2 border-b border-border/50">
+                    <span className="text-base font-bold">{latestDraw.category || latestDraw.type}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-muted-foreground">CRS Mínimo:</span>
-                    <span className="text-lg font-bold text-primary">{latestDraw.crs_min}</span>
+                    <span className="text-2xl font-bold text-primary">{latestDraw.crs_min}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-muted-foreground">ITAs:</span>
-                    <span className="text-sm font-semibold">{latestDraw.invitations.toLocaleString('pt-BR')}</span>
+                    <span className="text-lg font-semibold">{latestDraw.invitations.toLocaleString('pt-BR')}</span>
                   </div>
-                  <div className="text-xs text-muted-foreground text-center mt-2">
+                  <div className="text-xs text-muted-foreground text-center pt-2 border-t border-border/50">
                     {new Date(latestDraw.date).toLocaleDateString('pt-BR')}
                   </div>
                 </div>
