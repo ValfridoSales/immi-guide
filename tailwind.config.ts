@@ -47,6 +47,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        "canadian-red": {
+          DEFAULT: "hsl(var(--canadian-red))",
+          foreground: "hsl(var(--canadian-red-foreground))",
+        },
         "canadian-blue": {
           DEFAULT: "hsl(var(--canadian-blue))",
           foreground: "hsl(var(--canadian-blue-foreground))",

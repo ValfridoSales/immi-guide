@@ -25,6 +25,9 @@ All colors MUST be HSL.
     --secondary: 220 40% 96%;
     --secondary-foreground: 220 15% 25%;
 
+    --canadian-red: 0 84% 60%; /* Canadian Red */
+    --canadian-red-foreground: 0 0% 100%;
+    
     --canadian-blue: 214 84% 56%; /* Complementary Blue */
     --canadian-blue-foreground: 0 0% 100%;
 
