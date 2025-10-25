@@ -15,6 +15,24 @@ import {
   Calculator,
   CalendarDays
 } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+
+// Helper function to get score level
+const getScoreLevel = (score: number): { label: string; variant: "default" | "secondary" | "destructive" | "outline" } => {
+  if (score >= 500) return { label: "Excelente", variant: "default" };
+  if (score >= 450) return { label: "Muito Bom", variant: "default" };
+  if (score >= 400) return { label: "Bom", variant: "secondary" };
+  if (score >= 350) return { label: "Regular", variant: "secondary" };
+  return { label: "Baixo", variant: "outline" };
+};
+
+const getScoreColor = (score: number): string => {
+  if (score >= 500) return "text-primary";
+  if (score >= 450) return "text-primary";
+  if (score >= 400) return "text-blue-600 dark:text-blue-400";
+  if (score >= 350) return "text-orange-600 dark:text-orange-400";
+  return "text-destructive";
+};
 
 export default function Dashboard() {
   const { profile, subscription, isPro } = useAuth();
@@ -95,20 +113,36 @@ export default function Dashboard() {
           {/* Card CRS - apenas para premium */}
           {isPro && (
             <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 md:col-span-1">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground text-center">
-                  Seu CRS Mais Recente
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground text-center">
+                  Sua Pontuação Total CRS
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pb-3 pt-1">
+              <CardContent className="pb-4 pt-0">
                 {isLoadingCRS ? (
-                  <div className="flex items-center justify-center h-20">
+                  <div className="flex items-center justify-center h-32">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
                 ) : latestCRS ? (
-                  <div className="text-center">
-                    <p className="text-4xl font-bold text-primary">{latestCRS}</p>
-                    <p className="text-xs text-muted-foreground mt-1">pontos</p>
+                  <div className="space-y-3">
+                    <div className="text-center">
+                      <p className={`text-5xl font-bold ${getScoreColor(latestCRS)}`}>
+                        {latestCRS}
+                      </p>
+                      <p className="text-sm font-medium mt-1">
+                        {getScoreLevel(latestCRS).label}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Progress 
+                        value={(latestCRS / 1200) * 100} 
+                        variant="canadian"
+                        className="h-2"
+                      />
+                      <p className="text-xs text-muted-foreground text-center">
+                        {latestCRS} de 1200 pontos possíveis
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center py-2">
