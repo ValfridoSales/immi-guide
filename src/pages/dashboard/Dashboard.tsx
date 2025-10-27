@@ -19,6 +19,7 @@ import {
   Info
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 // Helper function to get score level
 const getScoreLevel = (score: number): { label: string; variant: "default" | "secondary" | "destructive" | "outline" } => {
@@ -99,7 +100,8 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <DashboardLayout>
+    <TooltipProvider>
+      <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -223,70 +225,63 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="pb-4">
                 {latestCRS >= latestDraw.crs_min ? (
-                  <div className="space-y-2">
-                    <p className="text-base font-semibold text-green-700 dark:text-green-400">
-                      🎉 Parabéns! Você seria convidado!
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Sua pontuação de <span className="font-semibold">{latestCRS} pontos</span> supera 
-                      o CRS mínimo de <span className="font-semibold">{latestDraw.crs_min}</span> do último sorteio.
-                    </p>
-                    
-                    {latestDraw.category && latestDraw.category !== 'No Program Specified' && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Categoria: <span className="font-semibold">{latestDraw.category}</span>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-base font-semibold text-green-700 dark:text-green-400">
+                        🎉 Parabéns! Você seria convidado!
                       </p>
-                    )}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors">
+                            <Info className="w-4 h-4" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">
+                            Esta análise considera apenas pontos CRS. Verifique se você atende aos demais critérios de elegibilidade para a categoria específica do sorteio.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     
-                    <div className="pt-2">
+                    <div className="flex justify-center">
                       <Badge variant="outline" className="bg-green-100 dark:bg-green-900/30 border-green-500 text-green-700 dark:text-green-400">
                         +{latestCRS - latestDraw.crs_min} pontos acima do corte
                       </Badge>
                     </div>
-                    
-                    <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-800">
-                      <div className="flex items-start gap-2">
-                        <Info className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                        <p className="text-xs text-muted-foreground italic">
-                          <span className="font-semibold text-amber-700 dark:text-amber-400">Importante:</span> Esta análise considera apenas pontos CRS. 
-                          Verifique se você atende aos demais critérios de elegibilidade para a categoria específica do sorteio.
-                        </p>
-                      </div>
-                    </div>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <p className="text-base font-semibold text-red-700 dark:text-red-400">
-                      Você ainda não seria convidado
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Você precisa de mais <span className="font-semibold text-red-600 dark:text-red-400">
-                      {latestDraw.crs_min - latestCRS} pontos</span> para atingir o CRS mínimo de{' '}
-                      <span className="font-semibold">{latestDraw.crs_min}</span>.
-                    </p>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <p className="text-base font-semibold text-red-700 dark:text-red-400">
+                          Você ainda não seria convidado
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Faltam <span className="font-semibold text-red-600 dark:text-red-400">
+                          {latestDraw.crs_min - latestCRS} pontos</span> para o corte
+                        </p>
+                      </div>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors">
+                            <Info className="w-4 h-4" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-xs">
+                            Esta análise considera apenas pontos CRS. Verifique se você atende aos demais critérios de elegibilidade para a categoria específica do sorteio.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     
-                    {latestDraw.category && latestDraw.category !== 'No Program Specified' && (
-                      <p className="text-xs text-muted-foreground">
-                        Categoria do sorteio: <span className="font-semibold">{latestDraw.category}</span>
-                      </p>
-                    )}
-                    
-                    <Button variant="outline" size="sm" asChild className="w-full mt-2 border-red-300 hover:bg-red-50 dark:hover:bg-red-950/30">
+                    <Button variant="outline" size="sm" asChild className="w-full border-red-300 hover:bg-red-50 dark:hover:bg-red-950/30">
                       <Link to="/dashboard/simulations">
                         <Target className="w-3 h-3 mr-2" />
                         Veja como melhorar seus pontos
                       </Link>
                     </Button>
-                    
-                    <div className="mt-2 pt-2 border-t border-red-200 dark:border-red-800">
-                      <div className="flex items-start gap-2">
-                        <Info className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                        <p className="text-xs text-muted-foreground italic">
-                          <span className="font-semibold text-amber-700 dark:text-amber-400">Nota:</span> Além dos pontos CRS, 
-                          outros critérios podem ser necessários dependendo da categoria do sorteio.
-                        </p>
-                      </div>
-                    </div>
                   </div>
                 )}
               </CardContent>
@@ -455,6 +450,7 @@ export default function Dashboard() {
           </Card>
         )}
       </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </TooltipProvider>
   );
 }
