@@ -8,7 +8,7 @@ import { useSimulations } from '@/hooks/useSimulations';
 import { SimulationWizard } from '@/components/simulations/SimulationWizard';
 import { SimulationCard } from '@/components/simulations/SimulationCard';
 import { SimulationComparison } from '@/components/simulations/SimulationComparison';
-import { SCENARIO_PRESETS } from '@/utils/simulation-engine';
+import { SCENARIO_PRESETS, filterRelevantScenarios } from '@/utils/simulation-engine';
 import { ScenarioPresetCard } from '@/components/simulations/ScenarioPresetCard';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -43,14 +43,16 @@ export default function Simulations() {
 
   // Executar algumas simulações automáticas se não houver nenhuma salva
   const autoSimulations = currentBaseInput && simulations.length === 0 
-    ? SCENARIO_PRESETS.slice(0, 4).map(preset => {
-        try {
-          return runSimulation(currentBaseInput, preset);
-        } catch (error) {
-          console.error('Erro ao rodar simulação preset:', preset.id, error);
-          return null;
-        }
-      }).filter(Boolean) as any[]
+    ? filterRelevantScenarios(currentBaseInput, SCENARIO_PRESETS)
+        .slice(0, 4)
+        .map(preset => {
+          try {
+            return runSimulation(currentBaseInput, preset);
+          } catch (error) {
+            console.error('Erro ao rodar simulação preset:', preset.id, error);
+            return null;
+          }
+        }).filter(Boolean) as any[]
     : [];
 
   return (
@@ -121,18 +123,34 @@ export default function Simulations() {
           {currentBaseInput && (
             <div>
               <h2 className="text-xl font-semibold mb-4">Cenários Sugeridos</h2>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {SCENARIO_PRESETS.slice(0, 6).map(preset => (
-                  <ScenarioPresetCard
-                    key={preset.id}
-                    preset={preset}
-                    onSelect={(p) => {
-                      const result = runSimulation(currentBaseInput, p);
-                      setViewSimulation(result);
-                    }}
-                  />
-                ))}
-              </div>
+              <CardDescription className="text-sm text-muted-foreground mb-4">
+                Estes cenários foram selecionados com base no seu perfil atual. 
+                Apenas sugestões que podem melhorar sua pontuação são exibidas.
+              </CardDescription>
+              {filterRelevantScenarios(currentBaseInput, SCENARIO_PRESETS).length === 0 ? (
+                <div className="text-center py-8 px-4 bg-primary/5 rounded-lg border border-primary/20">
+                  <TrendingUp className="w-12 h-12 mx-auto text-primary mb-3" />
+                  <p className="font-semibold text-lg mb-1">Parabéns! Seu perfil já está otimizado.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Não há cenários de melhoria disponíveis no momento.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {filterRelevantScenarios(currentBaseInput, SCENARIO_PRESETS)
+                    .slice(0, 6)
+                    .map(preset => (
+                      <ScenarioPresetCard
+                        key={preset.id}
+                        preset={preset}
+                        onSelect={(p) => {
+                          const result = runSimulation(currentBaseInput, p);
+                          setViewSimulation(result);
+                        }}
+                      />
+                    ))}
+                </div>
+              )}
             </div>
           )}
 

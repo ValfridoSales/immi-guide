@@ -309,6 +309,90 @@ export const SCENARIO_PRESETS: ScenarioPatch[] = [
   },
 ];
 
+// ===== Filtro de Cenários Relevantes =====
+
+export function filterRelevantScenarios(
+  baseInput: InputCRS,
+  presets: ScenarioPatch[] = SCENARIO_PRESETS
+): ScenarioPatch[] {
+  return presets.filter(preset => {
+    // Filtrar cenários de idioma
+    if (preset.id === 'improve-english-clb9') {
+      const { reading, writing, listening, speaking } = baseInput.firstOfficial;
+      // Só mostrar se ALGUMA habilidade está abaixo de CLB 9
+      return reading < 9 || writing < 9 || listening < 9 || speaking < 9;
+    }
+    
+    if (preset.id === 'improve-english-clb10') {
+      const { reading, writing, listening, speaking } = baseInput.firstOfficial;
+      // Só mostrar se ALGUMA habilidade está abaixo de CLB 10
+      return reading < 10 || writing < 10 || listening < 10 || speaking < 10;
+    }
+    
+    if (preset.id === 'add-french-clb7') {
+      // Só mostrar se não tem segundo idioma OU se tem mas é inferior a CLB 7
+      if (!baseInput.secondOfficial) return true;
+      const { reading, writing, listening, speaking } = baseInput.secondOfficial;
+      return reading < 7 || writing < 7 || listening < 7 || speaking < 7;
+    }
+    
+    // Filtrar cenários de educação
+    if (preset.id === 'add-masters') {
+      // Só mostrar se não tem mestrado/PhD
+      return !['masters_or_professional', 'phd'].includes(baseInput.education);
+    }
+    
+    if (preset.id === 'canadian-study-1-2') {
+      // Só mostrar se não estudou no Canadá
+      return !baseInput.additional?.canadianStudy || 
+             baseInput.additional.canadianStudy === 'none';
+    }
+    
+    if (preset.id === 'canadian-study-3plus') {
+      // Só mostrar se não tem 3+ anos de estudo canadense
+      return baseInput.additional?.canadianStudy !== '3plus';
+    }
+    
+    // Filtrar cenários de experiência canadense
+    if (preset.id === 'add-canadian-exp-1') {
+      // Só mostrar se tem 0 anos de experiência canadense
+      return baseInput.canadianExperienceYears === 0;
+    }
+    
+    if (preset.id === 'add-canadian-exp-2') {
+      // Só mostrar se tem menos de 2 anos
+      return baseInput.canadianExperienceYears < 2;
+    }
+    
+    // Filtrar cenários de cônjuge
+    if (preset.id === 'remove-spouse') {
+      // Só mostrar se está casado/com cônjuge
+      return baseInput.withSpouse === true;
+    }
+    
+    // Filtrar PNP
+    if (preset.id === 'get-pnp') {
+      // Só mostrar se ainda não tem PNP
+      return !baseInput.additional?.pnpNomination;
+    }
+    
+    // Cenários de idade sempre mostram
+    if (preset.id === 'age-future-1y') return true;
+    
+    if (preset.id === 'combo-optimal') {
+      // Mostrar combo apenas se pelo menos uma das condições não está satisfeita
+      const needsEnglish = baseInput.firstOfficial.reading < 9 || 
+                          baseInput.firstOfficial.writing < 9 || 
+                          baseInput.firstOfficial.listening < 9 || 
+                          baseInput.firstOfficial.speaking < 9;
+      const needsMasters = !['masters_or_professional', 'phd'].includes(baseInput.education);
+      return needsEnglish || needsMasters;
+    }
+    
+    return true; // Default: mostrar
+  });
+}
+
 // ===== Comparação de Múltiplas Simulações =====
 
 export interface SimulationComparison {
