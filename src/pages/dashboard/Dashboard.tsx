@@ -13,7 +13,9 @@ import {
   FileText, 
   Sparkles,
   Calculator,
-  CalendarDays
+  CalendarDays,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
@@ -109,7 +111,7 @@ export default function Dashboard() {
         </div>
 
         {/* Cards de Informação */}
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {/* Card CRS - apenas para premium */}
           {isPro && (
             <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 md:col-span-1">
@@ -200,6 +202,61 @@ export default function Dashboard() {
               )}
             </CardContent>
           </Card>
+
+          {/* Card Análise de Elegibilidade - apenas para Pro users com CRS */}
+          {isPro && latestCRS && latestDraw && !isLoadingCRS && !isLoadingDraw && (
+            <Card className={`border-2 md:col-span-1 ${
+              latestCRS >= latestDraw.crs_min 
+                ? 'bg-green-50 dark:bg-green-950/20 border-green-500/50' 
+                : 'bg-red-50 dark:bg-red-950/20 border-red-500/50'
+            }`}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  {latestCRS >= latestDraw.crs_min ? (
+                    <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  ) : (
+                    <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                  )}
+                  Status de Elegibilidade
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pb-4">
+                {latestCRS >= latestDraw.crs_min ? (
+                  <div className="space-y-2">
+                    <p className="text-base font-semibold text-green-700 dark:text-green-400">
+                      🎉 Parabéns! Você seria convidado!
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Sua pontuação de <span className="font-semibold">{latestCRS} pontos</span> supera 
+                      o CRS mínimo de <span className="font-semibold">{latestDraw.crs_min}</span> do último sorteio.
+                    </p>
+                    <div className="pt-2">
+                      <Badge variant="outline" className="bg-green-100 dark:bg-green-900/30 border-green-500 text-green-700 dark:text-green-400">
+                        +{latestCRS - latestDraw.crs_min} pontos acima do corte
+                      </Badge>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-base font-semibold text-red-700 dark:text-red-400">
+                      Você ainda não seria convidado
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Você precisa de mais <span className="font-semibold text-red-600 dark:text-red-400">
+                      {latestDraw.crs_min - latestCRS} pontos</span> para atingir o CRS mínimo de{' '}
+                      <span className="font-semibold">{latestDraw.crs_min}</span>.
+                    </p>
+                    <Button variant="outline" size="sm" asChild className="w-full mt-2 border-red-300 hover:bg-red-50 dark:hover:bg-red-950/30">
+                      <Link to="/dashboard/simulations">
+                        <Target className="w-3 h-3 mr-2" />
+                        Veja como melhorar seus pontos
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Status Card */}
