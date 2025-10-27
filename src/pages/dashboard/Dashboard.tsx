@@ -15,7 +15,8 @@ import {
   Calculator,
   CalendarDays,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Info
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
@@ -230,10 +231,27 @@ export default function Dashboard() {
                       Sua pontuação de <span className="font-semibold">{latestCRS} pontos</span> supera 
                       o CRS mínimo de <span className="font-semibold">{latestDraw.crs_min}</span> do último sorteio.
                     </p>
+                    
+                    {latestDraw.category && latestDraw.category !== 'No Program Specified' && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Categoria: <span className="font-semibold">{latestDraw.category}</span>
+                      </p>
+                    )}
+                    
                     <div className="pt-2">
                       <Badge variant="outline" className="bg-green-100 dark:bg-green-900/30 border-green-500 text-green-700 dark:text-green-400">
                         +{latestCRS - latestDraw.crs_min} pontos acima do corte
                       </Badge>
+                    </div>
+                    
+                    <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-800">
+                      <div className="flex items-start gap-2">
+                        <Info className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-muted-foreground italic">
+                          <span className="font-semibold text-amber-700 dark:text-amber-400">Importante:</span> Esta análise considera apenas pontos CRS. 
+                          Verifique se você atende aos demais critérios de elegibilidade para a categoria específica do sorteio.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -246,12 +264,29 @@ export default function Dashboard() {
                       {latestDraw.crs_min - latestCRS} pontos</span> para atingir o CRS mínimo de{' '}
                       <span className="font-semibold">{latestDraw.crs_min}</span>.
                     </p>
+                    
+                    {latestDraw.category && latestDraw.category !== 'No Program Specified' && (
+                      <p className="text-xs text-muted-foreground">
+                        Categoria do sorteio: <span className="font-semibold">{latestDraw.category}</span>
+                      </p>
+                    )}
+                    
                     <Button variant="outline" size="sm" asChild className="w-full mt-2 border-red-300 hover:bg-red-50 dark:hover:bg-red-950/30">
                       <Link to="/dashboard/simulations">
                         <Target className="w-3 h-3 mr-2" />
                         Veja como melhorar seus pontos
                       </Link>
                     </Button>
+                    
+                    <div className="mt-2 pt-2 border-t border-red-200 dark:border-red-800">
+                      <div className="flex items-start gap-2">
+                        <Info className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-muted-foreground italic">
+                          <span className="font-semibold text-amber-700 dark:text-amber-400">Nota:</span> Além dos pontos CRS, 
+                          outros critérios podem ser necessários dependendo da categoria do sorteio.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
               </CardContent>
