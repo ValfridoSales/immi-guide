@@ -228,8 +228,8 @@ export default function Dashboard() {
           {isPro && latestCRS && latestDraw && !isLoadingCRS && !isLoadingDraw && (
             <Card className={`border-2 md:col-span-1 ${
               latestCRS >= latestDraw.crs_min 
-                ? 'bg-green-50 dark:bg-green-950/20 border-green-500/50' 
-                : 'bg-red-50 dark:bg-red-950/20 border-red-500/50'
+                ? 'border-green-500/50' 
+                : 'border-red-500/50'
             }`}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
