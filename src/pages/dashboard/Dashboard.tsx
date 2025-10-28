@@ -211,7 +211,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-muted-foreground">ITAs:</span>
-                    <span className="text-lg font-semibold">{latestDraw.invitations.toLocaleString('pt-BR')}</span>
+                    <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">{latestDraw.invitations.toLocaleString('pt-BR')}</span>
                   </div>
                 </div>
               ) : (
