@@ -135,7 +135,7 @@ export default function Dashboard() {
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {/* Card CRS - apenas para premium */}
           {isPro && (
-            <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 md:col-span-1">
+            <Card className="border-primary/20 md:col-span-1">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground text-center">
                   Sua Pontuação Total CRS
@@ -182,7 +182,7 @@ export default function Dashboard() {
           )}
 
           {/* Card Último Draw */}
-          <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5 md:col-span-1">
+          <Card className="border-primary/20 md:col-span-1">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -228,8 +228,8 @@ export default function Dashboard() {
           {isPro && latestCRS && latestDraw && !isLoadingCRS && !isLoadingDraw && (
             <Card className={`border-2 md:col-span-1 ${
               latestCRS >= latestDraw.crs_min 
-                ? 'border-green-500/50' 
-                : 'border-red-500/50'
+                ? 'bg-green-50 dark:bg-green-950/20 border-green-500/50' 
+                : 'bg-red-50 dark:bg-red-950/20 border-red-500/50'
             }`}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
