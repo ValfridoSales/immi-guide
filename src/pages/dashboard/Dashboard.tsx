@@ -21,6 +21,24 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
+// Helper function to expand program abbreviations
+const expandProgramName = (name: string): string => {
+  const expansions: Record<string, string> = {
+    'PNP': 'Provincial Nominee Program',
+    'CEC': 'Canadian Experience Class',
+    'FSW': 'Federal Skilled Worker',
+    'FST': 'Federal Skilled Trades'
+  };
+  
+  // Check if the name is exactly an abbreviation
+  if (expansions[name.toUpperCase()]) {
+    return expansions[name.toUpperCase()];
+  }
+  
+  // Return as-is if not an abbreviation
+  return name;
+};
+
 // Helper function to get score level
 const getScoreLevel = (score: number): { label: string; variant: "default" | "secondary" | "destructive" | "outline" } => {
   if (score >= 500) return { label: "Excelente", variant: "default" };
@@ -185,7 +203,7 @@ export default function Dashboard() {
               ) : latestDraw ? (
                 <div className="space-y-2">
                   <div className="text-center pb-2 border-b border-border/50">
-                    <span className="text-base font-bold">{latestDraw.category || latestDraw.type}</span>
+                    <span className="text-base font-bold">{expandProgramName(latestDraw.category || latestDraw.type)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-muted-foreground">CRS Mínimo:</span>
