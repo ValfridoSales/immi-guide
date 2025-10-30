@@ -149,7 +149,7 @@ export default function Dashboard() {
                 ) : latestCRS ? (
                   <div className="space-y-3">
                     <div className="text-center">
-                      <p className={`text-5xl font-bold ${getScoreColor(latestCRS)}`}>
+                      <p className="text-5xl font-bold bg-gradient-to-r from-canadian-red via-primary to-canadian-blue bg-clip-text text-transparent">
                         {latestCRS}
                       </p>
                       <p className="text-sm font-medium mt-1">
