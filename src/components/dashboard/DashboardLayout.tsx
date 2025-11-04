@@ -10,6 +10,7 @@ import {
   FileText,
   Settings,
   CreditCard,
+  ClipboardList,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -18,6 +19,7 @@ interface DashboardLayoutProps {
 
 const sidebarLinks = [
   { href: '/dashboard', label: 'Overview', icon: Home },
+  { href: '/dashboard/quiz-results', label: 'Meus Resultados', icon: ClipboardList, pro: true },
   { href: '/dashboard/crs-history', label: 'Histórico CRS', icon: TrendingUp, pro: true },
   { href: '/dashboard/simulations', label: 'Simulações', icon: Target, pro: true },
   { href: '/dashboard/reports', label: 'Relatórios', icon: FileText, pro: true },

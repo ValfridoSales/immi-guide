@@ -19,6 +19,7 @@ import CRSHistory from "./pages/dashboard/CRSHistory";
 import Simulations from "./pages/dashboard/Simulations";
 import Reports from "./pages/dashboard/Reports";
 import Alerts from "./pages/dashboard/Alerts";
+import QuizResults from "./pages/dashboard/QuizResults";
 import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/dashboard/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
+            <Route path="/dashboard/quiz-results" element={<ProtectedRoute><QuizResults /></ProtectedRoute>} />
             <Route path="/dashboard/crs-history" element={<ProtectedRoute><CRSHistory /></ProtectedRoute>} />
             <Route path="/dashboard/simulations" element={<ProtectedRoute><Simulations /></ProtectedRoute>} />
             <Route path="/dashboard/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />

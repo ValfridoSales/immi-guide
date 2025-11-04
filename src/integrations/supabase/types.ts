@@ -346,6 +346,7 @@ export type Database = {
           session_id: string
           updated_at: string
           user_email: string | null
+          user_id: string | null
           user_location: string | null
           user_name: string | null
           user_timeline: string | null
@@ -358,6 +359,7 @@ export type Database = {
           session_id: string
           updated_at?: string
           user_email?: string | null
+          user_id?: string | null
           user_location?: string | null
           user_name?: string | null
           user_timeline?: string | null
@@ -370,6 +372,7 @@ export type Database = {
           session_id?: string
           updated_at?: string
           user_email?: string | null
+          user_id?: string | null
           user_location?: string | null
           user_name?: string | null
           user_timeline?: string | null

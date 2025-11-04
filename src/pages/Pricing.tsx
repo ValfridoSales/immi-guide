@@ -15,7 +15,8 @@ import {
   Bell, 
   FileText, 
   MessageCircle,
-  Loader2 
+  Loader2,
+  ClipboardList 
 } from 'lucide-react';
 
 export default function Pricing() {
@@ -55,6 +56,13 @@ export default function Pricing() {
   };
 
   const features = [
+    {
+      icon: ClipboardList,
+      title: 'Resultados do Quiz Salvos',
+      description: 'Salve e compare múltiplos resultados do Quiz de Imigração',
+      free: false,
+      pro: true,
+    },
     {
       icon: TrendingUp,
       title: 'Histórico de Pontuação CRS',

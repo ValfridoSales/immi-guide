@@ -28,6 +28,7 @@ export function ProFeatureGuard({ children, feature, fallback }: ProFeatureGuard
     alerts: 'Alertas de Draws',
     reports: 'Relatórios PDF Premium',
     whatsapp: 'Suporte WhatsApp Prioritário',
+    quiz_results: 'Resultados Salvos do Quiz',
   };
 
   return (
