@@ -204,11 +204,9 @@ export default function Dashboard() {
                     {/* Box Nota de Corte */}
                     <div className="rounded-lg border border-border/50 p-4 space-y-1">
                       <p className="text-xs text-muted-foreground">Nota de corte:</p>
-                      <div className="inline-block">
-                        <div className="bg-gradient-to-br from-canadian-red/20 to-canadian-red/10 dark:from-canadian-red/30 dark:to-canadian-red/20 rounded px-3 py-1 border border-canadian-red/30">
-                          <span className="text-2xl font-bold text-canadian-red dark:text-canadian-red">{latestDraw.crs_min}</span>
-                        </div>
-                      </div>
+                      <span className="text-2xl font-bold text-canadian-red dark:text-canadian-red">
+                        {latestDraw.crs_min}
+                      </span>
                     </div>
                     
                     {/* Box Convites */}
