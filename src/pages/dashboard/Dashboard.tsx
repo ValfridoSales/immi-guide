@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
-import { TrendingUp, Target, Bell, FileText, Sparkles, Calculator, CalendarDays, CheckCircle2, XCircle, Info } from 'lucide-react';
+import { TrendingUp, Target, Bell, FileText, Sparkles, Calculator, CalendarDays, CheckCircle2, XCircle, Info, Circle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
@@ -60,6 +60,16 @@ const getScoreColor = (score: number): string => {
   if (score >= 400) return "text-blue-600 dark:text-blue-400";
   if (score >= 350) return "text-orange-600 dark:text-orange-400";
   return "text-destructive";
+};
+
+// Helper function to format date in Portuguese
+const formatDrawDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('pt-BR', { 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  });
 };
 export default function Dashboard() {
   const {
@@ -171,31 +181,45 @@ export default function Dashboard() {
           {/* Card Último Draw */}
           <Card className="border-primary/20 md:col-span-1">
             <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-canadian-red/20 dark:bg-canadian-red/30 border-2 border-canadian-red flex items-center justify-center flex-shrink-0">
+                  <Circle className="w-3 h-3 fill-canadian-red text-canadian-red" />
+                </div>
+                <CardTitle className="text-sm font-medium">
                   Último Sorteio Express Entry
                 </CardTitle>
-                {!isLoadingDraw && latestDraw && <span className="text-xs text-muted-foreground">
-                    {new Date(latestDraw.date).toLocaleDateString('pt-BR')}
-                  </span>}
               </div>
             </CardHeader>
-            <CardContent className="pb-4">
+            <CardContent className="pb-4 space-y-4">
               {isLoadingDraw ? <div className="flex items-center justify-center h-16">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                </div> : latestDraw ? <div className="space-y-2">
-                  <div className="text-center pb-2 border-b border-border/50">
-                    <span className="text-base font-bold">{expandProgramName(latestDraw.category || latestDraw.type)}</span>
+                </div> : latestDraw ? <>
+                  {/* Data + Programa */}
+                  <div className="text-sm text-muted-foreground">
+                    {formatDrawDate(latestDraw.date)} — {expandProgramName(latestDraw.category || latestDraw.type)}
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Nota de corte:</span>
-                    <span className="text-2xl font-bold text-primary">{latestDraw.crs_min}</span>
+                  
+                  {/* Grid com 2 boxes */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Box Nota de Corte */}
+                    <div className="rounded-lg border border-border/50 p-4 space-y-1">
+                      <p className="text-xs text-muted-foreground">Nota de corte:</p>
+                      <div className="inline-block">
+                        <div className="bg-gradient-to-br from-canadian-red/20 to-canadian-red/10 dark:from-canadian-red/30 dark:to-canadian-red/20 rounded px-3 py-1 border border-canadian-red/30">
+                          <span className="text-2xl font-bold text-canadian-red dark:text-canadian-red">{latestDraw.crs_min}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Box Convites */}
+                    <div className="rounded-lg border border-border/50 p-4 space-y-1">
+                      <p className="text-xs text-muted-foreground">Convites:</p>
+                      <span className="text-2xl font-bold text-canadian-blue dark:text-canadian-blue">
+                        {latestDraw.invitations.toLocaleString('pt-BR')}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Convites emitidos:</span>
-                    <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">{latestDraw.invitations.toLocaleString('pt-BR')}</span>
-                  </div>
-                </div> : <div className="text-center">
+                </> : <div className="text-center">
                   <p className="text-sm text-muted-foreground">
                     Nenhum sorteio disponível
                   </p>
