@@ -6,18 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useState, useEffect } from 'react';
-import { 
-  TrendingUp, 
-  Target, 
-  Bell, 
-  FileText, 
-  Sparkles,
-  Calculator,
-  CalendarDays,
-  CheckCircle2,
-  XCircle,
-  Info
-} from 'lucide-react';
+import { TrendingUp, Target, Bell, FileText, Sparkles, Calculator, CalendarDays, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
@@ -29,25 +18,42 @@ const expandProgramName = (name: string): string => {
     'FSW': 'Federal Skilled Worker',
     'FST': 'Federal Skilled Trades'
   };
-  
+
   // Check if the name is exactly an abbreviation
   if (expansions[name.toUpperCase()]) {
     return expansions[name.toUpperCase()];
   }
-  
+
   // Return as-is if not an abbreviation
   return name;
 };
 
 // Helper function to get score level
-const getScoreLevel = (score: number): { label: string; variant: "default" | "secondary" | "destructive" | "outline" } => {
-  if (score >= 500) return { label: "Excelente", variant: "default" };
-  if (score >= 450) return { label: "Muito Bom", variant: "default" };
-  if (score >= 400) return { label: "Bom", variant: "secondary" };
-  if (score >= 350) return { label: "Regular", variant: "secondary" };
-  return { label: "Baixo", variant: "outline" };
+const getScoreLevel = (score: number): {
+  label: string;
+  variant: "default" | "secondary" | "destructive" | "outline";
+} => {
+  if (score >= 500) return {
+    label: "Excelente",
+    variant: "default"
+  };
+  if (score >= 450) return {
+    label: "Muito Bom",
+    variant: "default"
+  };
+  if (score >= 400) return {
+    label: "Bom",
+    variant: "secondary"
+  };
+  if (score >= 350) return {
+    label: "Regular",
+    variant: "secondary"
+  };
+  return {
+    label: "Baixo",
+    variant: "outline"
+  };
 };
-
 const getScoreColor = (score: number): string => {
   if (score >= 500) return "text-primary";
   if (score >= 450) return "text-primary";
@@ -55,30 +61,29 @@ const getScoreColor = (score: number): string => {
   if (score >= 350) return "text-orange-600 dark:text-orange-400";
   return "text-destructive";
 };
-
 export default function Dashboard() {
-  const { profile, subscription, isPro } = useAuth();
+  const {
+    profile,
+    subscription,
+    isPro
+  } = useAuth();
   const [latestCRS, setLatestCRS] = useState<number | null>(null);
   const [isLoadingCRS, setIsLoadingCRS] = useState(true);
   const [latestDraw, setLatestDraw] = useState<any | null>(null);
   const [isLoadingDraw, setIsLoadingDraw] = useState(true);
-
   useEffect(() => {
     const fetchLatestCRS = async () => {
       if (!isPro || !profile?.id) {
         setIsLoadingCRS(false);
         return;
       }
-
       try {
-        const { data, error } = await supabase
-          .from('crs_calculations')
-          .select('total_score, created_at')
-          .eq('user_id', profile.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
+        const {
+          data,
+          error
+        } = await supabase.from('crs_calculations').select('total_score, created_at').eq('user_id', profile.id).order('created_at', {
+          ascending: false
+        }).limit(1).maybeSingle();
         if (error) throw error;
         if (data) {
           setLatestCRS(data.total_score);
@@ -89,20 +94,17 @@ export default function Dashboard() {
         setIsLoadingCRS(false);
       }
     };
-
     fetchLatestCRS();
   }, [isPro, profile?.id]);
-
   useEffect(() => {
     const fetchLatestDraw = async () => {
       try {
-        const { data, error } = await supabase
-          .from('express_entry_draws')
-          .select('date, type, category, invitations, crs_min')
-          .order('date', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
+        const {
+          data,
+          error
+        } = await supabase.from('express_entry_draws').select('date, type, category, invitations, crs_min').order('date', {
+          ascending: false
+        }).limit(1).maybeSingle();
         if (error) throw error;
         if (data) {
           setLatestDraw(data);
@@ -113,12 +115,9 @@ export default function Dashboard() {
         setIsLoadingDraw(false);
       }
     };
-
     fetchLatestDraw();
   }, []);
-
-  return (
-    <TooltipProvider>
+  return <TooltipProvider>
       <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
@@ -134,20 +133,16 @@ export default function Dashboard() {
         {/* Cards de Informação */}
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {/* Card CRS - apenas para premium */}
-          {isPro && (
-            <Card className="border-primary/20 md:col-span-1">
+          {isPro && <Card className="border-primary/20 md:col-span-1">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground text-center">
                   Sua Pontuação Total CRS
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-4 pt-0">
-                {isLoadingCRS ? (
-                  <div className="flex items-center justify-center h-32">
+                {isLoadingCRS ? <div className="flex items-center justify-center h-32">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                  </div>
-                ) : latestCRS ? (
-                  <div className="space-y-3">
+                  </div> : latestCRS ? <div className="space-y-3">
                     <div className="text-center">
                       <p className="text-5xl font-bold bg-[linear-gradient(90deg,_hsl(var(--canadian-red))_0%,_hsl(var(--primary))_35%,_hsl(var(--canadian-blue))_100%)] bg-clip-text text-transparent">
                         {latestCRS}
@@ -157,29 +152,21 @@ export default function Dashboard() {
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <Progress 
-                        value={(latestCRS / 1200) * 100} 
-                        variant="canadian"
-                        className="h-2"
-                      />
+                      <Progress value={latestCRS / 1200 * 100} variant="canadian" className="h-2" />
                       <p className="text-xs text-muted-foreground text-center">
                         {latestCRS} de 1200 pontos possíveis
                       </p>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-2">
+                  </div> : <div className="text-center py-2">
                     <p className="text-xs text-muted-foreground">
                       Nenhum cálculo ainda
                     </p>
                     <Button variant="link" size="sm" asChild className="mt-1 p-0 h-auto text-xs">
                       <Link to="/crs-calculator">Calcular agora</Link>
                     </Button>
-                  </div>
-                )}
+                  </div>}
               </CardContent>
-            </Card>
-          )}
+            </Card>}
 
           {/* Card Último Draw */}
           <Card className="border-primary/20 md:col-span-1">
@@ -188,62 +175,44 @@ export default function Dashboard() {
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Último Sorteio Express Entry
                 </CardTitle>
-                {!isLoadingDraw && latestDraw && (
-                  <span className="text-xs text-muted-foreground">
+                {!isLoadingDraw && latestDraw && <span className="text-xs text-muted-foreground">
                     {new Date(latestDraw.date).toLocaleDateString('pt-BR')}
-                  </span>
-                )}
+                  </span>}
               </div>
             </CardHeader>
             <CardContent className="pb-4">
-              {isLoadingDraw ? (
-                <div className="flex items-center justify-center h-16">
+              {isLoadingDraw ? <div className="flex items-center justify-center h-16">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                </div>
-              ) : latestDraw ? (
-                <div className="space-y-2">
+                </div> : latestDraw ? <div className="space-y-2">
                   <div className="text-center pb-2 border-b border-border/50">
                     <span className="text-base font-bold">{expandProgramName(latestDraw.category || latestDraw.type)}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">CRS Mínimo:</span>
+                    <span className="text-xs text-muted-foreground">Nota de corte:</span>
                     <span className="text-2xl font-bold text-primary">{latestDraw.crs_min}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">ITAs:</span>
+                    <span className="text-xs text-muted-foreground">Convites emitidos:</span>
                     <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">{latestDraw.invitations.toLocaleString('pt-BR')}</span>
                   </div>
-                </div>
-              ) : (
-                <div className="text-center">
+                </div> : <div className="text-center">
                   <p className="text-sm text-muted-foreground">
                     Nenhum sorteio disponível
                   </p>
-                </div>
-              )}
+                </div>}
             </CardContent>
           </Card>
 
           {/* Card Análise de Elegibilidade - apenas para Pro users com CRS */}
-          {isPro && latestCRS && latestDraw && !isLoadingCRS && !isLoadingDraw && (
-            <Card className={`border-2 md:col-span-1 ${
-              latestCRS >= latestDraw.crs_min 
-                ? 'bg-green-50 dark:bg-green-950/20 border-green-500/50' 
-                : 'bg-red-50 dark:bg-red-950/20 border-red-500/50'
-            }`}>
+          {isPro && latestCRS && latestDraw && !isLoadingCRS && !isLoadingDraw && <Card className={`border-2 md:col-span-1 ${latestCRS >= latestDraw.crs_min ? 'bg-green-50 dark:bg-green-950/20 border-green-500/50' : 'bg-red-50 dark:bg-red-950/20 border-red-500/50'}`}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  {latestCRS >= latestDraw.crs_min ? (
-                    <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  ) : (
-                    <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                  )}
+                  {latestCRS >= latestDraw.crs_min ? <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" /> : <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />}
                   Status de Elegibilidade
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-4">
-                {latestCRS >= latestDraw.crs_min ? (
-                  <div className="space-y-3">
+                {latestCRS >= latestDraw.crs_min ? <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <p className="text-base font-semibold text-green-700 dark:text-green-400">
                         🎉 Parabéns! Você seria convidado!
@@ -267,9 +236,7 @@ export default function Dashboard() {
                         +{latestCRS - latestDraw.crs_min} pontos acima do corte
                       </Badge>
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
+                  </div> : <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <p className="text-base font-semibold text-red-700 dark:text-red-400">
@@ -300,11 +267,9 @@ export default function Dashboard() {
                         Veja como melhorar seus pontos
                       </Link>
                     </Button>
-                  </div>
-                )}
+                  </div>}
               </CardContent>
-            </Card>
-          )}
+            </Card>}
         </div>
 
         {/* Status Card */}
@@ -317,41 +282,31 @@ export default function Dashboard() {
                   {isPro ? 'Você tem acesso a todas as features premium' : 'Faça upgrade para desbloquear recursos premium'}
                 </CardDescription>
               </div>
-              {isPro ? (
-                <Badge className="bg-gradient-canadian border-0 text-white">
+              {isPro ? <Badge className="bg-gradient-canadian border-0 text-white">
                   <Sparkles className="w-3 h-3 mr-1" />
                   Plano Pro
-                </Badge>
-              ) : (
-                <Badge variant="outline">Plano Grátis</Badge>
-              )}
+                </Badge> : <Badge variant="outline">Plano Grátis</Badge>}
             </div>
           </CardHeader>
           <CardContent>
-            {isPro ? (
-              <div className="space-y-2">
+            {isPro ? <div className="space-y-2">
                 <p className="text-sm">
                   Status: <span className="font-semibold">{subscription?.status === 'trialing' ? 'Em período de teste' : 'Ativo'}</span>
                 </p>
-                {subscription?.trial_end && new Date(subscription.trial_end) > new Date() && (
-                  <p className="text-sm text-muted-foreground">
+                {subscription?.trial_end && new Date(subscription.trial_end) > new Date() && <p className="text-sm text-muted-foreground">
                     Teste grátis termina em {new Date(subscription.trial_end).toLocaleDateString('pt-BR')}
-                  </p>
-                )}
+                  </p>}
                 <Button variant="outline" size="sm" asChild className="mt-4">
                   <Link to="/dashboard/subscription">
                     Gerenciar Assinatura
                   </Link>
                 </Button>
-              </div>
-            ) : (
-              <Button asChild className="bg-gradient-canadian border-0">
+              </div> : <Button asChild className="bg-gradient-canadian border-0">
                 <Link to="/pricing">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Fazer Upgrade - 7 Dias Grátis
                 </Link>
-              </Button>
-            )}
+              </Button>}
           </CardContent>
         </Card>
 
@@ -429,8 +384,7 @@ export default function Dashboard() {
         </div>
 
         {/* Features Premium */}
-        {!isPro && (
-          <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
+        {!isPro && <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5" />
@@ -465,10 +419,8 @@ export default function Dashboard() {
                 </Link>
               </Button>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
       </div>
       </DashboardLayout>
-    </TooltipProvider>
-  );
+    </TooltipProvider>;
 }
