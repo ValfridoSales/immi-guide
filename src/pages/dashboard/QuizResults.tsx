@@ -6,10 +6,11 @@ import { getUserQuizResults, deleteQuizResult, StoredQuizResult } from '@/utils/
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ProgramCard } from '@/components/pdf/ProgramCard';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ClipboardList, Trash2 } from 'lucide-react';
+import { ClipboardList, Trash2, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
   AlertDialog,
@@ -139,72 +140,59 @@ function SavedResultCard({
   const formattedDate = format(new Date(result.created_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg flex items-center gap-2">
-              {formattedDate}
-              {isLatest && (
-                <Badge variant="default" className="bg-gradient-canadian border-0">
-                  Mais Recente
-                </Badge>
-              )}
-            </CardTitle>
-          </div>
-          
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Deletar resultado?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Esta ação não pode ser desfeita. O resultado será removido permanentemente.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={() => onDelete(result.id)}>
-                  Deletar
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
-        <div>
-          <h4 className="font-semibold mb-3 text-sm text-muted-foreground">
-            Top 3 Programas Recomendados
-          </h4>
-          <div className="space-y-3">
-            {topThree.map((program, index) => (
-              <div key={program.programId} className="flex items-center gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-canadian flex items-center justify-center text-white font-bold text-sm">
-                  {index + 1}
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{program.programName}</p>
-                  <div className="w-full bg-muted rounded-full h-2 mt-1">
-                    <div 
-                      className="bg-gradient-canadian h-2 rounded-full transition-all"
-                      style={{ width: `${program.compatibility}%` }}
-                    />
-                  </div>
-                </div>
-                <span className="text-sm font-semibold text-primary">
-                  {program.compatibility}%
-                </span>
+    <div className="space-y-6">
+      {/* Header Card with Date and Delete */}
+      <Card className="bg-muted/50">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Calendar className="w-5 h-5 text-muted-foreground" />
+              <div>
+                <h3 className="font-semibold text-lg">{formattedDate}</h3>
+                {isLatest && (
+                  <Badge variant="default" className="bg-gradient-canadian border-0 mt-1">
+                    Mais Recente
+                  </Badge>
+                )}
               </div>
-            ))}
+            </div>
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Deletar resultado?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação não pode ser desfeita. O resultado será removido permanentemente.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => onDelete(result.id)}>
+                    Deletar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* Program Cards */}
+      <div className="space-y-6">
+        {topThree.map((program, index) => (
+          <ProgramCard 
+            key={program.programId}
+            result={program}
+            index={index}
+            printMode={false}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
