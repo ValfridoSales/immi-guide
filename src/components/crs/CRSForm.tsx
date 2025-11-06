@@ -341,11 +341,30 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
                         <SelectItem value="B">18</SelectItem>
                         <SelectItem value="C">19</SelectItem>
                         <SelectItem value="D">20</SelectItem>
+                        <SelectItem value="E">21</SelectItem>
+                        <SelectItem value="F">22</SelectItem>
+                        <SelectItem value="G">23</SelectItem>
+                        <SelectItem value="H">24</SelectItem>
+                        <SelectItem value="I">25</SelectItem>
+                        <SelectItem value="J">26</SelectItem>
+                        <SelectItem value="K">27</SelectItem>
+                        <SelectItem value="L">28</SelectItem>
+                        <SelectItem value="M">29</SelectItem>
                         <SelectItem value="N">30</SelectItem>
                         <SelectItem value="O">31</SelectItem>
                         <SelectItem value="P">32</SelectItem>
+                        <SelectItem value="Q">33</SelectItem>
+                        <SelectItem value="R">34</SelectItem>
                         <SelectItem value="S">35</SelectItem>
+                        <SelectItem value="T">36</SelectItem>
+                        <SelectItem value="U">37</SelectItem>
+                        <SelectItem value="V">38</SelectItem>
+                        <SelectItem value="W">39</SelectItem>
                         <SelectItem value="X">40</SelectItem>
+                        <SelectItem value="Y">41</SelectItem>
+                        <SelectItem value="Z">42</SelectItem>
+                        <SelectItem value="AA">43</SelectItem>
+                        <SelectItem value="AB">44</SelectItem>
                         <SelectItem value="AC">45 ou mais</SelectItem>
                       </SelectContent>
                     </Select>
