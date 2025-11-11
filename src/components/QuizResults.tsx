@@ -6,7 +6,7 @@ import { ProgramCard } from '@/components/pdf/ProgramCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { storeQuizResults } from '@/utils/quiz-results';
-import { Save, Loader2, Sparkles } from 'lucide-react';
+import { Save, Loader2, Sparkles, Calculator } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -21,6 +21,10 @@ export function QuizResults({ results, onRestart }: QuizResultsProps) {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
+
+  const handleDiscoverPoints = () => {
+    navigate('/crs-calculator');
+  };
 
   const handleSaveResults = async () => {
     // Verificação 1: Usuário não está autenticado
@@ -106,6 +110,20 @@ export function QuizResults({ results, onRestart }: QuizResultsProps) {
 
       {/* Actions */}
       <div className="space-y-4">
+        {/* Botão principal: Descubra seus pontos */}
+        <div className="flex justify-center">
+          <Button 
+            variant="canadian"
+            size="lg" 
+            onClick={handleDiscoverPoints}
+            className="text-lg px-8 py-3 w-full sm:w-auto"
+          >
+            <Calculator className="mr-2 h-4 w-4" />
+            Descubra seus pontos CRS
+          </Button>
+        </div>
+
+        {/* Botões secundários */}
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Button 
             variant="outline" 
@@ -117,7 +135,7 @@ export function QuizResults({ results, onRestart }: QuizResultsProps) {
           </Button>
           
           <Button 
-            variant="canadian"
+            variant="outline"
             size="lg" 
             onClick={handleSaveResults}
             disabled={isSaving || authLoading}
