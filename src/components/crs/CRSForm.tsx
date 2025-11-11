@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -8,7 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Checkbox } from '@/components/ui/checkbox';
 import { computeCrs, type InputCRS, type EducationKey, type CRSResult } from '@/utils/crs-engine';
 import { mapIELTSGeneralToCLBs, mapCELPIPToCLBs, mapTEFCanadaToCLBs, mapTCFCanadaToCLBs } from '@/utils/language-maps';
-import { Calculator } from 'lucide-react';
+import { Calculator, Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   maritalStatus: z.string().min(1, 'Selecione seu estado civil'),
@@ -49,6 +50,8 @@ interface CRSFormProps {
 }
 
 export function CRSForm({ onCalculate }: CRSFormProps) {
+  const [isCalculating, setIsCalculating] = useState(false);
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -102,8 +105,12 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
     return [];
   };
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = async (values: FormValues) => {
+    setIsCalculating(true);
+    
     try {
+      // Pequeno delay para dar feedback visual
+      await new Promise(resolve => setTimeout(resolve, 500));
       // Map education
       const eduMap: Record<string, EducationKey> = {
         A: 'less_than_secondary', B: 'secondary', C: 'one_year', D: 'two_year',
@@ -238,6 +245,8 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
     } catch (error: any) {
       console.error('Erro ao calcular CRS:', error);
       alert(`Erro: ${error.message}`);
+    } finally {
+      setIsCalculating(false);
     }
   };
 
@@ -854,9 +863,18 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
           </AccordionItem>
         </Accordion>
 
-        <Button type="submit" className="w-full" size="lg">
-          <Calculator className="mr-2 h-5 w-5" />
-          Calcular Pontuação CRS
+        <Button type="submit" className="w-full" size="lg" disabled={isCalculating}>
+          {isCalculating ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Calculando...
+            </>
+          ) : (
+            <>
+              <Calculator className="mr-2 h-5 w-5" />
+              Calcular Pontuação CRS
+            </>
+          )}
         </Button>
       </form>
     </Form>
