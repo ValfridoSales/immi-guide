@@ -24,18 +24,6 @@ export const Navigation = ({ fixed = false }: { fixed?: boolean }) => {
       </Button>
       
       <Button
-        variant={location.pathname === '/express-entry/draws' ? 'default' : 'ghost'}
-        size="sm"
-        asChild
-        onClick={() => setOpen(false)}
-      >
-        <Link to="/express-entry/draws">
-          <TrendingUp className="w-4 h-4 mr-2" />
-          Express Entry Draws
-        </Link>
-      </Button>
-      
-      <Button
         variant={location.pathname === '/crs-calculator' ? 'default' : 'ghost'}
         size="sm"
         asChild
@@ -44,6 +32,18 @@ export const Navigation = ({ fixed = false }: { fixed?: boolean }) => {
         <Link to="/crs-calculator">
           <Calculator className="w-4 h-4 mr-2" />
           Calculadora CRS
+        </Link>
+      </Button>
+      
+      <Button
+        variant={location.pathname === '/express-entry/draws' ? 'default' : 'ghost'}
+        size="sm"
+        asChild
+        onClick={() => setOpen(false)}
+      >
+        <Link to="/express-entry/draws">
+          <TrendingUp className="w-4 h-4 mr-2" />
+          Express Entry Draws
         </Link>
       </Button>
     </>
