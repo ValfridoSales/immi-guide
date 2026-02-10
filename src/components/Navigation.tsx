@@ -41,7 +41,7 @@ export const Navigation = ({ fixed = false, transparent = false }: { fixed?: boo
                 {link.label}
               </Link>
             ))}
-            <Button asChild size="sm" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-6">
+            <Button asChild size="sm" className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 px-6">
               <Link to="/auth">Try for free</Link>
             </Button>
             <UserMenu />

@@ -67,30 +67,29 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation fixed />
+      <Navigation fixed transparent />
       <div className="pt-16">
 
         {/* Section 1: Hero */}
-        <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+        <section className="relative min-h-[85vh] flex items-end overflow-hidden pb-20">
           <img
             src={heroImage}
-            alt="Couple overlooking Canadian mountains"
+            alt="Couple enjoying Canadian winter"
             className="absolute inset-0 w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-dark-brown/60" />
           <div className="relative z-10 container mx-auto px-4 max-w-6xl">
             <div className="max-w-2xl">
-              <h1 className="font-display text-5xl md:text-7xl text-white mb-6 leading-tight">
+              <h1 className="font-display text-5xl md:text-7xl text-dark-brown mb-6 leading-tight italic">
                 Acelere o seu plano Canadá
               </h1>
-              <p className="text-lg md:text-xl text-white/85 mb-10 leading-relaxed">
+              <p className="text-lg md:text-xl text-dark-brown/80 mb-10 leading-relaxed">
                 Find the right immigration pathway, and track your progress toward permanent residency.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button asChild size="lg" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-8 text-base">
+                <Button asChild size="lg" className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 px-8 text-base">
                   <Link to="/auth">Começar Agora</Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="rounded-full border-white text-white hover:bg-white/10 px-8 text-base">
+                <Button asChild size="lg" variant="outline" className="rounded-none border-primary text-primary hover:bg-primary/10 px-8 text-base">
                   <Link to="/crs-calculator">Calcular CRS</Link>
                 </Button>
               </div>
