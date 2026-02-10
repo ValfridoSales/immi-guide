@@ -4,43 +4,39 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 import { UserMenu } from '@/components/auth/UserMenu';
 import { useState } from 'react';
-
-export const Navigation = ({ fixed = false, transparent = false }: { fixed?: boolean; transparent?: boolean }) => {
+export const Navigation = ({
+  fixed = false,
+  transparent = false
+}: {
+  fixed?: boolean;
+  transparent?: boolean;
+}) => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
-  
-  const navLinks = [
-    { label: 'Tools', path: '/crs-calculator' },
-    { label: 'Pricing', path: '/pricing' },
-    { label: 'Support', path: '/quiz' },
-  ];
-
-  return (
-    <nav className={`${fixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${transparent ? 'bg-transparent' : 'bg-dark-brown'}`}>
+  const navLinks = [{
+    label: 'Tools',
+    path: '/crs-calculator'
+  }, {
+    label: 'Pricing',
+    path: '/pricing'
+  }, {
+    label: 'Support',
+    path: '/quiz'
+  }];
+  return <nav className={`${fixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${transparent ? 'bg-transparent' : 'bg-dark-brown'}`}>
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center">
-            <span className="text-xl font-display text-dark-brown-foreground">
+            <span className="text-xl font-display text-dark-brown-foreground text-[#231c1a]">
               Guide Canada
             </span>
           </Link>
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-sm font-medium transition-colors ${
-                  location.pathname === link.path
-                    ? 'text-primary'
-                    : 'text-dark-brown-foreground/80 hover:text-dark-brown-foreground'
-                }`}
-                onClick={() => setOpen(false)}
-              >
+            {navLinks.map(link => <Link key={link.path} to={link.path} className={`text-sm font-medium transition-colors ${location.pathname === link.path ? 'text-primary' : 'text-dark-brown-foreground/80 hover:text-dark-brown-foreground'}`} onClick={() => setOpen(false)}>
                 {link.label}
-              </Link>
-            ))}
+              </Link>)}
             <Button asChild size="sm" className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 px-6">
               <Link to="/auth">Try for free</Link>
             </Button>
@@ -58,16 +54,9 @@ export const Navigation = ({ fixed = false, transparent = false }: { fixed?: boo
               </SheetTrigger>
               <SheetContent side="right" className="w-64 bg-dark-brown border-dark-brown">
                 <div className="flex flex-col gap-6 mt-8">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.path}
-                      to={link.path}
-                      className="text-dark-brown-foreground/80 hover:text-dark-brown-foreground font-medium"
-                      onClick={() => setOpen(false)}
-                    >
+                  {navLinks.map(link => <Link key={link.path} to={link.path} className="text-dark-brown-foreground/80 hover:text-dark-brown-foreground font-medium" onClick={() => setOpen(false)}>
                       {link.label}
-                    </Link>
-                  ))}
+                    </Link>)}
                   <Button asChild className="rounded-none bg-primary text-primary-foreground">
                     <Link to="/auth" onClick={() => setOpen(false)}>Try for free</Link>
                   </Button>
@@ -77,6 +66,5 @@ export const Navigation = ({ fixed = false, transparent = false }: { fixed?: boo
           </div>
         </div>
       </div>
-    </nav>
-  );
+    </nav>;
 };
