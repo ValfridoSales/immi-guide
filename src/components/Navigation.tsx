@@ -16,7 +16,7 @@ export const Navigation = ({ fixed = false, transparent = false }: { fixed?: boo
   ];
 
   return (
-    <nav className={`${fixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${transparent ? 'bg-dark-brown' : 'bg-dark-brown'}`}>
+    <nav className={`${fixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${transparent ? 'bg-transparent' : 'bg-dark-brown'}`}>
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center">
@@ -41,7 +41,7 @@ export const Navigation = ({ fixed = false, transparent = false }: { fixed?: boo
                 {link.label}
               </Link>
             ))}
-            <Button asChild size="sm" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-6">
+            <Button asChild size="sm" className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 px-6">
               <Link to="/auth">Try for free</Link>
             </Button>
             <UserMenu />
@@ -68,7 +68,7 @@ export const Navigation = ({ fixed = false, transparent = false }: { fixed?: boo
                       {link.label}
                     </Link>
                   ))}
-                  <Button asChild className="rounded-full bg-primary text-primary-foreground">
+                  <Button asChild className="rounded-none bg-primary text-primary-foreground">
                     <Link to="/auth" onClick={() => setOpen(false)}>Try for free</Link>
                   </Button>
                 </div>
