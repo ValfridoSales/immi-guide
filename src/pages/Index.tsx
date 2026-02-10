@@ -79,7 +79,7 @@ const Index = () => {
           
           <div className="relative z-10 container mx-auto px-4 max-w-6xl">
             <div className="max-w-2xl">
-              <h1 className="font-display text-5xl md:text-7xl mb-6 leading-tight text-[#545454] font-semibold">
+              <h1 className="font-display text-[60px] mb-6 leading-tight text-[#54514D] font-semibold">
                 Acelere o seu plano Canadá
               </h1>
               <p className="text-lg md:text-xl mb-10 leading-relaxed text-[#545454]">
