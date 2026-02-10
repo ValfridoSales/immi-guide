@@ -27,24 +27,25 @@ export const Navigation = ({
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center">
-            <span className="text-xl font-display text-dark-brown-foreground text-[#231c1a]">
+            <span className="text-xl font-display text-dark-brown-foreground text-[#55524e] font-semibold pl-[60px]">
               Guide Canada
             </span>
           </Link>
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map(link => <Link key={link.path} to={link.path} className={`text-sm font-medium transition-colors ${location.pathname === link.path ? 'text-primary' : 'text-[#54514D] hover:text-[#54514D]/80'}`} onClick={() => setOpen(false)}>
+            {navLinks.map(link => <Link key={link.path} to={link.path} className={`text-sm font-medium transition-colors ${location.pathname === link.path ? 'text-primary' : 'text-dark-brown-foreground/80 hover:text-dark-brown-foreground'}`} onClick={() => setOpen(false)}>
                 {link.label}
               </Link>)}
             <Button asChild size="sm" className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 px-6">
               <Link to="/auth">Try for free</Link>
             </Button>
+            <UserMenu />
           </div>
 
           {/* Mobile Navigation */}
           <div className="flex md:hidden items-center gap-2">
-            
+            <UserMenu />
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-dark-brown-foreground">
