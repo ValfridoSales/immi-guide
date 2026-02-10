@@ -78,11 +78,9 @@ const Index = () => {
           <img src={heroImage} alt="Couple overlooking Canadian mountains" className="absolute inset-0 w-full h-full object-cover" />
           
           <div className="relative z-10 container mx-auto px-4 max-w-6xl">
-            <div className="max-w-2xl">
-              <h1 className="font-display text-[60px] mb-6 leading-tight text-[#54514D] font-semibold">
-                Acelere o seu plano Canadá
-              </h1>
-              <p className="text-lg md:text-xl mb-10 leading-relaxed text-[#545454]">
+            <div className="max-w-2xl pt-[320px] pl-[60px]">
+              <h1 className="font-display leading-tight text-[#54514D] font-semibold text-5xl mb-[8px]">Acelere o seu plano Canada</h1>
+              <p className="text-lg leading-relaxed text-[#545454] pr-0 mb-[4px] mr-[100px] md:text-2xl">
                 Find the right immigration pathway, and track your progress toward permanent residency.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
