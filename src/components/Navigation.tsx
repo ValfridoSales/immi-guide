@@ -16,7 +16,7 @@ export const Navigation = ({ fixed = false, transparent = false }: { fixed?: boo
   ];
 
   return (
-    <nav className={`${fixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${transparent ? 'bg-dark-brown' : 'bg-dark-brown'}`}>
+    <nav className={`${fixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${transparent ? 'bg-transparent' : 'bg-dark-brown'}`}>
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center">
