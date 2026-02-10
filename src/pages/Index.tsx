@@ -70,7 +70,7 @@ const Index = () => {
   const nextTestimonial = () => setCurrentTestimonial(prev => (prev + 1) % testimonials.length);
   const prevTestimonial = () => setCurrentTestimonial(prev => (prev - 1 + testimonials.length) % testimonials.length);
   return <div className="min-h-screen bg-background">
-      <Navigation fixed />
+      <Navigation fixed transparent />
       <div className="pt-16">
 
         {/* Section 1: Hero */}
