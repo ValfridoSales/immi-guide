@@ -40,12 +40,11 @@ export const Navigation = ({
             <Button asChild size="sm" className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 px-6">
               <Link to="/auth">Try for free</Link>
             </Button>
-            <UserMenu />
           </div>
 
           {/* Mobile Navigation */}
           <div className="flex md:hidden items-center gap-2">
-            <UserMenu />
+            
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-dark-brown-foreground">
