@@ -44,7 +44,7 @@ export const Navigation = ({
 
           {/* Mobile Navigation */}
           <div className="flex md:hidden items-center gap-2">
-            <UserMenu />
+            
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-dark-brown-foreground">
