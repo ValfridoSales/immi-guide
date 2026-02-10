@@ -79,10 +79,10 @@ const Index = () => {
           
           <div className="relative z-10 container mx-auto px-4 max-w-6xl">
             <div className="max-w-2xl">
-              <h1 className="font-display text-5xl md:text-7xl text-white mb-6 leading-tight">
+              <h1 className="font-display text-5xl md:text-7xl mb-6 leading-tight text-[#545454] font-semibold">
                 Acelere o seu plano Canadá
               </h1>
-              <p className="text-lg md:text-xl text-white/85 mb-10 leading-relaxed">
+              <p className="text-lg md:text-xl mb-10 leading-relaxed text-[#545454]">
                 Find the right immigration pathway, and track your progress toward permanent residency.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
