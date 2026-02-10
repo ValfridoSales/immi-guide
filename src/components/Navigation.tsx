@@ -40,7 +40,6 @@ export const Navigation = ({
             <Button asChild size="sm" className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90 px-6">
               <Link to="/auth">Try for free</Link>
             </Button>
-            <UserMenu />
           </div>
 
           {/* Mobile Navigation */}
