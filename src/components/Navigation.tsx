@@ -68,7 +68,7 @@ export const Navigation = ({ fixed = false, transparent = false }: { fixed?: boo
                       {link.label}
                     </Link>
                   ))}
-                  <Button asChild className="rounded-full bg-primary text-primary-foreground">
+                  <Button asChild className="rounded-none bg-primary text-primary-foreground">
                     <Link to="/auth" onClick={() => setOpen(false)}>Try for free</Link>
                   </Button>
                 </div>
