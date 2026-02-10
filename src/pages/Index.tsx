@@ -76,7 +76,7 @@ const Index = () => {
         {/* Section 1: Hero */}
         <section className="relative min-h-[85vh] flex items-center overflow-hidden">
           <img src={heroImage} alt="Couple overlooking Canadian mountains" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-dark-brown/60" />
+          
           <div className="relative z-10 container mx-auto px-4 max-w-6xl">
             <div className="max-w-2xl">
               <h1 className="font-display text-5xl md:text-7xl text-white mb-6 leading-tight">
