@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"DM Serif Display"', 'Georgia', 'serif'],
+        display: ['"Degular Display"', '"DM Serif Display"', 'Georgia', 'serif'],
         body: ['Helvetica', 'Arial', 'sans-serif'],
       },
       colors: {
