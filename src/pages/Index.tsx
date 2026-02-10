@@ -1,442 +1,336 @@
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Calculator, TrendingUp, ClipboardList, Award, ArrowRight, Shield, Bell, Target, Sparkles } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { ArrowRight, ArrowLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import airportImage from '@/assets/airport-journey.png';
-import { useInView } from '@/hooks/useInView';
+import { useState } from 'react';
+import heroImage from '@/assets/homepage-hero.jpg';
+import snowWomanImage from '@/assets/homepage-snow-woman.jpg';
+import passportImage from '@/assets/homepage-passport.png';
+
+const testimonials = [
+  {
+    quote: "A calculadora CRS e as simulações me ajudaram a entender exatamente o que preciso melhorar. Consegui aumentar minha pontuação de 420 para 480 em 6 meses seguindo as recomendações!",
+    name: "Maria Silva",
+    role: "Software Engineer, São Paulo",
+  },
+  {
+    quote: "Finalmente encontrei uma plataforma que mostra os draws do Express Entry de forma clara e atualizada. Os gráficos me ajudaram a entender as tendências.",
+    name: "João Santos",
+    role: "Product Manager, Lisboa",
+  },
+  {
+    quote: "O quiz de imigração me deu uma direção clara sobre qual programa seguir. Antes estava perdida com tantas opções, agora sei exatamente o que fazer.",
+    name: "Ana Costa",
+    role: "Designer, Rio de Janeiro",
+  },
+];
+
+const comparisonData = [
+  { task: "Eligibility Assessment", guideCanada: "3-minute quiz", onYourOwn: "Hours of research" },
+  { task: "CRS Score Calculation", guideCanada: "Instant & accurate", onYourOwn: "Manual & error-prone" },
+  { task: "Draw Monitoring", guideCanada: "Real-time alerts", onYourOwn: "Check manually daily" },
+  { task: "Score Improvement Plan", guideCanada: "AI-powered simulations", onYourOwn: "Trial and error" },
+  { task: "Program Matching", guideCanada: "Personalized results", onYourOwn: "Compare 80+ programs" },
+  { task: "Progress Tracking", guideCanada: "Visual dashboard", onYourOwn: "Spreadsheets" },
+  { task: "Expert Guidance", guideCanada: "Built-in recommendations", onYourOwn: "Expensive consultants" },
+];
+
+const faqItems = [
+  {
+    question: "What is the CRS score and why does it matter?",
+    answer: "The Comprehensive Ranking System (CRS) score determines your ranking in the Express Entry pool. Higher scores increase your chances of receiving an Invitation to Apply (ITA) for permanent residency in Canada.",
+  },
+  {
+    question: "How accurate is your CRS calculator?",
+    answer: "Our calculator follows the exact same methodology used by Immigration, Refugees and Citizenship Canada (IRCC). It's regularly updated to reflect any changes in the scoring system.",
+  },
+  {
+    question: "Is the immigration quiz really free?",
+    answer: "Yes! The immigration quiz is completely free with no hidden fees. You'll get personalized program recommendations and actionable next steps in just 3 minutes.",
+  },
+  {
+    question: "How often are Express Entry draws updated?",
+    answer: "We sync draw data directly from the official IRCC source. New draws are typically reflected on our platform within minutes of being published.",
+  },
+  {
+    question: "Can I improve my CRS score?",
+    answer: "Absolutely. Our simulation tools let you model different scenarios — like improving language scores, gaining more work experience, or getting a provincial nomination — so you can see exactly how each change impacts your score.",
+  },
+];
 
 const Index = () => {
-  const [headerRef, headerInView] = useInView();
-  const [gridRef, gridInView] = useInView();
-  const [ctaRef, ctaInView] = useInView();
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  const nextTestimonial = () => setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+  const prevTestimonial = () => setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation fixed />
       <div className="pt-16">
 
-      {/* Hero Section with Video Background */}
-      <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
-        {/* Video Background */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/videos/hero-background.mp4" type="video/mp4" />
-        </video>
-        
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/50" />
-        
-        {/* Content */}
-        <div className="relative z-10 text-left px-4 max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
-            Acelere o seu plano Canadá
-          </h1>
-          <p className="text-xl md:text-2xl text-white/90 mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            A plataforma mais completa para sua jornada de imigração
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-start animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <Button asChild size="lg" variant="canadian" className="text-lg">
-              <Link to="/auth">Começar Agora</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="text-lg bg-white/10 text-white border-white hover:bg-white/20">
-              <Link to="/crs-calculator">Calcular CRS</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 px-4 bg-gradient-subtle">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Ferramentas Essenciais</h2>
-            <p className="text-xl text-muted-foreground">
-              Tudo que você precisa para planejar sua imigração
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Quiz de Imigração */}
-            <Card className="hover-scale border-2 hover:border-primary transition-all">
-              <CardHeader>
-                <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
-                  <ClipboardList className="w-6 h-6 text-white" />
-                </div>
-                <CardTitle>Quiz de Imigração</CardTitle>
-                <CardDescription>
-                  Descubra qual programa de imigração é ideal para você em apenas 3 minutos
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
-                  <li>✓ Análise personalizada do seu perfil</li>
-                  <li>✓ Recomendações de programas</li>
-                  <li>✓ Próximos passos detalhados</li>
-                </ul>
-                <Button asChild variant="quiz" className="w-full">
-                  <a href="/quiz">Fazer Quiz Gratuito</a>
+        {/* Section 1: Hero */}
+        <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+          <img
+            src={heroImage}
+            alt="Couple overlooking Canadian mountains"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-dark-brown/60" />
+          <div className="relative z-10 container mx-auto px-4 max-w-6xl">
+            <div className="max-w-2xl">
+              <h1 className="font-display text-5xl md:text-7xl text-white mb-6 leading-tight">
+                Acelere o seu plano Canadá
+              </h1>
+              <p className="text-lg md:text-xl text-white/85 mb-10 leading-relaxed">
+                Find the right immigration pathway, and track your progress toward permanent residency.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button asChild size="lg" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-8 text-base">
+                  <Link to="/auth">Começar Agora</Link>
                 </Button>
-              </CardContent>
-            </Card>
-
-            {/* Express Entry Draws */}
-            <Card className="hover-scale border-2 hover:border-primary transition-all">
-              <CardHeader>
-                <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-                <CardTitle>Express Entry Draws</CardTitle>
-                <CardDescription>
-                  Acompanhe os sorteios do Express Entry em tempo real
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
-                  <li>✓ Dados atualizados dos draws</li>
-                  <li>✓ Gráficos e tendências</li>
-                  <li>✓ Análise histórica completa</li>
-                </ul>
-                <Button asChild variant="quiz" className="w-full">
-                  <Link to="/express-entry/draws">Ver Draws</Link>
+                <Button asChild size="lg" variant="outline" className="rounded-full border-white text-white hover:bg-white/10 px-8 text-base">
+                  <Link to="/crs-calculator">Calcular CRS</Link>
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+          </div>
+        </section>
 
-            {/* Calculadora CRS */}
-            <Card className="hover-scale border-2 hover:border-primary transition-all">
-              <CardHeader>
-                <div className="w-12 h-12 bg-gradient-canadian rounded-lg flex items-center justify-center mb-4">
-                  <Calculator className="w-6 h-6 text-white" />
-                </div>
-                <CardTitle>Calculadora CRS</CardTitle>
-                <CardDescription>
-                  Calcule sua pontuação CRS e descubra suas chances
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
-                  <li>✓ Cálculo preciso e oficial</li>
-                  <li>✓ Simulações de cenários</li>
-                  <li>✓ Histórico de pontuações</li>
-                </ul>
-                <Button asChild variant="quiz" className="w-full">
-                  <Link to="/crs-calculator">Calcular Agora</Link>
+        {/* Section 2: Services */}
+        <section className="py-24 px-4 bg-background">
+          <div className="container mx-auto max-w-6xl space-y-24">
+            {/* Block 1: Text left + Image right */}
+            <div className="flex flex-col lg:flex-row items-center gap-16">
+              <div className="lg:w-1/2 space-y-6">
+                <span className="text-sm font-medium text-primary uppercase tracking-widest">Services</span>
+                <h2 className="font-display text-4xl md:text-5xl text-foreground leading-tight">
+                  Discover your ideal program in just 3 minutes
+                </h2>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  Our AI-powered quiz analyzes your profile and matches you with the best Canadian immigration programs — personalized, fast, and free.
+                </p>
+                <Button asChild className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-8">
+                  <Link to="/quiz">
+                    Start Your Journey
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Link>
                 </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+              </div>
+              <div className="lg:w-1/2">
+                <img
+                  src={snowWomanImage}
+                  alt="Woman enjoying Canadian winter"
+                  className="w-full h-[500px] object-cover rounded-2xl shadow-elevated"
+                />
+              </div>
+            </div>
 
-      {/* Why Choose Us Section */}
-      <section className="relative overflow-hidden">
-        <div className="flex flex-col lg:flex-row min-h-[600px]">
-          {/* Left Half - Background Image */}
-          <div className="lg:w-1/2 h-64 lg:h-auto">
-            <img 
-              src={airportImage} 
-              alt="Journey to Canada" 
-              className="w-full h-full object-cover"
-            />
+            {/* Block 2: Image left + Text right */}
+            <div className="flex flex-col lg:flex-row-reverse items-center gap-16">
+              <div className="lg:w-1/2 space-y-6">
+                <span className="text-sm font-medium text-primary uppercase tracking-widest">Services</span>
+                <h2 className="font-display text-4xl md:text-5xl text-foreground leading-tight">
+                  Track your path to Canadian PR
+                </h2>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  Calculate your CRS score, monitor Express Entry draws in real-time, and simulate scenarios to maximize your chances of getting an ITA.
+                </p>
+                <Button asChild className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-8">
+                  <Link to="/crs-calculator">
+                    Start here
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="lg:w-1/2">
+                <img
+                  src={passportImage}
+                  alt="Canadian passport and documents"
+                  className="w-full h-[500px] object-cover rounded-2xl shadow-elevated"
+                />
+              </div>
+            </div>
           </div>
+        </section>
 
-          {/* Right Half - Content with White Background */}
-          <div className="lg:w-1/2 bg-white py-20 px-8 flex items-center">
-            <div className="max-w-2xl mx-auto text-center w-full">
-          <div 
-            ref={headerRef}
-            className={`mb-12 transition-all duration-1000 ${
-              headerInView 
-                ? 'opacity-100 translate-y-0' 
-                : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <Award className="w-16 h-16 mx-auto mb-6 text-primary" />
-            <h2 className="text-4xl font-bold mb-4">
-              Transforme o Sonho Canadense em um Plano Real
+        {/* Section 3: About / Comparison Table */}
+        <section className="py-24 px-4 bg-secondary">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16 space-y-4">
+              <span className="text-sm font-medium text-primary uppercase tracking-widest">About Guide Canada</span>
+              <h2 className="font-display text-4xl md:text-5xl text-foreground leading-tight max-w-3xl mx-auto">
+                We exist to simplify your Canada journey, every step of the way
+              </h2>
+            </div>
+
+            <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-soft">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[600px]">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left p-5 text-sm font-medium text-muted-foreground">Your Tasks</th>
+                      <th className="text-left p-5 text-sm font-medium text-primary">Through Guide Canada</th>
+                      <th className="text-left p-5 text-sm font-medium text-muted-foreground">On your own</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {comparisonData.map((row, i) => (
+                      <tr key={i} className="border-b border-border last:border-b-0">
+                        <td className="p-5 text-sm font-medium text-foreground">{row.task}</td>
+                        <td className="p-5 text-sm text-primary font-medium">{row.guideCanada}</td>
+                        <td className="p-5 text-sm text-muted-foreground">{row.onYourOwn}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 4: Testimonials */}
+        <section className="py-24 px-4 bg-background">
+          <div className="container mx-auto max-w-6xl">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-16">
+              <div className="space-y-2">
+                <span className="text-sm font-medium text-primary uppercase tracking-widest">Testimonial</span>
+                <span className="inline-block ml-4 px-4 py-1 bg-secondary text-foreground text-sm rounded-full">
+                  What they say about us
+                </span>
+              </div>
+              <div className="flex gap-3 mt-6 md:mt-0">
+                <button
+                  onClick={prevTestimonial}
+                  className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+                  aria-label="Previous testimonial"
+                >
+                  <ArrowLeft className="w-5 h-5 text-foreground" />
+                </button>
+                <button
+                  onClick={nextTestimonial}
+                  className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+                  aria-label="Next testimonial"
+                >
+                  <ArrowRight className="w-5 h-5 text-foreground" />
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-card rounded-2xl border border-border p-8 md:p-12 shadow-soft">
+              <div className="flex flex-col lg:flex-row gap-10 items-center">
+                <div className="w-32 h-32 lg:w-48 lg:h-48 rounded-2xl bg-secondary flex-shrink-0 flex items-center justify-center">
+                  <span className="text-5xl font-display text-primary">
+                    {testimonials[currentTestimonial].name.charAt(0)}
+                  </span>
+                </div>
+                <div className="flex-1 space-y-6">
+                  <span className="text-6xl font-display text-primary/20 leading-none">"</span>
+                  <p className="text-xl md:text-2xl text-foreground leading-relaxed -mt-8">
+                    {testimonials[currentTestimonial].quote}
+                  </p>
+                  <div>
+                    <p className="text-primary font-semibold text-lg">{testimonials[currentTestimonial].name}</p>
+                    <p className="text-muted-foreground text-sm">{testimonials[currentTestimonial].role}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Dot indicators */}
+            <div className="flex justify-center gap-2 mt-8">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentTestimonial(i)}
+                  className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                    i === currentTestimonial ? 'bg-primary' : 'bg-border'
+                  }`}
+                  aria-label={`Go to testimonial ${i + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Section 5: FAQ */}
+        <section className="py-24 px-4 bg-secondary">
+          <div className="container mx-auto max-w-6xl">
+            <div className="flex flex-col lg:flex-row gap-16">
+              <div className="lg:w-2/5 space-y-4">
+                <span className="text-sm font-medium text-primary uppercase tracking-widest">Frequently Asked Questions</span>
+                <h2 className="font-display text-4xl md:text-5xl text-foreground leading-tight">
+                  Questions?<br />Answers.
+                </h2>
+              </div>
+              <div className="lg:w-3/5">
+                <Accordion type="single" collapsible className="space-y-3">
+                  {faqItems.map((item, i) => (
+                    <AccordionItem key={i} value={`faq-${i}`} className="bg-card rounded-xl border border-border px-6">
+                      <AccordionTrigger className="text-base font-medium text-foreground hover:no-underline">
+                        {item.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-muted-foreground leading-relaxed">
+                        {item.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 6: CTA Banner */}
+        <section className="py-24 px-4 bg-dark-brown">
+          <div className="container mx-auto max-w-4xl text-center space-y-8">
+            <h2 className="font-display italic text-4xl md:text-5xl text-dark-brown-foreground leading-tight">
+              Ready to Accelerate Your Canada Dream?
             </h2>
-            <p className="text-xl text-muted-foreground">
-              A única plataforma que combina inteligência, dados e estratégia para acelerar sua imigração.
-            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size="lg" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-8 text-base">
+                <Link to="/auth">Começar Agora</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="rounded-full border-dark-brown-foreground text-dark-brown-foreground hover:bg-dark-brown-foreground/10 px-8 text-base">
+                <Link to="/crs-calculator">Calcular CRS</Link>
+              </Button>
+            </div>
           </div>
+        </section>
 
-          <div 
-            ref={gridRef}
-            className={`grid md:grid-cols-2 gap-6 mb-12 transition-all duration-1000 ${
-              gridInView 
-                ? 'opacity-100 translate-y-0' 
-                : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <div className="p-8 bg-card rounded-lg border-2 border-primary/20 hover:border-primary shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
-              <div className="w-12 h-12 rounded-lg bg-gradient-canadian flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-white" />
+        {/* Section 7: Footer */}
+        <footer className="py-16 px-4 bg-background border-t border-border">
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+              <div className="space-y-4">
+                <h3 className="font-display text-2xl text-foreground">Contact us</h3>
+                <p className="text-muted-foreground text-sm">
+                  We'd love to hear from you. Reach out for any questions about your immigration journey.
+                </p>
               </div>
-              <h3 className="font-semibold text-xl mb-3 text-primary">Precisão Oficial</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Resultados baseados em dados autênticos do Governo do Canadá.
-              </p>
-            </div>
-            <div className="p-8 bg-card rounded-lg border-2 border-primary/20 hover:border-primary shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
-              <div className="w-12 h-12 rounded-lg bg-gradient-canadian flex items-center justify-center mb-4">
-                <Bell className="w-6 h-6 text-white" />
+              <div className="space-y-3">
+                <h4 className="font-semibold text-foreground text-sm uppercase tracking-wider">Enquiries</h4>
+                <p className="text-muted-foreground text-sm">General: hello@guiacanada.com</p>
+                <p className="text-muted-foreground text-sm">Recruitment: careers@guiacanada.com</p>
+                <p className="text-muted-foreground text-sm">New Business: partners@guiacanada.com</p>
               </div>
-              <h3 className="font-semibold text-xl mb-3 text-primary">Monitoramento Constante</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Sistema que acompanha automaticamente os draws e mudanças do IRCC.
-              </p>
-            </div>
-            <div className="p-8 bg-card rounded-lg border-2 border-primary/20 hover:border-primary shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
-              <div className="w-12 h-12 rounded-lg bg-gradient-canadian flex items-center justify-center mb-4">
-                <Target className="w-6 h-6 text-white" />
+              <div className="space-y-3">
+                <h4 className="font-semibold text-foreground text-sm uppercase tracking-wider">Links</h4>
+                <div className="flex flex-col gap-2">
+                  <a href="#" className="text-muted-foreground text-sm hover:text-foreground transition-colors">LinkedIn</a>
+                  <a href="#" className="text-muted-foreground text-sm hover:text-foreground transition-colors">Instagram</a>
+                  <a href="#" className="text-muted-foreground text-sm hover:text-foreground transition-colors">Accessibility</a>
+                  <a href="#" className="text-muted-foreground text-sm hover:text-foreground transition-colors">Terms & Privacy</a>
+                </div>
               </div>
-              <h3 className="font-semibold text-xl mb-3 text-primary">Simulações Personalizadas</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Ajuste seu perfil, teste cenários e veja como alcançar a pontuação ideal.
-              </p>
             </div>
-            <div className="p-8 bg-card rounded-lg border-2 border-primary/20 hover:border-primary shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
-              <div className="w-12 h-12 rounded-lg bg-gradient-canadian flex items-center justify-center mb-4">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="font-semibold text-xl mb-3 text-primary">Design Feito para Você</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Intuitivo, rápido e acessível — sem burocracia, sem complicações.
-              </p>
+            <div className="border-t border-border pt-8 text-center">
+              <p className="text-muted-foreground text-sm">© 2026 Guia Canada Inc. All rights reserved.</p>
             </div>
           </div>
+        </footer>
 
-          <div
-            ref={ctaRef}
-            className={`transition-all duration-1000 ${
-              ctaInView 
-                ? 'opacity-100 translate-y-0' 
-                : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <Button asChild size="lg" variant="canadian" className="text-lg group">
-              <Link to="/auth">
-                Comece sua jornada hoje mesmo. É gratuito.
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
-          </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 px-4 bg-gradient-subtle">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">O Que Nossos Usuários Dizem</h2>
-            <p className="text-xl text-muted-foreground">
-              Histórias reais de pessoas que usaram nossas ferramentas
-            </p>
-          </div>
-
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full"
-          >
-            <CarouselContent>
-              {/* Testimonial 1 */}
-              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
-                <Card className="hover-scale transition-all h-full">
-                  <CardHeader>
-                    <div className="flex gap-1 mb-3">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className="text-yellow-500 text-xl">★</span>
-                      ))}
-                    </div>
-                    <CardTitle className="text-lg">Ferramenta Essencial</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-6">
-                      A calculadora CRS e as simulações me ajudaram a entender exatamente o que preciso melhorar. 
-                      Consegui aumentar minha pontuação de 420 para 480 em 6 meses seguindo as recomendações!
-                    </p>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="font-medium">Maria Silva</span>
-                      <span className="text-muted-foreground">Mar 15, 2025</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-
-              {/* Testimonial 2 */}
-              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
-                <Card className="hover-scale transition-all h-full">
-                  <CardHeader>
-                    <div className="flex gap-1 mb-3">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className="text-yellow-500 text-xl">★</span>
-                      ))}
-                    </div>
-                    <CardTitle className="text-lg">Dados Confiáveis</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-6">
-                      Finalmente encontrei uma plataforma que mostra os draws do Express Entry de forma clara e atualizada. 
-                      Os gráficos me ajudaram a entender as tendências e planejar melhor minha aplicação.
-                    </p>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="font-medium">João Santos</span>
-                      <span className="text-muted-foreground">Fev 28, 2025</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-
-              {/* Testimonial 3 */}
-              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
-                <Card className="hover-scale transition-all h-full">
-                  <CardHeader>
-                    <div className="flex gap-1 mb-3">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className="text-yellow-500 text-xl">★</span>
-                      ))}
-                    </div>
-                    <CardTitle className="text-lg">Muito Útil</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-6">
-                      O quiz de imigração me deu uma direção clara sobre qual programa seguir. 
-                      Antes estava perdida com tantas opções, agora sei exatamente o que fazer. Recomendo muito!
-                    </p>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="font-medium">Ana Costa</span>
-                      <span className="text-muted-foreground">Jan 10, 2025</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-
-              {/* Testimonial 4 */}
-              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
-                <Card className="hover-scale transition-all h-full">
-                  <CardHeader>
-                    <div className="flex gap-1 mb-3">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className="text-yellow-500 text-xl">★</span>
-                      ))}
-                    </div>
-                    <CardTitle className="text-lg">Mudou Minha Estratégia</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-6">
-                      Com as simulações, percebi que melhorar meu francês seria mais rápido do que esperar por mais experiência. 
-                      Fui de 440 para 510 pontos em apenas 4 meses! Incrível!
-                    </p>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="font-medium">Pedro Oliveira</span>
-                      <span className="text-muted-foreground">Abr 02, 2025</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-
-              {/* Testimonial 5 */}
-              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
-                <Card className="hover-scale transition-all h-full">
-                  <CardHeader>
-                    <div className="flex gap-1 mb-3">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className="text-yellow-500 text-xl">★</span>
-                      ))}
-                    </div>
-                    <CardTitle className="text-lg">Interface Perfeita</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-6">
-                      Muito intuitivo e fácil de usar. Testei várias calculadoras CRS, mas essa é disparada a melhor. 
-                      O histórico de pontuações me ajuda a acompanhar meu progresso ao longo do tempo.
-                    </p>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="font-medium">Carla Mendes</span>
-                      <span className="text-muted-foreground">Mar 20, 2025</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-
-              {/* Testimonial 6 */}
-              <CarouselItem className="md:basis-1/2 lg:basis-1/3">
-                <Card className="hover-scale transition-all h-full">
-                  <CardHeader>
-                    <div className="flex gap-1 mb-3">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className="text-yellow-500 text-xl">★</span>
-                      ))}
-                    </div>
-                    <CardTitle className="text-lg">Informação Sempre Atualizada</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-6">
-                      Receber alertas dos draws do Express Entry em tempo real faz toda a diferença. 
-                      Consegui aplicar logo após um draw com score próximo ao meu. Valeu muito a pena!
-                    </p>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="font-medium">Rafael Lima</span>
-                      <span className="text-muted-foreground">Fev 14, 2025</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
-          </Carousel>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-canadian text-white">
-        <div className="container mx-auto max-w-3xl text-center">
-          <h2 className="text-4xl font-bold mb-6">
-            Pronto para começar sua jornada?
-          </h2>
-          <p className="text-xl mb-8 text-white/90">
-            Junte-se a milhares de pessoas que já estão planejando sua imigração para o Canadá
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" variant="outline" className="text-lg bg-white text-primary hover:bg-white/90">
-              <Link to="/crs-calculator">Calcular Minha Pontuação</Link>
-            </Button>
-            <Button asChild size="lg" variant="secondary" className="text-lg">
-              <a href="/quiz">Fazer Quiz Gratuito</a>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-background border-t border-border">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center space-y-4">
-            <p className="text-sm text-muted-foreground">
-              <strong>Aviso importante:</strong> Esta ferramenta é apenas informativa. Para decisões oficiais sobre imigração, 
-              consulte sempre o site oficial{' '}
-              <a href="https://canada.ca" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                canada.ca
-              </a>{' '}
-              ou um consultor de imigração regulamentado (RCIC).
-            </p>
-            <p className="text-xs text-muted-foreground">© 2025 Canada Immigration Platform. Baseado em dados oficiais do governo canadense.</p>
-          </div>
-        </div>
-      </footer>
       </div>
     </div>
   );
