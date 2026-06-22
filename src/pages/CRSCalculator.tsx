@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { CRSForm } from '@/components/crs/CRSForm';
 import { CRSResults } from '@/components/crs/CRSResults';
@@ -7,14 +7,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info } from 'lucide-react';
 import type { CRSResult, InputCRS } from '@/utils/crs-engine';
 import { useSimulations } from '@/hooks/useSimulations';
-import { useToast } from '@/hooks/use-toast';
 
 const CRSCalculator = () => {
   const [result, setResult] = useState<CRSResult | null>(null);
   const [currentInput, setCurrentInput] = useState<InputCRS | null>(null);
-  const resultsRef = useRef<HTMLDivElement>(null);
   const { setCurrentBaseInput } = useSimulations();
-  const { toast } = useToast();
 
   // Atualizar base input no hook de simulações quando houver cálculo
   useEffect(() => {
@@ -26,21 +23,6 @@ const CRSCalculator = () => {
   const handleCalculate = (calcResult: CRSResult, input: InputCRS) => {
     setResult(calcResult);
     setCurrentInput(input);
-    
-    // Mostrar toast de sucesso
-    toast({
-      title: "✅ Cálculo concluído!",
-      description: `Sua pontuação CRS é ${calcResult.total}`,
-      duration: 4000,
-    });
-    
-    // Scroll suave para os resultados
-    setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start'
-      });
-    }, 100);
   };
 
   return (
@@ -80,9 +62,7 @@ const CRSCalculator = () => {
           </Card>
 
           {result && currentInput && (
-            <div ref={resultsRef} className="animate-fade-in">
-              <CRSResults result={result} inputData={currentInput} />
-            </div>
+            <CRSResults result={result} inputData={currentInput} />
           )}
         </div>
       </main>

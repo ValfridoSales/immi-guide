@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,7 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Checkbox } from '@/components/ui/checkbox';
 import { computeCrs, type InputCRS, type EducationKey, type CRSResult } from '@/utils/crs-engine';
 import { mapIELTSGeneralToCLBs, mapCELPIPToCLBs, mapTEFCanadaToCLBs, mapTCFCanadaToCLBs } from '@/utils/language-maps';
-import { Calculator, Loader2 } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 
 const formSchema = z.object({
   maritalStatus: z.string().min(1, 'Selecione seu estado civil'),
@@ -50,8 +49,6 @@ interface CRSFormProps {
 }
 
 export function CRSForm({ onCalculate }: CRSFormProps) {
-  const [isCalculating, setIsCalculating] = useState(false);
-  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -105,12 +102,8 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
     return [];
   };
 
-  const onSubmit = async (values: FormValues) => {
-    setIsCalculating(true);
-    
+  const onSubmit = (values: FormValues) => {
     try {
-      // Pequeno delay para dar feedback visual
-      await new Promise(resolve => setTimeout(resolve, 500));
       // Map education
       const eduMap: Record<string, EducationKey> = {
         A: 'less_than_secondary', B: 'secondary', C: 'one_year', D: 'two_year',
@@ -245,8 +238,6 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
     } catch (error: any) {
       console.error('Erro ao calcular CRS:', error);
       alert(`Erro: ${error.message}`);
-    } finally {
-      setIsCalculating(false);
     }
   };
 
@@ -350,30 +341,11 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
                         <SelectItem value="B">18</SelectItem>
                         <SelectItem value="C">19</SelectItem>
                         <SelectItem value="D">20</SelectItem>
-                        <SelectItem value="E">21</SelectItem>
-                        <SelectItem value="F">22</SelectItem>
-                        <SelectItem value="G">23</SelectItem>
-                        <SelectItem value="H">24</SelectItem>
-                        <SelectItem value="I">25</SelectItem>
-                        <SelectItem value="J">26</SelectItem>
-                        <SelectItem value="K">27</SelectItem>
-                        <SelectItem value="L">28</SelectItem>
-                        <SelectItem value="M">29</SelectItem>
                         <SelectItem value="N">30</SelectItem>
                         <SelectItem value="O">31</SelectItem>
                         <SelectItem value="P">32</SelectItem>
-                        <SelectItem value="Q">33</SelectItem>
-                        <SelectItem value="R">34</SelectItem>
                         <SelectItem value="S">35</SelectItem>
-                        <SelectItem value="T">36</SelectItem>
-                        <SelectItem value="U">37</SelectItem>
-                        <SelectItem value="V">38</SelectItem>
-                        <SelectItem value="W">39</SelectItem>
                         <SelectItem value="X">40</SelectItem>
-                        <SelectItem value="Y">41</SelectItem>
-                        <SelectItem value="Z">42</SelectItem>
-                        <SelectItem value="AA">43</SelectItem>
-                        <SelectItem value="AB">44</SelectItem>
                         <SelectItem value="AC">45 ou mais</SelectItem>
                       </SelectContent>
                     </Select>
@@ -500,93 +472,91 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
                 )}
               />
 
-              {firstLanguageTest && firstLanguageTest !== 'E' && (
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="firstLangReading"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Reading *</FormLabel>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="firstLangReading"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Reading *</FormLabel>
+                      <FormControl>
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pontuação" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="z-50 max-h-60 overflow-y-auto bg-popover">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pontuação" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {getScoreOptions(firstLanguageTest, 'reading')}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name="firstLangWriting"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Writing *</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="firstLangWriting"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Writing *</FormLabel>
+                      <FormControl>
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pontuação" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="z-50 max-h-60 overflow-y-auto bg-popover">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pontuação" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {getScoreOptions(firstLanguageTest, 'writing')}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name="firstLangListening"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Listening *</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="firstLangListening"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Listening *</FormLabel>
+                      <FormControl>
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pontuação" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="z-50 max-h-60 overflow-y-auto bg-popover">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pontuação" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {getScoreOptions(firstLanguageTest, 'listening')}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  <FormField
-                    control={form.control}
-                    name="firstLangSpeaking"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Speaking *</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="firstLangSpeaking"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Speaking *</FormLabel>
+                      <FormControl>
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pontuação" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="z-50 max-h-60 overflow-y-auto bg-popover">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pontuação" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {getScoreOptions(firstLanguageTest, 'speaking')}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              )}
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
@@ -643,93 +613,91 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
                     )}
                   />
 
-                  {secondLanguageTest && (
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="secondLangReading"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Reading</FormLabel>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="secondLangReading"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Reading</FormLabel>
+                          <FormControl>
                             <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Pontuação" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="z-50 max-h-60 overflow-y-auto bg-popover">
-                                {getScoreOptions(secondLanguageTest, 'reading')}
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pontuação" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {secondLanguageTest && getScoreOptions(secondLanguageTest, 'reading')}
                               </SelectContent>
                             </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                      <FormField
-                        control={form.control}
-                        name="secondLangWriting"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Writing</FormLabel>
+                    <FormField
+                      control={form.control}
+                      name="secondLangWriting"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Writing</FormLabel>
+                          <FormControl>
                             <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Pontuação" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="z-50 max-h-60 overflow-y-auto bg-popover">
-                                {getScoreOptions(secondLanguageTest, 'writing')}
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pontuação" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {secondLanguageTest && getScoreOptions(secondLanguageTest, 'writing')}
                               </SelectContent>
                             </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                      <FormField
-                        control={form.control}
-                        name="secondLangListening"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Listening</FormLabel>
+                    <FormField
+                      control={form.control}
+                      name="secondLangListening"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Listening</FormLabel>
+                          <FormControl>
                             <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Pontuação" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="z-50 max-h-60 overflow-y-auto bg-popover">
-                                {getScoreOptions(secondLanguageTest, 'listening')}
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pontuação" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {secondLanguageTest && getScoreOptions(secondLanguageTest, 'listening')}
                               </SelectContent>
                             </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                      <FormField
-                        control={form.control}
-                        name="secondLangSpeaking"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Speaking</FormLabel>
+                    <FormField
+                      control={form.control}
+                      name="secondLangSpeaking"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Speaking</FormLabel>
+                          <FormControl>
                             <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Pontuação" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="z-50 max-h-60 overflow-y-auto bg-popover">
-                                {getScoreOptions(secondLanguageTest, 'speaking')}
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pontuação" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {secondLanguageTest && getScoreOptions(secondLanguageTest, 'speaking')}
                               </SelectContent>
                             </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  )}
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </>
               )}
             </AccordionContent>
@@ -867,18 +835,9 @@ export function CRSForm({ onCalculate }: CRSFormProps) {
           </AccordionItem>
         </Accordion>
 
-        <Button type="submit" className="w-full" size="lg" disabled={isCalculating}>
-          {isCalculating ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Calculando...
-            </>
-          ) : (
-            <>
-              <Calculator className="mr-2 h-5 w-5" />
-              Calcular Pontuação CRS
-            </>
-          )}
+        <Button type="submit" className="w-full" size="lg">
+          <Calculator className="mr-2 h-5 w-5" />
+          Calcular Pontuação CRS
         </Button>
       </form>
     </Form>
